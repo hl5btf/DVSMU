@@ -8,9 +8,9 @@ Type=simple
 Restart=always
 RestartSec=3
 StandardOutput=null
-WorkingDirectory=/opt/user00
+WorkingDirectory=/opt/userUSER_NO
 ExecStartPre = /bin/sh -c 'echo "Starting md380-emu: [`date +%%T.%%3N`]" >> /var/log/netcheck'
-ExecStart=/usr/bin/qemu-arm-static /opt/user00/md380-emu -S 2471
+ExecStart=/usr/bin/qemu-arm-static /opt/userUSER_NO/md380-emu -S 2471
 ExecReload=/bin/kill -HUP $MAINPID
 KillMode=process
 

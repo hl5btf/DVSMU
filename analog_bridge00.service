@@ -12,10 +12,10 @@ Restart=on-failure
 RestartSec=3
 RestartPreventExitStatus=254
 StandardOutput=null
-WorkingDirectory=/opt/user00
-Environment=AnalogBridgeLogDir=/var/log/dvswitch
+WorkingDirectory=/opt/userUSER_NO
+Environment=AnalogBridgeLogDir=/var/log/dvswitch/userUSER_NO
 ExecStartPre = /bin/sh -c 'echo "Starting Analog_Bridge: [`date +%%T.%%3N`]" >> /var/log/netcheck'
-ExecStart=/opt/user00/Analog_Bridge /opt/user00/Analog_Bridge.ini
+ExecStart=/opt/userUSER_NO/Analog_Bridge /opt/userUSER_NO/Analog_Bridge.ini
 ExecStartPost= -/usr/local/sbin/update-config.sh
 ExecReload=/bin/kill -2 $MAINPID
 KillMode=process
