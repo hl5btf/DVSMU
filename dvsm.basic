@@ -18,5 +18,5 @@
 dbupdate = /opt/userUSER_NO/dvswitch.sh collectProcessPushDataFiles
 
 ; Example TG / Reflector Macro
-9876 =  /opt/Analog_Bridge/parrot.sh
+9876 =  /opt/userUSER_NO/parrot.sh
 
