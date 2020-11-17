@@ -869,7 +869,7 @@ done
 
 
 sel=$(whiptail --title " DVSwitch Multi User " --menu "\
-               v.1.3 by HL5KY
+               v.1.3test by HL5KY
 \n
 " 36 50 27 \
 "S" "시스템 모니터링" \
