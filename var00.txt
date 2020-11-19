@@ -81,10 +81,10 @@ usrpGain_default=1.10
 # MMDVM_Bridge Info
 rx_freq=000000000
 tx_freq=000000000
-pwr=
+pwr=0
 lat=36.0000
 lon=128.0000
-hgt=
+hgt=0
 lctn="Seoul, Korea"
 desc=DVSwitch
 url=
