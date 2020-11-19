@@ -86,7 +86,7 @@ lat=36.0000
 lon=128.0000
 hgt=0
 lctn="Seoul, Korea"
-desc=DVSwitch
+desc=dvsMU
 url=
 
 # ETC
