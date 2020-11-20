@@ -9,10 +9,10 @@ sudo wget -O /var/lib/dvswitch/dvs/var00.txt https://raw.githubusercontent.com/h
 user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
 
 for user in $user; do
+source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
     TERM=ansi whiptail --title "$T029" --infobox "user${user} 처리중" 8 60
 
-    source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
     update_var pwr 0
     update_var hgt 0
     update_var desc dvsMU
