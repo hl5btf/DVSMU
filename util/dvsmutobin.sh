@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# dvsmu를 만들고 나서, Binary로 바꾸고 Backup을 만드는 등의 작업을 자동화 함.
+
 DVS=/usr/local/dvs/
 HOME=/home/dvswitch/
 SHC=/home/dvswitch/shc-3.8.9/
