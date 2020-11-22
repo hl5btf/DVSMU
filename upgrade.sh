@@ -4,6 +4,7 @@ sudo wget -O /usr/local/dvs/dvsmu https://raw.githubusercontent.com/hl5btf/DVSMU
 sudo chmod +x /usr/local/dvs/dvsmu
 
 #----v.1.4.5에서 var.txt의 Description이 바뀌기 때문에 처리하는 내용-------------------------------------------------------
+function var_changed() {
 sudo wget -O /var/lib/dvswitch/dvs/var00.txt https://raw.githubusercontent.com/hl5btf/DVSMU/main/var00.txt > /dev/null 2>&1
 
 TERM=ansi whiptail --title "$T029" --infobox "사용자설정이 있어서 시간이 걸립니다." 8 60
@@ -33,5 +34,6 @@ file=/opt/user${user}/MMDVM_Bridge.ini
 #   sudo systemctl start md380-emu${user} > /dev/null 2>&1
 fi
 done
+}
 #----v.1.4.5에서 var.txt의 Description이 바뀌기 때문에 처리하는 내용. 끝부분--------------------------------------------------
 
