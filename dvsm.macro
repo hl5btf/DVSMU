@@ -60,9 +60,9 @@ extra_5   = ${MACRO} extra_5.txt
 
 
 # Hotspots
-11 = ${DVSM} hotspot_1
-12 = ${DVSM} hotspot_2
-13 = ${DVSM} hotspot_3
+# 11 = ${DVSM} hotspot_1
+# 12 = ${DVSM} hotspot_2
+# 13 = ${DVSM} hotspot_3
 
 
 # Restart DVSwitch services and Reboot the system
