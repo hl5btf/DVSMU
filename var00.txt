@@ -118,3 +118,4 @@ new_val=()
 
 # ETC
 cpu_temp=
+talkerAlias=
