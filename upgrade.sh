@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#sudo wget -O /usr/local/dvs/dvsmu https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu
-#sudo chmod +x /usr/local/dvs/dvsmu
+sudo wget -O /usr/local/dvs/dvsmu https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu
+sudo chmod +x /usr/local/dvs/dvsmu
 
 #----변수가 추가될때 처리하는 루틴 시작부분-------------------------------------------------------
 function var_added() {
@@ -10,9 +10,9 @@ function var_added() {
 TERM=ansi whiptail --title "$T029" --infobox "사용자설정이 있어서 시간이 걸립니다." 8 60
 
 # When updating, the stanzas will be appended to varxx.txt, if not exist.
-new_var=""
+new_var="talkerAlias"
 # default value will be applied once, at the first time
-new_val=()
+new_val=("")
 
 user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
 for user in $user; do
