@@ -38,7 +38,10 @@ n=0
 speep 1
 
 file=/opt/user${user}/DVSwitch.ini
-    $update_ini $file DMR talkerAlias "${talkerAlias}"
+        if [ "${talkerAlias}" = "" ];
+        then    sudo sed -i -e "/talkerAlias/ c talkerAlias = " $file
+        else    $update_ini $file DMR talkerAlias "${talkerAlias}"
+        fi
 #    $update_ini $file Info Description "${desc}"
 
     sudo systemctl start mmdvm_bridge${user} > /dev/null 2>&1
