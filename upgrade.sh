@@ -37,8 +37,8 @@ n=0
 
 speep 1
 
-#file=/opt/user${user}/MMDVM_Bridge.ini
-#    $update_ini $file Info Power ${pwr}
+file=/opt/user${user}/DVSwitch.ini
+    $update_ini $file DMR talkerAlias "${talkerAlias}"
 #    $update_ini $file Info Description "${desc}"
 
     sudo systemctl start mmdvm_bridge${user} > /dev/null 2>&1
