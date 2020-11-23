@@ -10,9 +10,9 @@ function var_added() {
 TERM=ansi whiptail --title "$T029" --infobox "사용자설정이 있어서 시간이 걸립니다." 8 60
 
 # When updating, the stanzas will be appended to var.txt, if not exist.
-new_var="test ttt"
+new_var=""
 # default value will be applied once, at the first time
-new_val=("" ttt)
+new_val=()
 
 user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
 for user in $user; do
