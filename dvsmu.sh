@@ -3,9 +3,9 @@
 #source /var/lib/dvswitch/dvs/var.txt
 
 #===================================
-SCRIPT_VERSION="1.4.8"
+SCRIPT_VERSION="1.4.9"
 SCRIPT_AUTHOR="HL5KY"
-SCRIPT_DATE="2020-11-23"
+SCRIPT_DATE="2020-11-25"
 #===================================
 
 if [ "$1" != "" ]; then
@@ -684,6 +684,8 @@ function dvsmu_upgrade() {
 clear
 source /var/lib/dvswitch/dvs/var.txt
 
+TERM=ansi whiptail --title "확인중" --infobox "$T006" 8 60
+
 random_char=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 12 | sed 1q)
 sudo wget -O ${DVS}${random_char} https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu_ver > /dev/null 2>&1
 
@@ -951,7 +953,7 @@ if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
 
 
 declare ext=${rpt_id:7:2}
-declare TA=${talkerAlias}
+declare TA="${talkerAlias:0:15}"
 if [ "$TA" = "" ]; then TA=공백; fi
 
 file=/opt/user$USER_NO/dvsm.macro
@@ -1331,7 +1333,7 @@ else
 clear
 whiptail --msgbox "\
 
-$sp10 상태를 변경하지 않았습니다.
+$sp09 상태를 변경하지 않았습니다.
 " 9 50 1
 
 fi
@@ -1411,8 +1413,8 @@ source /var/lib/dvswitch/dvs/var.txt
 user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
 
 for user in $user; do
+source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
-	source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 	declare call_sign${user}=$call_sign
 	if [ ${#call_sign} = 4 ]; then declare call_sign${user}="$call_sign$sp02"; fi
 	if [ ${#call_sign} = 5 ]; then declare call_sign${user}="$call_sign$sp01"; fi
@@ -1420,10 +1422,52 @@ if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
 	declare rpt_id${user}=$rpt_id
 	declare ext${user}=${rpt_id:7:2}
 	declare usrp_port${user}=$usrp_port
-#	declare talkerAlias${user}="$talkerAlias"
+	declare talkerAlias${user}="${talkerAlias:0:13}"
+	if [ "$talkerAlias" != "" ] && [[ "$talkerAlias" != *"$call_sign"* ]]; then no_main_call_in_TA=yes; fi
 fi
 done
 
+if [ "$no_main_call_in_TA" = yes ];
+then
+
+sel=$(whiptail --title " DVSwitch Multi User " --menu "\
+                  dvsMU v.$SCRIPT_VERSION HL5KY
+\n
+" 37 60 28 \
+"S" "시스템 모니터링" \
+"O" "시스템 최적화" \
+"M" "MAIN   $call_sign_M $dmr_id_M $ext_M $usrp_port_M talkerAlias" \
+"=" "============================================" \
+"1" "User01 $call_sign01 $dmr_id01 $ext01 $usrp_port01 $talkerAlias01" \
+"2" "User02 $call_sign02 $dmr_id02 $ext02 $usrp_port02 $talkerAlias02" \
+"3" "User03 $call_sign03 $dmr_id03 $ext03 $usrp_port03 $talkerAlias03" \
+"4" "User04 $call_sign04 $dmr_id04 $ext04 $usrp_port04 $talkerAlias04" \
+"5" "User05 $call_sign05 $dmr_id05 $ext05 $usrp_port05 $talkerAlias05" \
+"6" "User06 $call_sign06 $dmr_id06 $ext06 $usrp_port06 $talkerAlias06" \
+"7" "User07 $call_sign07 $dmr_id07 $ext07 $usrp_port07 $talkerAlias07" \
+"8" "User08 $call_sign08 $dmr_id08 $ext08 $usrp_port08 $talkerAlias08" \
+"9" "User09 $call_sign09 $dmr_id09 $ext09 $usrp_port09 $talkerAlias09" \
+"10" "User10 $call_sign10 $dmr_id10 $ext10 $usrp_port10 $talkerAlias10" \
+"11" "User11 $call_sign11 $dmr_id11 $ext11 $usrp_port11 $talkerAlias11" \
+"12" "User12 $call_sign12 $dmr_id12 $ext12 $usrp_port12 $talkerAlias12" \
+"13" "User13 $call_sign13 $dmr_id13 $ext13 $usrp_port13 $talkerAlias13" \
+"14" "User14 $call_sign14 $dmr_id14 $ext14 $usrp_port14 $talkerAlias14" \
+"15" "User15 $call_sign15 $dmr_id15 $ext15 $usrp_port15 $talkerAlias15" \
+"16" "User16 $call_sign16 $dmr_id16 $ext16 $usrp_port16 $talkerAlias16" \
+"17" "User17 $call_sign17 $dmr_id17 $ext17 $usrp_port17 $talkerAlias17" \
+"18" "User18 $call_sign18 $dmr_id18 $ext18 $usrp_port18 $talkerAlias18" \
+"19" "User19 $call_sign19 $dmr_id19 $ext19 $usrp_port19 $talkerAlias19" \
+"20" "User20 $call_sign20 $dmr_id20 $ext20 $usrp_port20 $talkerAlias20" \
+"=" "============================================" \
+"D" "추가사용자 DVSwitch 업그레이드" \
+"U" "dvsMU (Multi User) 업그레이드" \
+"X" "종 료" \
+3>&1 1>&2 2>&3)
+
+if [ $? != 0 ]; then exit 0; fi
+
+
+else
 
 sel=$(whiptail --title " DVSwitch Multi User " --menu "\
              dvsMU v.$SCRIPT_VERSION HL5KY
@@ -1460,6 +1504,9 @@ sel=$(whiptail --title " DVSwitch Multi User " --menu "\
 3>&1 1>&2 2>&3)
 
 if [ $? != 0 ]; then exit 0; fi
+
+fi
+
 
 case $sel in
 S)
