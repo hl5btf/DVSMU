@@ -13,3 +13,8 @@ sudo \cp -f ${DVS}dvsmu.sh ${HOME}dvsmu.sh
 
 ${SHC}shc -r -v -T -f ${HOME}dvsmu.sh
 sudo mv ${HOME}dvsmu.sh.x ${HOME}dvsmu
+
+
+# 아래와 같이 다운로드가 가능함
+# wget -O /usr/local/dvs/dvsmutobin.sh https://raw.githubusercontent.com/hl5btf/DVSMU/main/util/dvsmutobin.sh
+# chmod +x /usr/local/dvs/dvsmutobin.sh
