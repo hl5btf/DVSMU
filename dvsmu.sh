@@ -1378,8 +1378,9 @@ if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
 	declare ext${user}=${rpt_id:7:2}
 	declare usrp_port${user}=$usrp_port
 	declare talkerAlias${user}="${talkerAlias:0:13}"
-	# TA가 공백이 아니고, TA에 핫스팟관리자의 호출부호가 없으면 no_main_call_in_TA=yes
-	if [ "$talkerAlias" != "" ] && [[ "$talkerAlias" != *"$call_sign"* ]]; then show_TA=yes; fi
+#	 TA가 공백이 아니고, TA에 핫스팟관리자의 호출부호가 없으면 no_main_call_in_TA=yes
+#	if [ "$talkerAlias" != "" ] && [[ "$talkerAlias" != *"$call_sign"* ]]; then show_TA=yes; fi
+	if [ "$talkerAlias" != "" ]; then show_TA=yes; fi
 fi
 done
 
