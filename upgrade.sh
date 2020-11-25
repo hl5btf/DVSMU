@@ -7,8 +7,6 @@ sudo chmod +x /usr/local/dvs/dvsmu
 function var_added() {
 #sudo wget -O /var/lib/dvswitch/dvs/var00.txt https://raw.githubusercontent.com/hl5btf/DVSMU/main/var00.txt > /dev/null 2>&1
 
-TERM=ansi whiptail --title "$T029" --infobox "사용자설정이 있어서 시간이 걸립니다." 8 60
-
 # When updating, the stanzas will be appended to varxx.txt, if not exist.
 new_var="talkerAlias"
 # default value will be applied once, at the first time
