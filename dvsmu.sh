@@ -17,16 +17,16 @@ if [ "$1" != "" ]; then
 fi
 
 
-###############################################################
+#--------------------------------------------------------------
 # Function pse_wait
-###############################################################
+#--------------------------------------------------------------
 function pse_wait() {
 TERM=ansi whiptail --title "$T029" --infobox "$T006" 8 60
 }
 
-###############################################################
+#--------------------------------------------------------------
 # Function update_DV3000
-###############################################################
+#--------------------------------------------------------------
 function update_DV3000() {
 
 # usage $1:1st keyword for search, $2:2nd keyword for search or " ", $3:value, $4:cmnt_out for comment out or n/a, $5:USER_NO
@@ -195,6 +195,9 @@ let "complete=complete+10"
 fi
 echo -e "$complete"
 }
+#==============================================================
+# END of var_to_ini
+#==============================================================
 
 
 ###############################################################
@@ -231,6 +234,10 @@ else
         sudo \cp -f ${adv}user00EN/*.* /opt/user$1
 fi
 }
+#==============================================================
+# END of file_copy_and_initialize
+#==============================================================
+
 
 ###############################################################
 # Function user_input
@@ -517,6 +524,10 @@ $sp10 설정이 완료되었습니다.
 
 ${DVS}dvsmu; exit 0
 }
+#==============================================================
+# END of user_input
+#==============================================================
+
 
 ###############################################################
 # Function user_delete
@@ -574,6 +585,10 @@ $sp10 작업이 완료되었습니다.
 
 ${DVS}dvsmu; exit 0
 }
+#==============================================================
+# END of user_delete
+#==============================================================
+
 
 ###############################################################
 # Function dvswitch_upgrade
@@ -675,6 +690,10 @@ $sp04 업그레이드 및 설정이 완료되었습니다.
 
 ${DVS}dvsmu; exit 0
 }
+#==============================================================
+# END of dvswitch_upgrade
+#==============================================================
+
 
 ###############################################################
 # Function dvsmu_upgrade
@@ -735,10 +754,14 @@ $sp08 업그레이드가 완료되었습니다.
 	fi
 fi
 }
+#==============================================================
+# END of dvsmu_upgrade
+#==============================================================
 
-###############################################################
+
+#--------------------------------------------------------------
 # Function log_error_msg
-###############################################################
+#--------------------------------------------------------------
 function log_error_msg() {
 
 clear
@@ -749,21 +772,43 @@ $sp05 PTT를 한번 잡은 후, 다시 실행해 보시기 바랍니다.
 " 10 60 1
 }
 
-###############################################################
-# Function restart
-###############################################################
-function restart() {
-source /var/lib/dvswitch/dvs/var$1.txt > /dev/null 2>&1
+#--------------------------------------------------------------
+# Function main_user_log
+#--------------------------------------------------------------
+function main_user_log() {
+clear
+whiptail --msgbox "\
 
-USER_NO=$1
+$sp05 로그화면의 종료 명령은 q 또는 Ctrl-C
+" 9 50 1
 
-pse_wait
+date=$(date '+%Y-%m-%d');
+file1=/var/log/mmdvm/MMDVM_Bridge-$date.log
+file2=/var/log/dvswitch/Analog_Bridge.log
 
-sudo systemctl restart mmdvm_bridge$USER_NO analog_bridge$USER_NO md380-emu$USER_NO > /dev/null 2>&1
-#sudo systemctl restart analog_bridge$USER_NO
-#sudo systemctl restart md380-emu$USER_NO
+SIZE=`du $file1 | awk -F" " '{print $1}'`; clear
+if [ ! -e $file1 ] || [ "$SIZE" == 0 ]; then
+        date=$(date -d '1 day ago' '+%Y-%m-%d')
+        file1=/var/log/mmdvm/MMDVM_Bridge-$date.log
+        log_error_msg
+fi
 
-${DVS}dvsmu $USER_NO; exit 0
+SIZE=`du $file2 | awk -F" " '{print $1}'`; clear
+if [ ! -e $file2 ] || [ "$SIZE" == 0 ]; then
+        date=$(date '+%Y-%m-%d')
+        file2=/var/log/dvswitch/Analog_Bridge-$date.log;
+        log_error_msg
+fi
+
+SIZE=`du $file2 | awk -F" " '{print $1}'`; clear
+if [ ! -e $file2 ] || [ "$SIZE" == 0 ]; then
+        date=$(date -d '1 day ago' '+%Y-%m-%d')
+        file2=/var/log/dvswitch/Analog_Bridge-$date.log;
+        log_error_msg
+fi
+
+multitail $file1 $file2
+${DVS}dvsmu M
 }
 
 ###############################################################
@@ -775,7 +820,7 @@ source /var/lib/dvswitch/dvs/var.txt
 
 declare ext=${rpt_id:7:2}
 
-#-------------------------------------------------------------
+
 if [[ $T031 =~ $call_sign ]] && [ ${#call_sign} = 5 ];then
 
 sel3=$(whiptail --title " Main User Configuration " --menu "\
@@ -800,39 +845,7 @@ if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
 
 case $sel3 in
 1)
-clear
-whiptail --msgbox "\
-
-$sp05 로그화면의 종료 명령은 q 또는 Ctrl-C
-" 9 50 1
-
-date=$(date '+%Y-%m-%d');
-file1=/var/log/mmdvm/MMDVM_Bridge-$date.log
-file2=/var/log/dvswitch/Analog_Bridge.log
-
-SIZE=`du $file1 | awk -F" " '{print $1}'`; clear
-if [ ! -e $file1 ] || [ "$SIZE" == 0 ]; then
-        date=$(date -d '1 day ago' '+%Y-%m-%d')
-        file1=/var/log/mmdvm/MMDVM_Bridge-$date.log
-	log_error_msg
-fi
-
-SIZE=`du $file2 | awk -F" " '{print $1}'`; clear
-if [ ! -e $file2 ] || [ "$SIZE" == 0 ]; then
-        date=$(date '+%Y-%m-%d')
-        file2=/var/log/dvswitch/Analog_Bridge-$date.log;
-	log_error_msg
-fi
-
-SIZE=`du $file2 | awk -F" " '{print $1}'`; clear
-if [ ! -e $file2 ] || [ "$SIZE" == 0 ]; then
-        date=$(date -d '1 day ago' '+%Y-%m-%d')
-        file2=/var/log/dvswitch/Analog_Bridge-$date.log;
-	log_error_msg
-fi
-
-multitail $file1 $file2
-${DVS}dvsmu M ;;
+main_user_log ;;
 2)
 sudo nano /var/lib/dvswitch/dvs/var.txt; ${DVS}dvsmu M ;;
 3)
@@ -873,39 +886,7 @@ if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
 
 case $sel3 in
 1)
-clear
-whiptail --msgbox "\
-
-$sp05 로그화면의 종료 명령은 q 또는 Ctrl-C
-" 9 50 1
-
-date=$(date '+%Y-%m-%d');
-file1=/var/log/mmdvm/MMDVM_Bridge-$date.log
-file2=/var/log/dvswitch/Analog_Bridge.log
-
-SIZE=`du $file1 | awk -F" " '{print $1}'`; clear
-if [ ! -e $file1 ] || [ "$SIZE" == 0 ]; then
-        date=$(date -d '1 day ago' '+%Y-%m-%d')
-        file1=/var/log/mmdvm/MMDVM_Bridge-$date.log
-        log_error_msg
-fi
-
-SIZE=`du $file2 | awk -F" " '{print $1}'`; clear
-if [ ! -e $file2 ] || [ "$SIZE" == 0 ]; then
-        date=$(date '+%Y-%m-%d')
-        file2=/var/log/dvswitch/Analog_Bridge-$date.log;
-        log_error_msg
-fi
-
-SIZE=`du $file2 | awk -F" " '{print $1}'`; clear
-if [ ! -e $file2 ] || [ "$SIZE" == 0 ]; then
-        date=$(date -d '1 day ago' '+%Y-%m-%d')
-        file2=/var/log/dvswitch/Analog_Bridge-$date.log;
-        log_error_msg
-fi
-
-multitail $file1 $file2
-${DVS}dvsmu M ;;
+main_user_log ;;
 2)
 pse_wait
 ${DVS}88_restart.sh; ${DVS}dvsmu M ;;
@@ -916,14 +897,109 @@ ${DVS}dvsmu; exit 0 ;;
 esac
 
 fi
-#-------------------------------------------------------------
 exit 0
+}
+#==============================================================
+# END of main_user_config
+#==============================================================
+
+
+#--------------------------------------------------------------
+# Function restart
+#--------------------------------------------------------------
+function restart() {
+
+source /var/lib/dvswitch/dvs/var$1.txt > /dev/null 2>&1
+
+USER_NO=$1
+
+pse_wait
+
+sudo systemctl restart mmdvm_bridge$USER_NO analog_bridge$USER_NO md380-emu$USER_NO > /dev/null 2>&1
+#sudo systemctl restart analog_bridge$USER_NO
+#sudo systemctl restart md380-emu$USER_NO
+
+${DVS}dvsmu $USER_NO; exit 0
+}
+
+#--------------------------------------------------------------
+# Function sub_user_log
+#--------------------------------------------------------------
+function sub_user_log() {
+clear
+whiptail --msgbox "\
+
+$sp05 로그화면의 종료 명령은 q 또는 Ctrl-C
+" 9 50 1
+
+date=$(date '+%Y-%m-%d');
+file1=/var/log/mmdvm/MMDVM_Bridge$USER_NO-$date.log;
+file2=/var/log/dvswitch/user$USER_NO/Analog_Bridge.log;
+
+SIZE=`du $file1 | awk -F" " '{print $1}'`; clear
+if [ ! -e $file1 ] || [ "$SIZE" == 0 ]; then
+        date=$(date -d '1 day ago' '+%Y-%m-%d')
+        file1=/var/log/mmdvm/MMDVM_Bridge$USER_NO-$date.log;
+        log_error_msg
+fi
+
+SIZE=`du $file2 | awk -F" " '{print $1}'`; clear
+if [ ! -e $file2 ] || [ "$SIZE" == 0 ]; then
+        date=$(date '+%Y-%m-%d')
+        file2=/var/log/dvswitch/user$USER_NO/Analog_Bridge-$date.log;
+        log_error_msg
+fi
+
+SIZE=`du $file2 | awk -F" " '{print $1}'`; clear
+if [ ! -e $file2 ] || [ "$SIZE" == 0 ]; then
+        date=$(date -d '1 day ago' '+%Y-%m-%d')
+        file2=/var/log/dvswitch/user$USER_NO/Analog_Bridge-$date.log;
+        log_error_msg
+fi
+
+multitail $file1 $file2;
+${DVS}dvsmu $USER_NO
+}
+
+#--------------------------------------------------------------
+# Function TA_input
+#--------------------------------------------------------------
+function TA_input() {
+
+source /var/lib/dvswitch/dvs/var$USER_NO.txt > /dev/null 2>&1
+TA_in=$(whiptail --title "talkerAlias" --inputbox "\
+
+기본값(공백) :
+    안드로이드 사용자의 호출부호/이름 전달(BM의 기능)
+    (예: VK3AZN Bob)
+
+정보 수정 :
+    수정한 내용으로 전달
+    (예: VK3AZN dvsMU)
+
+" 16 60 "${talkerAlias}" 3>&1 1>&2 2>&3)
+if [ $? != 0 ]; then ${DVS}dvsmu $USER_NO; exit 0; fi
+
+if [ "${TA_in}" = " " ]; then TA_in=""; fi
+
+source /var/lib/dvswitch/dvs/var$USER_NO.txt > /dev/null 2>&1
+if [ "${TA_in}" != "${talkerAlias}" ]; then
+        pse_wait
+        update_var talkerAlias "${TA_in}"
+file=/opt/user$USER_NO/DVSwitch.ini
+        if [ "${TA_in}" = "" ];
+        then    sudo sed -i -e "/talkerAlias/ c talkerAlias = " $file
+        else    $update_ini $file DMR talkerAlias "${TA_in}"
+        fi
+        ${DVS}88_restart.sh
+fi
+${DVS}dvsmu $USER_NO
 }
 
 ###############################################################
-# Function user_config
+# Function sub_user_config
 ###############################################################
-function user_config() {
+function sub_user_config() {
 
 clear
 
@@ -993,39 +1069,7 @@ if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
 
 case $sel2 in
 1)
-clear
-whiptail --msgbox "\
-
-$sp05 로그화면의 종료 명령은 q 또는 Ctrl-C
-" 9 50 1
-
-date=$(date '+%Y-%m-%d');
-file1=/var/log/mmdvm/MMDVM_Bridge$USER_NO-$date.log;
-file2=/var/log/dvswitch/user$USER_NO/Analog_Bridge.log;
-
-SIZE=`du $file1 | awk -F" " '{print $1}'`; clear
-if [ ! -e $file1 ] || [ "$SIZE" == 0 ]; then
-        date=$(date -d '1 day ago' '+%Y-%m-%d')
-        file1=/var/log/mmdvm/MMDVM_Bridge$USER_NO-$date.log;
-	log_error_msg
-fi
-
-SIZE=`du $file2 | awk -F" " '{print $1}'`; clear
-if [ ! -e $file2 ] || [ "$SIZE" == 0 ]; then
-        date=$(date '+%Y-%m-%d')
-        file2=/var/log/dvswitch/user$USER_NO/Analog_Bridge-$date.log;
-	log_error_msg
-fi
-
-SIZE=`du $file2 | awk -F" " '{print $1}'`; clear
-if [ ! -e $file2 ] || [ "$SIZE" == 0 ]; then
-        date=$(date -d '1 day ago' '+%Y-%m-%d')
-        file2=/var/log/dvswitch/user$USER_NO/Analog_Bridge-$date.log;
-	log_error_msg
-fi
-
-multitail $file1 $file2;
-${DVS}dvsmu $USER_NO ;;
+sub_user_log ;;
 2)
 user_input $1 ;;
 3)
@@ -1045,34 +1089,7 @@ sudo \cp -f /opt/user$1/dvsm.basic /opt/user$1/dvsm.macro; ${DVS}dvsmu $USER_NO 
 10)
 sudo \cp -f /opt/user$1/dvsm.adv /opt/user$1/dvsm.macro; ${DVS}dvsmu $USER_NO ;;
 11)
-source /var/lib/dvswitch/dvs/var$USER_NO.txt > /dev/null 2>&1
-TA_in=$(whiptail --title "talkerAlias" --inputbox "\
-
-기본값(공백) :
-    안드로이드 사용자의 호출부호/이름 전달(BM의 기능)
-    (예: VK3AZN Bob)
-
-정보 수정 :
-    수정한 내용으로 전달
-    (예: VK3AZN dvsMU)
-
-" 16 60 "${talkerAlias}" 3>&1 1>&2 2>&3)
-if [ $? != 0 ]; then ${DVS}dvsmu $USER_NO; exit 0; fi
-
-if [ "${TA_in}" = " " ]; then TA_in=""; fi
-
-source /var/lib/dvswitch/dvs/var$USER_NO.txt > /dev/null 2>&1
-if [ "${TA_in}" != "${talkerAlias}" ]; then
-	pse_wait
-	update_var talkerAlias "${TA_in}"
-file=/opt/user$USER_NO/DVSwitch.ini
-        if [ "${TA_in}" = "" ];
-        then    sudo sed -i -e "/talkerAlias/ c talkerAlias = " $file
-        else    $update_ini $file DMR talkerAlias "${TA_in}"
-        fi
-	${DVS}88_restart.sh
-fi
-${DVS}dvsmu $USER_NO ;;
+TA_input ;;
 12)
 restart $USER_NO ;;
 13)
@@ -1102,39 +1119,7 @@ if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
 
 case $sel2 in
 1)
-clear
-whiptail --msgbox "\
-
-$sp05 로그화면의 종료 명령은 q 또는 Ctrl-C
-" 9 50 1
-
-date=$(date '+%Y-%m-%d');
-file1=/var/log/mmdvm/MMDVM_Bridge$USER_NO-$date.log;
-file2=/var/log/dvswitch/user$USER_NO/Analog_Bridge.log;
-
-SIZE=`du $file1 | awk -F" " '{print $1}'`; clear
-if [ ! -e $file1 ] || [ "$SIZE" == 0 ]; then
-        date=$(date -d '1 day ago' '+%Y-%m-%d')
-        file1=/var/log/mmdvm/MMDVM_Bridge$USER_NO-$date.log;
-        log_error_msg
-fi
-
-SIZE=`du $file2 | awk -F" " '{print $1}'`; clear
-if [ ! -e $file2 ] || [ "$SIZE" == 0 ]; then
-        date=$(date '+%Y-%m-%d')
-        file2=/var/log/dvswitch/user$USER_NO/Analog_Bridge-$date.log;
-        log_error_msg
-fi
-
-SIZE=`du $file2 | awk -F" " '{print $1}'`; clear
-if [ ! -e $file2 ] || [ "$SIZE" == 0 ]; then
-        date=$(date -d '1 day ago' '+%Y-%m-%d')
-        file2=/var/log/dvswitch/user$USER_NO/Analog_Bridge-$date.log;
-        log_error_msg
-fi
-
-multitail $file1 $file2;
-${DVS}dvsmu $USER_NO ;;
+sub_user_log ;;
 2)
 user_input $1 ;;
 3)
@@ -1144,43 +1129,135 @@ sudo \cp -f /opt/user$1/dvsm.basic /opt/user$1/dvsm.macro; ${DVS}dvsmu $USER_NO 
 5)
 sudo \cp -f /opt/user$1/dvsm.adv /opt/user$1/dvsm.macro; ${DVS}dvsmu $USER_NO ;;
 6)
-source /var/lib/dvswitch/dvs/var$USER_NO.txt > /dev/null 2>&1
-TA_in=$(whiptail --title "talkerAlias" --inputbox "\
-
-기본값(공백) :
-    안드로이드 사용자의 호출부호/이름 전달(BM의 기능)
-    (예: VK3AZN Bob)
-
-정보 수정 :
-    수정한 내용으로 전달
-    (예: VK3AZN dvsMU)
-
-" 16 60 "${talkerAlias}" 3>&1 1>&2 2>&3)
-if [ $? != 0 ]; then ${DVS}dvsmu $USER_NO; exit 0; fi
-
-if [ "${TA_in}" = " " ]; then TA_in=""; fi
-
-source /var/lib/dvswitch/dvs/var$USER_NO.txt > /dev/null 2>&1
-if [ "${TA_in}" != "${talkerAlias}" ]; then
-	pse_wait
-        update_var talkerAlias "${TA_in}"
-file=/opt/user$USER_NO/DVSwitch.ini
-        if [ "${TA_in}" = "" ];
-        then    sudo sed -i -e "/talkerAlias/ c talkerAlias = " $file
-        else    $update_ini $file DMR talkerAlias "${TA_in}"
-        fi
-        ${DVS}88_restart.sh
-fi
-${DVS}dvsmu $USER_NO ;;
+TA_input ;;
 7)
 user_delete $USER_NO ;;
 8)
 ${DVS}dvsmu; exit 0 ;;
 esac
 fi
-#-------------------------------------------------------------
+
 exit 0
 }
+#==============================================================
+# END of sub_user_config
+#==============================================================
+
+
+#--------------------------------------------------------------
+# Function change_status
+#--------------------------------------------------------------
+function change_status() {
+sel=$(whiptail --title " 설정 변경 " --menu "\
+\n
+" 11 30 3 \
+"C" "취 소" \
+"A" "활성화" \
+"I" "비활성화" \
+3>&1 1>&2 2>&3)
+
+case $sel in
+C)
+${DVS}dvsmu O; exit 0 ;;
+A)
+change=A ;;
+I)
+change=I ;;
+esac
+
+  if [ $1 = dstar ] && [ $change = A ] && [ $dstar_chk != "active" ]; then
+pse_wait
+sudo systemctl enable ircddbgatewayd > /dev/null 2>&1
+sudo systemctl start ircddbgatewayd > /dev/null 2>&1
+${DVS}88_restart.sh;
+
+elif [ $1 = dstar ] && [ $change = I ] && [ $dstar_chk = "active" ]; then
+pse_wait
+sudo systemctl disable ircddbgatewayd quantar_bridge > /dev/null 2>&1
+sudo systemctl stop ircddbgatewayd quantar_bridge > /dev/null 2>&1
+${DVS}88_restart.sh;
+
+elif [ $1 = ysf ] && [ $change = A ] && [ $ysf_chk != "active" ]; then
+pse_wait
+sudo systemctl enable ysfgateway ysfparrot > /dev/null 2>&1
+sudo systemctl start ysfgateway ysfparrot > /dev/null 2>&1
+${DVS}88_restart.sh;
+
+elif [ $1 = ysf ] && [ $change = I ] && [ $ysf_chk = "active" ]; then
+pse_wait
+sudo systemctl disable ysfgateway ysfparrot quantar_bridge > /dev/null 2>&1
+sudo systemctl stop ysfgateway ysfparrot quantar_bridge > /dev/null 2>&1
+${DVS}88_restart.sh;
+
+elif [ $1 = nxdn ] && [ $change = A ] && [ $nxdn_chk != "active" ]; then
+pse_wait
+sudo systemctl enable nxdngateway nxdnparrot > /dev/null 2>&1
+sudo systemctl start nxdngateway nxdnparrot > /dev/null 2>&1
+${DVS}88_restart.sh;
+
+elif [ $1 = nxdn ] && [ $change = I ] && [ $nxdn_chk = "active" ]; then
+pse_wait
+sudo systemctl disable nxdngateway nxdnparrot quantar_bridge > /dev/null 2>&1
+sudo systemctl stop nxdngateway nxdnparrot quantar_bridge > /dev/null 2>&1
+${DVS}88_restart.sh;
+
+elif [ $1 = p25 ] && [ $change = A ] && [ $p25_chk != "active" ]; then
+pse_wait
+sudo systemctl enable p25gateway p25parrot > /dev/null 2>&1
+sudo systemctl start p25gateway p25parrot > /dev/null 2>&1
+${DVS}88_restart.sh;
+
+elif [ $1 = p25 ] && [ $change = I ] && [ $p25_chk = "active" ]; then
+pse_wait
+sudo systemctl disable p25gateway p25parrot quantar_bridge > /dev/null 2>&1
+sudo systemctl stop p25gateway p25parrot quantar_bridge > /dev/null 2>&1
+${DVS}88_restart.sh;
+
+elif [ $1 = lighttpd ] && [ $change = A ] && [ $lighttpd_chk != "active" ]; then
+pse_wait
+sudo systemctl enable lighttpd webproxy > /dev/null 2>&1
+sudo systemctl start lighttpd webproxy > /dev/null 2>&1
+
+elif [ $1 = lighttpd ] && [ $change = I ] && [ $lighttpd_chk = "active" ]; then
+pse_wait
+sudo systemctl disable lighttpd webproxy > /dev/null 2>&1
+sudo systemctl stop lighttpd webproxy > /dev/null 2>&1
+
+elif [ $1 = monit ] && [ $change = A ] && [ $monit_chk != "active" ]; then
+pse_wait
+sudo systemctl enable monit > /dev/null 2>&1
+sudo systemctl start monit > /dev/null 2>&1
+
+elif [ $1 = monit ] && [ $change = I ] && [ $monit_chk = "active" ]; then
+pse_wait
+sudo systemctl disable monit > /dev/null 2>&1
+sudo systemctl stop monit > /dev/null 2>&1
+
+elif [ $1 = shellinabox ] && [ $change = A ] && [ $shellinabox_chk != "active" ]; then
+pse_wait
+sudo systemctl enable shellinabox > /dev/null 2>&1
+sudo systemctl start shellinabox > /dev/null 2>&1
+
+elif [ $1 = shellinabox ] && [ $change = I ] && [ $shellinabox_chk = "active" ]; then
+pse_wait
+sudo systemctl disable shellinabox > /dev/null 2>&1
+sudo systemctl stop shellinabox > /dev/null 2>&1
+
+else
+clear
+whiptail --msgbox "\
+
+$sp09 상태를 변경하지 않았습니다.
+" 9 50 1
+
+fi
+
+${DVS}dvsmu O; exit 0
+}
+#--------------------------------------------------------------
+# END of change_status
+#--------------------------------------------------------------
+
 
 ###############################################################
 # Function system_optimizer
@@ -1216,134 +1293,6 @@ if [ $shellinabox_chk = "active" ]; then shellinabox_sts="<< 활성상태 >>"; e
 #echo "shell=$shellinabox_sts"
 
 
-function change_sts() {
-sel=$(whiptail --title " 설정 변경 " --menu "\
-\n
-" 10 30 2 \
-"A" "활성화" \
-"I" "비활성화" \
-3>&1 1>&2 2>&3)
-
-case $sel in
-A)
-change=A ;;
-I)
-change=I ;;
-esac
-
-  if [ $1 = dstar ] && [ $change = A ] && [ $dstar_chk != "active" ]; then
-pse_wait
-sudo systemctl enable ircddbgatewayd > /dev/null 2>&1
-sudo systemctl start ircddbgatewayd > /dev/null 2>&1
-${DVS}88_restart.sh;
-
-elif [ $1 = dstar ] && [ $change = I ] && [ $dstar_chk = "active" ]; then
-pse_wait
-sudo systemctl disable ircddbgatewayd quantar_bridge > /dev/null 2>&1
-sudo systemctl stop ircddbgatewayd quantar_bridge > /dev/null 2>&1
-#sudo systemctl disable quantar_bridge > /dev/null 2>&1
-#sudo systemctl stop quantar_bridge > /dev/null 2>&1
-${DVS}88_restart.sh;
-
-elif [ $1 = ysf ] && [ $change = A ] && [ $ysf_chk != "active" ]; then
-pse_wait
-sudo systemctl enable ysfgateway ysfparrot > /dev/null 2>&1
-sudo systemctl start ysfgateway ysfparrot > /dev/null 2>&1
-#sudo systemctl enable ysfparrot > /dev/null 2>&1
-#sudo systemctl start ysfparrot > /dev/null 2>&1
-${DVS}88_restart.sh;
-
-elif [ $1 = ysf ] && [ $change = I ] && [ $ysf_chk = "active" ]; then
-pse_wait
-sudo systemctl disable ysfgateway ysfparrot quantar_bridge > /dev/null 2>&1
-sudo systemctl stop ysfgateway ysfparrot quantar_bridge > /dev/null 2>&1
-#sudo systemctl disable ysfparrot > /dev/null 2>&1
-#sudo systemctl stop ysfparrot > /dev/null 2>&1
-#sudo systemctl disable quantar_bridge > /dev/null 2>&1
-#sudo systemctl stop quantar_bridge > /dev/null 2>&1
-${DVS}88_restart.sh;
-
-elif [ $1 = nxdn ] && [ $change = A ] && [ $nxdn_chk != "active" ]; then
-pse_wait
-sudo systemctl enable nxdngateway nxdnparrot > /dev/null 2>&1
-sudo systemctl start nxdngateway nxdnparrot > /dev/null 2>&1
-#sudo systemctl enable nxdnparrot > /dev/null 2>&1
-#sudo systemctl start nxdnparrot > /dev/null 2>&1
-${DVS}88_restart.sh;
-
-elif [ $1 = nxdn ] && [ $change = I ] && [ $nxdn_chk = "active" ]; then
-pse_wait
-sudo systemctl disable nxdngateway nxdnparrot quantar_bridge > /dev/null 2>&1
-sudo systemctl stop nxdngateway nxdnparrot quantar_bridge > /dev/null 2>&1
-#sudo systemctl disable nxdnparrot > /dev/null 2>&1
-#sudo systemctl stop nxdnparrot > /dev/null 2>&1
-#sudo systemctl disable quantar_bridge > /dev/null 2>&1
-#sudo systemctl stop quantar_bridge > /dev/null 2>&1
-${DVS}88_restart.sh;
-
-elif [ $1 = p25 ] && [ $change = A ] && [ $p25_chk != "active" ]; then
-pse_wait
-sudo systemctl enable p25gateway p25parrot > /dev/null 2>&1
-sudo systemctl start p25gateway p25parrot > /dev/null 2>&1
-#sudo systemctl enable p25parrot > /dev/null 2>&1
-#sudo systemctl start p25parrot > /dev/null 2>&1
-${DVS}88_restart.sh;
-
-elif [ $1 = p25 ] && [ $change = I ] && [ $p25_chk = "active" ]; then
-pse_wait
-sudo systemctl disable p25gateway p25parrot quantar_bridge > /dev/null 2>&1
-sudo systemctl stop p25gateway p25parrot quantar_bridge > /dev/null 2>&1
-#sudo systemctl disable p25parrot > /dev/null 2>&1
-#sudo systemctl stop p25parrot > /dev/null 2>&1
-#sudo systemctl disable quantar_bridge > /dev/null 2>&1
-#sudo systemctl stop quantar_bridge > /dev/null 2>&1
-${DVS}88_restart.sh;
-
-elif [ $1 = lighttpd ] && [ $change = A ] && [ $lighttpd_chk != "active" ]; then
-pse_wait
-sudo systemctl enable lighttpd webproxy > /dev/null 2>&1
-sudo systemctl start lighttpd webproxy > /dev/null 2>&1
-#sudo systemctl enable webproxy > /dev/null 2>&1
-#sudo systemctl start webproxy > /dev/null 2>&1
-
-elif [ $1 = lighttpd ] && [ $change = I ] && [ $lighttpd_chk = "active" ]; then
-pse_wait
-sudo systemctl disable lighttpd webproxy > /dev/null 2>&1
-sudo systemctl stop lighttpd webproxy > /dev/null 2>&1
-#sudo systemctl disable webproxy > /dev/null 2>&1
-#sudo systemctl stop webproxy > /dev/null 2>&1
-
-elif [ $1 = monit ] && [ $change = A ] && [ $monit_chk != "active" ]; then
-pse_wait
-sudo systemctl enable monit > /dev/null 2>&1
-sudo systemctl start monit > /dev/null 2>&1
-
-elif [ $1 = monit ] && [ $change = I ] && [ $monit_chk = "active" ]; then
-pse_wait
-sudo systemctl disable monit > /dev/null 2>&1
-sudo systemctl stop monit > /dev/null 2>&1
-
-elif [ $1 = shellinabox ] && [ $change = A ] && [ $shellinabox_chk != "active" ]; then
-pse_wait
-sudo systemctl enable shellinabox > /dev/null 2>&1
-sudo systemctl start shellinabox > /dev/null 2>&1
-
-elif [ $1 = shellinabox ] && [ $change = I ] && [ $shellinabox_chk = "active" ]; then
-pse_wait
-sudo systemctl disable shellinabox > /dev/null 2>&1
-sudo systemctl stop shellinabox > /dev/null 2>&1
-
-else
-clear
-whiptail --msgbox "\
-
-$sp09 상태를 변경하지 않았습니다.
-" 9 50 1
-
-fi
-
-${DVS}dvsmu O; exit 0
-}
 
 source /var/lib/dvswitch/dvs/var.txt
 
@@ -1367,25 +1316,27 @@ if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
 
 case $sel in
 1)
-change_sts dstar ;;
+change_status dstar ;;
 2)
-change_sts ysf ;;
+change_status ysf ;;
 3)
-change_sts nxdn ;;
+change_status nxdn ;;
 4)
-change_sts p25 ;;
+change_status p25 ;;
 5)
-change_sts lighttpd ;;
+change_status lighttpd ;;
 6)
-change_sts monit ;;
+change_status monit ;;
 7)
-change_sts shellinabox ;;
+change_status shellinabox ;;
 8)
 ${DVS}dvsmu; exit 0 ;;
 esac
-
-
 }
+#==============================================================
+# END of system_optimizer
+#==============================================================
+
 
 ###############################################################
 # MAIN SCRIPT
@@ -1402,7 +1353,7 @@ if [ "$USER_NO" = M ]; then main_user_config; fi
 
 if [ "$USER_NO" = O ]; then system_optimizer; fi
 
-if [ x${USER_NO} != x ] && [ ${#USER_NO} = 2 ]; then user_config $USER_NO; fi
+if [ x${USER_NO} != x ] && [ ${#USER_NO} = 2 ]; then sub_user_config $USER_NO; fi
 
 source /var/lib/dvswitch/dvs/var.txt
 	declare call_sign_M=$call_sign
@@ -1428,11 +1379,11 @@ if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
 	declare usrp_port${user}=$usrp_port
 	declare talkerAlias${user}="${talkerAlias:0:13}"
 	# TA가 공백이 아니고, TA에 핫스팟관리자의 호출부호가 없으면 no_main_call_in_TA=yes
-	if [ "$talkerAlias" != "" ] && [[ "$talkerAlias" != *"$call_sign"* ]]; then no_main_call_in_TA=yes; fi
+	if [ "$talkerAlias" != "" ] && [[ "$talkerAlias" != *"$call_sign"* ]]; then show_TA=yes; fi
 fi
 done
 
-if [ "$no_main_call_in_TA" = yes ];
+if [ "$show_TA" = yes ];
 
 
 then
@@ -1531,45 +1482,45 @@ main_user_config ;;
 =)
 ${DVS}dvsmu ;;
 1)
-user_config 01 ;;
+sub_user_config 01 ;;
 2)
-user_config 02 ;;
+sub_user_config 02 ;;
 3)
-user_config 03 ;;
+sub_user_config 03 ;;
 4)
-user_config 04 ;;
+sub_user_config 04 ;;
 5)
-user_config 05 ;;
+sub_user_config 05 ;;
 6)
-user_config 06 ;;
+sub_user_config 06 ;;
 7)
-user_config 07 ;;
+sub_user_config 07 ;;
 8)
-user_config 08 ;;
+sub_user_config 08 ;;
 9)
-user_config 09 ;;
+sub_user_config 09 ;;
 10)
-user_config 10 ;;
+sub_user_config 10 ;;
 11)
-user_config 11 ;;
+sub_user_config 11 ;;
 12)
-user_config 12 ;;
+sub_user_config 12 ;;
 13)
-user_config 13 ;;
+sub_user_config 13 ;;
 14)
-user_config 14 ;;
+sub_user_config 14 ;;
 15)
-user_config 15 ;;
+sub_user_config 15 ;;
 16)
-user_config 16 ;;
+sub_user_config 16 ;;
 17)
-user_config 17 ;;
+sub_user_config 17 ;;
 18)
-user_config 18 ;;
+sub_user_config 18 ;;
 19)
-user_config 19 ;;
+sub_user_config 19 ;;
 20)
-user_config 20 ;;
+sub_user_config 20 ;;
 " ")
 ${DVS}dvsmu ;;
 D)
