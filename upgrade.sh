@@ -3,7 +3,7 @@
 sudo wget -O /usr/local/dvs/dvsmu https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu
 sudo chmod +x /usr/local/dvs/dvsmu
 
-sleep 5
+sleep 10
 
 
 #----변수가 추가될때 처리하는 루틴 시작부분-------------------------------------------------------
