@@ -1059,6 +1059,8 @@ TA_in=$(whiptail --title "talkerAlias" --inputbox "\
 " 16 60 "${talkerAlias}" 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu $USER_NO; exit 0; fi
 
+if [ "${TA_in}" = " " ]; then TA_in=""; fi
+
 source /var/lib/dvswitch/dvs/var$USER_NO.txt > /dev/null 2>&1
 if [ "${TA_in}" != "${talkerAlias}" ]; then
 	pse_wait
@@ -1155,6 +1157,8 @@ TA_in=$(whiptail --title "talkerAlias" --inputbox "\
 
 " 16 60 "${talkerAlias}" 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu $USER_NO; exit 0; fi
+
+if [ "${TA_in}" = " " ]; then TA_in=""; fi
 
 source /var/lib/dvswitch/dvs/var$USER_NO.txt > /dev/null 2>&1
 if [ "${TA_in}" != "${talkerAlias}" ]; then
@@ -1423,11 +1427,14 @@ if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
 	declare ext${user}=${rpt_id:7:2}
 	declare usrp_port${user}=$usrp_port
 	declare talkerAlias${user}="${talkerAlias:0:13}"
+	# TA가 공백이 아니고, TA에 핫스팟관리자의 호출부호가 없으면 no_main_call_in_TA=yes
 	if [ "$talkerAlias" != "" ] && [[ "$talkerAlias" != *"$call_sign"* ]]; then no_main_call_in_TA=yes; fi
 fi
 done
 
 if [ "$no_main_call_in_TA" = yes ];
+
+
 then
 
 sel=$(whiptail --title " DVSwitch Multi User " --menu "\
