@@ -3,6 +3,9 @@
 sudo wget -O /usr/local/dvs/dvsmu https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu
 sudo chmod +x /usr/local/dvs/dvsmu
 
+sleep 5
+
+
 #----변수가 추가될때 처리하는 루틴 시작부분-------------------------------------------------------
 function var_added() {
 #sudo wget -O /var/lib/dvswitch/dvs/var00.txt https://raw.githubusercontent.com/hl5btf/DVSMU/main/var00.txt > /dev/null 2>&1
