@@ -1,19 +1,13 @@
 #!/bin/bash
 
-sudo wget -O /usr/local/dvs/dvsmu https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu
-sudo chmod +x /usr/local/dvs/dvsmu
-
-sleep 10
-
-
 #----변수가 추가될때 처리하는 루틴 시작부분-------------------------------------------------------
 function var_added() {
 #sudo wget -O /var/lib/dvswitch/dvs/var00.txt https://raw.githubusercontent.com/hl5btf/DVSMU/main/var00.txt > /dev/null 2>&1
 
 # When updating, the stanzas will be appended to varxx.txt, if not exist.
-new_var="talkerAlias"
+new_var=""
 # default value will be applied once, at the first time
-new_val=("")
+new_val=()
 
 user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
 for user in $user; do
@@ -53,5 +47,13 @@ done
 }
 #----변수가 추가될때 처리하는 루틴 끝 부분-------------------------------------------------------
 
-var_added
+################################################
+# MAIN PROGRAM
+################################################
+sudo wget -O /usr/local/dvs/dvsmu https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu
+sudo chmod +x /usr/local/dvs/dvsmu
+
+sleep 10
+
+# var_added
 
