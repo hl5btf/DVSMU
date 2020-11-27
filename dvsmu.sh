@@ -982,7 +982,7 @@ file=/opt/user$USER_NO/DVSwitch.ini
         then    sudo sed -i -e "/talkerAlias/ c talkerAlias = " $file
         else    $update_ini $file DMR talkerAlias "${TA_in}"
         fi
-        ${DVS}88_restart.sh
+	restart $USER_NO
 fi
 ${DVS}dvsmu $USER_NO
 }
