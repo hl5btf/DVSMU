@@ -15,9 +15,9 @@ done
 
 
 log_dir=/var/log/dvswitch
-sudo find $log_dir -name '*.log' -mtime +4 -delete
+sudo find ${log_dir}/*.log -mtime +4 -exec rm -f {} \;
 
+log_dir=/var/log/mmdvm
+sudo find ${log_dir}/*.log -mtime +4 -exec rm -f {} \;
 
-log_dir= /var/log/mmdvm
-sudo find $log_dir -name '*.log' -mtime +4 -delete
 
