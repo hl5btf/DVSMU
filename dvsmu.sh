@@ -3,7 +3,7 @@
 #source /var/lib/dvswitch/dvs/var.txt
 
 #===================================
-SCRIPT_VERSION="1.4.9"
+SCRIPT_VERSION="1.5"
 SCRIPT_AUTHOR="HL5KY"
 SCRIPT_DATE="2020-11-25"
 #===================================
@@ -174,8 +174,6 @@ fi
 echo -e "$complete"
 
 sudo systemctl enable mmdvm_bridge$USER_NO analog_bridge$USER_NO md380-emu$USER_NO > /dev/null 2>&1
-#sudo systemctl enable analog_bridge$USER_NO > /dev/null 2>&1
-#sudo systemctl enable md380-emu$USER_NO > /dev/null 2>&1
 
 if [ "$2" = "upgrade" ]; then
 let "complete=complete+15"
@@ -185,8 +183,6 @@ fi
 echo -e "$complete"
 
 sudo systemctl start mmdvm_bridge$USER_NO analog_bridge$USER_NO md380-emu$USER_NO > /dev/null 2>&1
-#sudo systemctl start analog_bridge$USER_NO > /dev/null 2>&1
-#sudo systemctl start md380-emu$USER_NO > /dev/null 2>&1
 
 if [ "$2" = "upgrade" ]; then
 let "complete=complete+15"
@@ -552,12 +548,8 @@ if [ $? != 0 ]; then ${DVS}dvsmu $USER_NO; exit 0; fi
 pse_wait
 
 sudo systemctl stop mmdvm_bridge$USER_NO analog_bridge$USER_NO md380-emu$USER_NO > /dev/null 2>&1
-#sudo systemctl stop analog_bridge$USER_NO
-#sudo systemctl stop md380-emu$USER_NO
 
 sudo systemctl disable mmdvm_bridge$USER_NO analog_bridge$USER_NO md380-emu$USER_NO > /dev/null 2>&1
-#sudo systemctl disable analog_bridge$USER_NO > /dev/null 2>&1
-#sudo systemctl disable md380-emu$USER_NO > /dev/null 2>&1
 
 sudo rm /opt/user$USER_NO/*
 sudo rmdir /opt/user$USER_NO
@@ -607,7 +599,7 @@ $sp03 진행하시겠습니까?  $T005
         else ${DVS}dvsmu; exit 0
 fi
 
-
+#-----------------------------------------------------------
 TERM=ansi whiptail --title "확인중" --infobox "$T006" 8 60
 
 user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
@@ -629,7 +621,7 @@ if [ -d /opt/user${user} ]; then
 fi
 done
 
-
+#-----------------------------------------------------------
 if [ "$upgrade" = yes ]; then :
 
 else
@@ -656,7 +648,7 @@ $sp03 $T005
 fi
 if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
 
-
+#-----------------------------------------------------------
 user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
 
 for user in $user; do
@@ -669,8 +661,6 @@ let "complete=complete+15"
 echo -e "$complete"
 
 	sudo systemctl stop mmdvm_bridge${user} analog_bridge${user} md380-emu${user} > /dev/null 2>&1
-#	sudo systemctl stop analog_bridge${user} > /dev/null 2>&1
-#	sudo systemctl stop md380-emu${user} > /dev/null 2>&1
 
 	# Function
 	file_copy_and_initialize ${user}
@@ -681,7 +671,7 @@ echo -e "$complete"
 
 fi
 done
-
+#-----------------------------------------------------------
 clear
 whiptail --msgbox "\
 
@@ -714,7 +704,7 @@ new_ver=$ver
 source /var/lib/dvswitch/dvs/var.txt
 sudo rm ${DVS}${random_char}
 crnt_ver=$(dvsmu -v)
-
+#-----------------------------------------------------------
 if [ $new_ver = $crnt_ver ]; then
 
         clear
@@ -725,7 +715,7 @@ $sp04 현재 v.${crnt_ver}  최신 버전을 사용중입니다.
 
         ${DVS}dvsmu; exit 0
 else
-
+#-----------------------------------------------------------
 	clear
         if (whiptail --title " dvsMU 업그레이드 " --yesno "\
 $sp10 최신버전(v.$new_ver)으로 업그레이드가 가능합니다.
@@ -744,7 +734,7 @@ $sp10 $T005
 
 	clear
 	whiptail --msgbox "\
-
+#-----------------------------------------------------------
 $sp08 업그레이드가 완료되었습니다.
 	" 9 50 1
 
@@ -916,8 +906,6 @@ USER_NO=$1
 pse_wait
 
 sudo systemctl restart mmdvm_bridge$USER_NO analog_bridge$USER_NO md380-emu$USER_NO > /dev/null 2>&1
-#sudo systemctl restart analog_bridge$USER_NO
-#sudo systemctl restart md380-emu$USER_NO
 
 ${DVS}dvsmu $USER_NO; exit 0
 }
@@ -980,7 +968,10 @@ TA_in=$(whiptail --title "talkerAlias" --inputbox "\
 " 16 60 "${talkerAlias}" 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu $USER_NO; exit 0; fi
 
-if [ "${TA_in}" = " " ]; then TA_in=""; fi
+TA_in_no_blank=$(echo ${TA_in} | tr -d ' ')
+TA_no=${#TA_in_no_blank}
+
+if [ ${TA_no} = 0 ]; then TA_in=""; fi
 
 source /var/lib/dvswitch/dvs/var$USER_NO.txt > /dev/null 2>&1
 if [ "${TA_in}" != "${talkerAlias}" ]; then
@@ -1266,42 +1257,38 @@ function system_optimizer() {
 
 dstar_chk=$(systemctl is-active ircddbgatewayd)
 if [ $dstar_chk = "active" ]; then dstar_sts="<< 활성상태 >>"; else dstar_sts=" 비활성상태"; fi
-#echo "dstar=$dstar_sts"
 
 ysf_chk=$(systemctl is-active ysfgateway)
 if [ $ysf_chk = "active" ]; then ysf_sts="<< 활성상태 >>"; else ysf_sts=" 비활성상태"; fi
-#echo "ysf=$ysf_sts"
 
 nxdn_chk=$(systemctl is-active nxdngateway)
 if [ $nxdn_chk = "active" ]; then nxdn_sts="<< 활성상태 >>"; else nxdn_sts=" 비활성상태"; fi
-#echo "nxdn=$nxdn_sts"
 
 p25_chk=$(systemctl is-active p25gateway)
 if [ $p25_chk = "active" ]; then p25_sts="<< 활성상태 >>"; else p25_sts=" 비활성상태"; fi
-#echo "p25=$p25_sts"
 
 lighttpd_chk=$(systemctl is-active lighttpd)
 if [ $lighttpd_chk = "active" ]; then lighttpd_sts="<< 활성상태 >>"; else lighttpd_sts=" 비활성상태"; fi
-#echo "light=$lighttpd_sts"
 
 monit_chk=$(systemctl is-active monit)
 if [ $monit_chk = "active" ]; then monit_sts="<< 활성상태 >>"; else monit_sts=" 비활성상태"; fi
-#echo "monit=$monit_sts"
 
 shellinabox_chk=$(systemctl is-active shellinabox)
 if [ $shellinabox_chk = "active" ]; then shellinabox_sts="<< 활성상태 >>"; else shellinabox_sts=" 비활성상태"; fi
-#echo "shell=$shellinabox_sts"
 
-
+#cpu_usage=$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)* id.*/\1/" | awk '{printf "%.0f", 100 - $1}')
+temp=$(cat /sys/class/thermal/thermal_zone0/temp)
+temp=$(($temp/1000))
 
 source /var/lib/dvswitch/dvs/var.txt
 
 sel=$(whiptail --title " 시스템 최적화 " --menu "\
+                  CPU $temp'C
 
             주사용자의 시스템 설정
 ---------------------------------------------
 \n
-" 18 50 8 \
+" 19 50 8 \
 "1" "DSTAR  $dstar_sts" \
 "2" "YSF    $ysf_sts" \
 "3" "NXDN   $nxdn_sts" \
@@ -1390,7 +1377,7 @@ if [ "$show_TA" = yes ];
 then
 
 sel=$(whiptail --title " DVSwitch Multi User " --menu "\
-                  dvsMU v.$SCRIPT_VERSION HL5KY
+                   dvsMU v.$SCRIPT_VERSION HL5KY
 \n
 " 37 60 28 \
 "S" "시스템 모니터링" \
@@ -1429,7 +1416,7 @@ if [ $? != 0 ]; then exit 0; fi
 else
 
 sel=$(whiptail --title " DVSwitch Multi User " --menu "\
-             dvsMU v.$SCRIPT_VERSION HL5KY
+              dvsMU v.$SCRIPT_VERSION HL5KY
 \n
 " 37 50 28 \
 "S" "시스템 모니터링" \
