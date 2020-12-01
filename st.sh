@@ -4,12 +4,12 @@
 source /var/lib/dvswitch/dvs/var.txt
 
 TERM=ansi whiptail --title "$T029" --infobox "$T006" 8 60
-#pse_wait
-#------------------------------------------------------------------------
+
+#---------핫스팟 호출부호 추출 -------------------------------------------
 source /var/lib/dvswitch/dvs/var.txt
-	declare call_sign_M=$call_sign
-	if [ ${#call_sign} = 4 ]; then declare call_sign_M="$call_sign$sp02"; fi
-	if [ ${#call_sign} = 5 ]; then declare call_sign_M="$call_sign$sp01"; fi
+        declare call_sign_M=$call_sign
+        if [ ${#call_sign} = 4 ]; then declare call_sign_M="$call_sign$sp02"; fi
+        if [ ${#call_sign} = 5 ]; then declare call_sign_M="$call_sign$sp01"; fi
 
 
 user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
@@ -17,41 +17,30 @@ user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
 for user in $user; do
 source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
-	declare call_sign${user}=$call_sign
-	if [ ${#call_sign} = 4 ]; then declare call_sign${user}="$call_sign$sp02"; fi
-	if [ ${#call_sign} = 5 ]; then declare call_sign${user}="$call_sign$sp01"; fi
+        declare call_sign${user}=$call_sign
+        if [ ${#call_sign} = 4 ]; then declare call_sign${user}="$call_sign$sp02"; fi
+        if [ ${#call_sign} = 5 ]; then declare call_sign${user}="$call_sign$sp01"; fi
 fi
 done
 
-#------------------------------------------------------------------------
-date=$(date '+%Y-%m-%d');
-file1=/var/log/mmdvm/MMDVM_Bridge-$date.log
+#echo $call_sign_M
+#echo $call_sign01
+#echo $call_sign02
 
-if [ -e $file1 ]; then
-        SIZE=`du $file1 | awk -F" " '{print $1}'`
-        if [ "$SIZE" == 0 ]; then
-        date=$(date -d '1 day ago' '+%Y-%m-%d')
-        fi
-        else
-        date=$(date -d '1 day ago' '+%Y-%m-%d')
+#---------- 핫스팟의 BM 연결상태 확인 ------------------------------------
+
+file1=/var/log/mmdvm/MMDVM_Bridge.log
+
+n=0
+until [ -e $file1 ] && [ -s $file1 ]; do
+if [ ! -e $file1 ] || [ ! -s $file1 ]; then
+        log_date=$(date -d "$n day ago" '+%Y-%m-%d')
+        file1=/var/log/mmdvm/MMDVM_Bridge-$log_date.log
 fi
+n=$(($n+1))
+done
 
-date=$(date '+%Y-%m-%d');
-file1=/var/log/mmdvm/MMDVM_Bridge-$date.log
 
-if [ -e $file1 ]; then
-        SIZE=`du $file1 | awk -F" " '{print $1}'`
-        if [ "$SIZE" == 0 ]; then
-        date=$(date -d '1 day ago' '+%Y-%m-%d')
-        fi
-        else
-        date=$(date -d '1 day ago' '+%Y-%m-%d')
-fi
-
-file1=/var/log/mmdvm/MMDVM_Bridge-$date.log
-date_10min_ago=$(date -d '9 hour ago 10 minute ago' '+%Y%m%d%H%M%S')
-
-if [ -e $file1 ]; then
         tail -10 $file1 | sudo tee test.txt > /dev/null 2>&1
         while read line
         do
@@ -65,92 +54,112 @@ if [ -e $file1 ]; then
         else declare con_BM_M=ok
         fi
         done < test.txt
-fi
 
-#------------------------------------------------------------------------
+#echo $con_BM_M
+
+#------------ 클라이언트의 BM 연결상태 확인 --------------------------------
 user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
 
 for user in $user; do
 
-date=$(date '+%Y-%m-%d');
-file1=/var/log/mmdvm/MMDVM_Bridge${user}-$date.log
+file=/var/lib/dvswitch/dvs/var${user}.txt
+dir=/opt/user${user}
 
-if [ -e $file1 ]; then
-        SIZE=`du $file1 | awk -F" " '{print $1}'`
-        if [ "$SIZE" == 0 ]; then
-        date=$(date -d '1 day ago' '+%Y-%m-%d')
+if [ -e $file ] && [ -d $dir ]; then
+
+        file1=/var/log/mmdvm/MMDVM_Bridge${user}.log;
+
+        n=0
+        until [ -e $file1 ] && [ -s $file1 ]; do
+        if [ ! -e $file1 ] || [ ! -s $file1 ]; then
+                log_date=$(date -d "$n day ago" '+%Y-%m-%d')
+                file1=/var/log/mmdvm/MMDVM_Bridge${user}-$log_date.log
         fi
-	else
-	date=$(date -d '1 day ago' '+%Y-%m-%d')
-fi
+        n=$(($n+1))
+        done
 
-file1=/var/log/mmdvm/MMDVM_Bridge${user}-$date.log
-date_10min_ago=$(date -d '9 hour ago 10 minute ago' '+%Y%m%d%H%M%S')
-
-if [ -e $file1 ]; then
-	tail -10 $file1 | sudo tee test.txt > /dev/null 2>&1
-	while read line
-	do
+        tail -10 $file1 | sudo tee test.txt > /dev/null 2>&1
+        while read line
+        do
         date_10min_ago=$(date -d '9 hour ago 10 minute ago' '+%Y%m%d%H%M%S')
-	dd=${line:3:22}
-	ddd=$(date -d "$dd" +"%Y%m%d%H%M%S")
+        dd=${line:3:22}
+        ddd=$(date -d "$dd" +"%Y%m%d%H%M%S")
 
-	if [ $ddd -gt $date_10min_ago ] && [[ $line =~ "failed" ]]; then
-#		echo "${user} yes"
-		declare con_BM_${user}=NO; break
-	else declare con_BM_${user}=ok
-	fi
-	done < test.txt
+        if [ $ddd -gt $date_10min_ago ] && [[ $line =~ "failed" ]]; then
+#               echo "${user} yes"
+                declare con_BM_${user}=NO; break
+        else declare con_BM_${user}=ok
+        fi
+        done < test.txt
 fi
 done
 
 
 #echo "con_BM_M=${con_BM_M}"
-#echo $con_BM_01
-#echo $con_BM_01
-#echo $con_BM_01
-#echo $con_BM_01
-#echo $con_BM_01
-#echo $con_BM_05
-#echo $con_BM_06
-#echo $con_BM_07
-#echo $con_BM_08
-#echo $con_BM_09
-#echo $con_BM_10
-#echo $con_BM_11
-#echo $con_BM_15
-#echo $con_BM_16
+#echo "01=$con_BM_01"
+#echo "02=$con_BM_02"
+#echo "03=$con_BM_03"
+#echo "04=$con_BM_04"
+#echo "05=$con_BM_05"
+#echo "06=$con_BM_06"
+#echo "07=$con_BM_07"
+#echo "08=$con_BM_08"
+#echo "09=$con_BM_09"
+#echo "10=$con_BM_10"
+#echo "11=$con_BM_11"
+#echo "15=$con_BM_15"
+#echo "16=$con_BM_16"
 
-#------------------------------------------------------------------------
-date=$(date '+%Y-%m-%d')
-file1=/var/log/dvswitch/Analog_Bridge-$date.log
-date=$(date -d '1 day ago' '+%Y-%m-%d')
-file2=/var/log/dvswitch/Analog_Bridge-$date.log
 
-sudo cat $file2 | sudo tee  test.txt > /dev/null 2>&1
+#----------- 핫스팟의 연결시간 및 연결상태 확인 --------------------------
+file1=/var/log/dvswitch/Analog_Bridge.log
+
+log_date=$(date '+%Y-%m-%d')
+file2=/var/log/dvswitch/Analog_Bridge-$log_date.log
+
+until [ -e $file2 ] && [ -s $file2 ]; do
+n=$(($n+1))
+if [ ! -e $file2 ] || [ ! -s $file2 ]; then
+        log_date=$(date -d "$n day ago" '+%Y-%m-%d')
+        file2=/var/log/dvswitch/Analog_Bridge-$log_date.log
+fi
+done
+
+if [ -e $file2 ]; then
+        sudo cat $file2 | sudo tee test.txt > /dev/null 2>&1
+fi
+
 if [ -e $file1 ]; then
         sudo cat $file1 | sudo tee -a test.txt > /dev/null 2>&1
 fi
 
 file=test.txt
 
-line_no_reset=$(grep -n "USRP reset" $file | cut -d: -f1 | tail -1)
+if [ -e $file ] && [[ ! -z `sudo grep "USRP_TYPE_TEXT" $file` ]]; then
+
 line_no_connect=$(grep -n "USRP_TYPE_TEXT" $file | cut -d: -f1 | tail -1)
+line_no_reset=$(grep -n "USRP reset" $file | cut -d: -f1 | tail -1)
+        if [ "$line_no_reset" = "" ]; then line_no_reset=0; fi
 line_no_analog_start=$(grep -n "Analog_Bridge is starting" $file | cut -d: -f1 | tail -1)
+        if [ "$line_no_analog_start" = "" ]; then line_no_analog_start=0; fi
 
 if [ $line_no_connect -gt $line_no_reset ]; then
-	line=$(cat $file | sed -n ${line_no_connect}p)
-	else line=$(cat $file | sed -n ${line_no_reset}p)
+        line=$(cat $file | sed -n ${line_no_connect}p)
+        else line=$(cat $file | sed -n ${line_no_reset}p)
 fi
+
 dd=${line:3:21}
 declare con_cl_time_M=$(date -d "${dd} 9 hour" +"%m-%d_%H:%M")
 #echo $con_cl_time_M
 
 line=$(cat $file | sed -n ${line_no_connect}p)
-callsign_cl_M=$(echo $line | cut -d '(' -f 2 | cut -d ')' -f 1)
-dmrid_cl_M=${line: -7:7}
+#callsign_cl_M=$(echo $line | cut -d '(' -f 2 | cut -d ')' -f 1)
 #echo $callsign_cl_M
+dmrid_cl_M=${line: -7:7}
 #echo $dmrid_cl_M
+dvswitch=/opt/MMDVM_Bridge/dvswitch.sh
+callsign=$($dvswitch lookup $dmrid_cl_M)
+callsign_cl_M=$(echo $callsign | awk '{print $2}')
 if [ ${#callsign_cl_M} = 4 ]; then declare callsign_cl_M="$callsign_cl_M$sp02"; fi
 if [ ${#callsign_cl_M} = 5 ]; then declare callsign_cl_M="$callsign_cl_M$sp01"; fi
 
@@ -160,44 +169,60 @@ if [ $line_no_connect -gt $line_no_reset ] && [ $line_no_connect -gt $line_no_an
         else declare con_cl_M=NO
 fi
 
+else declare callsign_cl_M="------"
+
+fi
+
 
 #echo $con_cl_M
-#------------------------------------------------------------------------
+
+#-------------- 클라이언트의 연결시간 및 연결상태 확인 --------------------
 user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
 
 for user in $user; do
 
-file=/var/log/dvswitch/user${user}/Analog_Bridge.log
+file=/var/lib/dvswitch/dvs/var${user}.txt
+dir=/opt/user${user}
 
-if [ -e $file ]; then
-line_no_reset=$(grep -n "USRP reset" $file | cut -d: -f1 | tail -1)
-line_no_connect=$(grep -n "USRP_TYPE_TEXT" $file | cut -d: -f1 | tail -1)
-line_no_analog_start=$(grep -n "Analog_Bridge is starting" $file | cut -d: -f1 | tail -1)
+if [ -e $file ] && [ -d $dir ]; then
 
-if [ $line_no_connect -gt $line_no_reset ]; then
+        file=/var/log/dvswitch/user${user}/Analog_Bridge.log
+
+        if [[ ! -z `sudo grep "USRP_TYPE_TEXT" $file` ]]; then
+
+        line_no_connect=$(grep -n "USRP_TYPE_TEXT" $file | cut -d: -f1 | tail -1)
+        line_no_reset=$(grep -n "USRP reset" $file | cut -d: -f1 | tail -1)
+        if [ "$line_no_reset" = "" ]; then line_no_reset=0; fi
+        line_no_analog_start=$(grep -n "Analog_Bridge is starting" $file | cut -d: -f1 | tail -1)
+        if [ "$line_no_analog_start" = "" ]; then line_no_analog_start=0; fi
+
+        if [ $line_no_connect -gt $line_no_reset ]; then
+                line=$(cat $file | sed -n ${line_no_connect}p)
+                else line=$(cat $file | sed -n ${line_no_reset}p)
+        fi
+
+        dd=${line:3:21}
+        declare con_cl_time_${user}=$(date -d "${dd} 9 hour" "+%m-%d_%H:%M")
+
         line=$(cat $file | sed -n ${line_no_connect}p)
-        else line=$(cat $file | sed -n ${line_no_reset}p)
-fi
+        #declare callsign_cl=$(echo $line | cut -d '(' -f 2 | cut -d ')' -f 1)
+        #callsign_cl=`echo ${callsign_cl} | tr '[a-z]' '[A-Z]'`
+        declare dmrid_cl=${line: -7:7}
+        dvswitch=/opt/MMDVM_Bridge/dvswitch.sh
+        callsign=$($dvswitch lookup $dmrid_cl)
+        callsign_cl=$(echo $callsign | awk '{print $2}')
+        if [ ${#callsign_cl} = 4 ]; then declare callsign_cl_${user}="$callsign_cl$sp02"; fi
+        if [ ${#callsign_cl} = 5 ]; then declare callsign_cl_${user}="$callsign_cl$sp01"; fi
+        if [ ${#callsign_cl} = 6 ]; then declare callsign_cl_${user}="$callsign_cl"; fi
 
-dd=${line:3:21}
-declare con_cl_time_${user}=$(date -d "${dd} 9 hour" "+%m-%d_%H:%M")
+        if [ $line_no_connect -gt $line_no_reset ] && [ $line_no_connect -gt $line_no_analog_start ]; then
+                declare con_cl_${user}=ok
+                else declare con_cl_${user}=NO
+        fi
 
-line=$(cat $file | sed -n ${line_no_connect}p)
-#declare callsign_cl=$(echo $line | cut -d '(' -f 2 | cut -d ')' -f 1)
-#callsign_cl=`echo ${callsign_cl} | tr '[a-z]' '[A-Z]'`
-declare dmrid_cl=${line: -7:7}
-dvswitch=/opt/MMDVM_Bridge/dvswitch.sh
-callsign=$($dvswitch lookup $dmrid_cl)
-callsign_cl=$(echo $callsign | awk '{print $2}')
-if [ ${#callsign_cl} = 4 ]; then declare callsign_cl_${user}="$callsign_cl$sp02"; fi
-if [ ${#callsign_cl} = 5 ]; then declare callsign_cl_${user}="$callsign_cl$sp01"; fi
-if [ ${#callsign_cl} = 6 ]; then declare callsign_cl_${user}="$callsign_cl"; fi
+        else declare callsign_cl_${user}="------"
 
-
-if [ $line_no_connect -gt $line_no_reset ] && [ $line_no_connect -gt $line_no_analog_start ]; then
-        declare con_cl_${user}=ok
-        else declare con_cl_${user}=NO
-fi
+        fi
 fi
 done
 
@@ -230,55 +255,61 @@ whiptail --msgbox "\
      <<< 핫스팟 및 클라이언트 연결상태 >>>
 
 
-      핫스팟 BM  클라이언트_최종연결_현재상태\
+       핫스팟 BM  클라이언트_최종연결_현재상태\
 
    -----------------------------------------\
 
-   M  $call_sign_M $con_BM_M   $callsign_cl_M $con_cl_time_M  $con_cl_M\
+   M   $call_sign_M $con_BM_M   $callsign_cl_M $con_cl_time_M  $con_cl_M\
 
    =========================================\
 
-   01 $call_sign01 $con_BM_01   $callsign_cl_01 $con_cl_time_01  $con_cl_01\
+   01  $call_sign01 $con_BM_01   $callsign_cl_01 $con_cl_time_01  $con_cl_01\
 
-   02 $call_sign02 $con_BM_02   $callsign_cl_02 $con_cl_time_02  $con_cl_02\
+   02  $call_sign02 $con_BM_02   $callsign_cl_02 $con_cl_time_02  $con_cl_02\
 
-   03 $call_sign03 $con_BM_03   $callsign_cl_03 $con_cl_time_03  $con_cl_03\
+   03  $call_sign03 $con_BM_03   $callsign_cl_03 $con_cl_time_03  $con_cl_03\
 
-   04 $call_sign04 $con_BM_04   $callsign_cl_04 $con_cl_time_04  $con_cl_04\
+   04  $call_sign04 $con_BM_04   $callsign_cl_04 $con_cl_time_04  $con_cl_04\
 
-   05 $call_sign05 $con_BM_05   $callsign_cl_05 $con_cl_time_05  $con_cl_05\
+   05  $call_sign05 $con_BM_05   $callsign_cl_05 $con_cl_time_05  $con_cl_05\
 
-   06 $call_sign06 $con_BM_06   $callsign_cl_06 $con_cl_time_06  $con_cl_06\
+   06  $call_sign06 $con_BM_06   $callsign_cl_06 $con_cl_time_06  $con_cl_06\
 
-   07 $call_sign07 $con_BM_07   $callsign_cl_07 $con_cl_time_07  $con_cl_07\
+   07  $call_sign07 $con_BM_07   $callsign_cl_07 $con_cl_time_07  $con_cl_07\
 
-   08 $call_sign08 $con_BM_08   $callsign_cl_08 $con_cl_time_08  $con_cl_08\
+   08  $call_sign08 $con_BM_08   $callsign_cl_08 $con_cl_time_08  $con_cl_08\
 
-   09 $call_sign09 $con_BM_09   $callsign_cl_09 $con_cl_time_09  $con_cl_09\
+   09  $call_sign09 $con_BM_09   $callsign_cl_09 $con_cl_time_09  $con_cl_09\
 
-   10 $call_sign10 $con_BM_10   $callsign_cl_10 $con_cl_time_10  $con_cl_10\
+   10  $call_sign10 $con_BM_10   $callsign_cl_10 $con_cl_time_10  $con_cl_10\
 
-   11 $call_sign11 $con_BM_11   $callsign_cl_11 $con_cl_time_11  $con_cl_11\
+   11  $call_sign11 $con_BM_11   $callsign_cl_11 $con_cl_time_11  $con_cl_11\
 
-   12 $call_sign12 $con_BM_12   $callsign_cl_12 $con_cl_time_12  $con_cl_12\
+   12  $call_sign12 $con_BM_12   $callsign_cl_12 $con_cl_time_12  $con_cl_12\
 
-   13 $call_sign13 $con_BM_13   $callsign_cl_13 $con_cl_time_13  $con_cl_13\
+   13  $call_sign13 $con_BM_13   $callsign_cl_13 $con_cl_time_13  $con_cl_13\
 
-   14 $call_sign14 $con_BM_14   $callsign_cl_14 $con_cl_time_14  $con_cl_14\
+   14  $call_sign14 $con_BM_14   $callsign_cl_14 $con_cl_time_14  $con_cl_14\
+ 
+   15  $call_sign15 $con_BM_15   $callsign_cl_15 $con_cl_time_15  $con_cl_15\
 
-   15 $call_sign15 $con_BM_15   $callsign_cl_15 $con_cl_time_15  $con_cl_15\
+   16  $call_sign16 $con_BM_16   $callsign_cl_16 $con_cl_time_16  $con_cl_16\
 
-   16 $call_sign16 $con_BM_16   $callsign_cl_16 $con_cl_time_16  $con_cl_16\
+   17  $call_sign17 $con_BM_17   $callsign_cl_17 $con_cl_time_17  $con_cl_17\
 
-   17 $call_sign17 $con_BM_17   $callsign_cl_17 $con_cl_time_17  $con_cl_17\
+   18  $call_sign18 $con_BM_18   $callsign_cl_18 $con_cl_time_18  $con_cl_18\
 
-   18 $call_sign18 $con_BM_18   $callsign_cl_18 $con_cl_time_18  $con_cl_18\
+   19  $call_sign19 $con_BM_19   $callsign_cl_19 $con_cl_time_19  $con_cl_19\
 
-   19 $call_sign19 $con_BM_19   $callsign_cl_19 $con_cl_time_19  $con_cl_19\
-
-   20 $call_sign20 $con_BM_20   $callsign_cl_20 $con_cl_time_20  $con_cl_20\
+   20  $call_sign20 $con_BM_20   $callsign_cl_20 $con_cl_time_20  $con_cl_20\
 
    =========================================\
 " 35 52 1
 
-#${DVS}dvsmu; exit 0
+exit 0
+}
+#==============================================================
+# END of connection_status
+#==============================================================
+
+
