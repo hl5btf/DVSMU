@@ -153,15 +153,26 @@ declare con_cl_time_M=$(date -d "${dd} 9 hour" +"%m-%d_%H:%M")
 #echo $con_cl_time_M
 
 line=$(cat $file | sed -n ${line_no_connect}p)
-#callsign_cl_M=$(echo $line | cut -d '(' -f 2 | cut -d ')' -f 1)
-#echo $callsign_cl_M
+callsign_cl_M_A=$(echo $line | cut -d '(' -f 2 | cut -d ')' -f 1)
+#echo $callsign_cl_M_A
 dmrid_cl_M=${line: -7:7}
 #echo $dmrid_cl_M
 dvswitch=/opt/MMDVM_Bridge/dvswitch.sh
 callsign=$($dvswitch lookup $dmrid_cl_M)
 callsign_cl_M=$(echo $callsign | awk '{print $2}')
-if [ ${#callsign_cl_M} = 4 ]; then declare callsign_cl_M="$callsign_cl_M$sp02"; fi
-if [ ${#callsign_cl_M} = 5 ]; then declare callsign_cl_M="$callsign_cl_M$sp01"; fi
+
+if [ "${#callsign_cl_M}" = 0 ]; then
+        declare callsign_cl_M="$callsign_cl_M_A"
+#       declare callsign_cl_M="------"
+fi
+
+if [ ${#callsign_cl_M} = 3 ]; then
+        declare callsign_cl_M="$callsign_cl_M$sp03"
+elif [ ${#callsign_cl_M} = 4 ]; then
+        declare callsign_cl_M="$callsign_cl_M$sp02"
+elif [ ${#callsign_cl_M} = 5 ]; then
+        declare callsign_cl_M="$callsign_cl_M$sp01"
+fi
 
 
 if [ $line_no_connect -gt $line_no_reset ] && [ $line_no_connect -gt $line_no_analog_start ]; then
@@ -205,15 +216,28 @@ if [ -e $file ] && [ -d $dir ]; then
         declare con_cl_time_${user}=$(date -d "${dd} 9 hour" "+%m-%d_%H:%M")
 
         line=$(cat $file | sed -n ${line_no_connect}p)
-        #declare callsign_cl=$(echo $line | cut -d '(' -f 2 | cut -d ')' -f 1)
-        #callsign_cl=`echo ${callsign_cl} | tr '[a-z]' '[A-Z]'`
+        declare callsign_cl_A=$(echo $line | cut -d '(' -f 2 | cut -d ')' -f 1)
+        callsign_cl_A=`echo ${callsign_cl_A} | tr '[a-z]' '[A-Z]'`
         declare dmrid_cl=${line: -7:7}
         dvswitch=/opt/MMDVM_Bridge/dvswitch.sh
         callsign=$($dvswitch lookup $dmrid_cl)
         callsign_cl=$(echo $callsign | awk '{print $2}')
-        if [ ${#callsign_cl} = 4 ]; then declare callsign_cl_${user}="$callsign_cl$sp02"; fi
-        if [ ${#callsign_cl} = 5 ]; then declare callsign_cl_${user}="$callsign_cl$sp01"; fi
-        if [ ${#callsign_cl} = 6 ]; then declare callsign_cl_${user}="$callsign_cl"; fi
+
+        if [ "${#callsign_cl}" = 0 ]; then
+                declare callsign_cl="$callsign_cl_A"
+#               declare callsign_cl="------"
+        fi
+
+        if [ ${#callsign_cl} = 3 ]; then
+                declare callsign_cl_${user}="$callsign_cl$sp03"
+        elif [ ${#callsign_cl} = 4 ]; then
+                declare callsign_cl_${user}="$callsign_cl$sp02"
+        elif [ ${#callsign_cl} = 5 ]; then
+                declare callsign_cl_${user}="$callsign_cl$sp01"
+        elif [ ${#callsign_cl} = 6 ]; then
+                declare callsign_cl_${user}="$callsign_cl"
+        fi
+
 
         if [ $line_no_connect -gt $line_no_reset ] && [ $line_no_connect -gt $line_no_analog_start ]; then
                 declare con_cl_${user}=ok
