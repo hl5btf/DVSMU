@@ -53,6 +53,9 @@ done
 sudo wget -O /usr/local/dvs/dvsmu https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu
 sudo chmod +x /usr/local/dvs/dvsmu
 
+sudo wget -O /etc/cron.daily/man_log.sh https://raw.githubusercontent.com/hl5btf/DVSMU/main/cron/man_log.sh > /dev/null 2>&1
+sudo chmod +x /etc/cron.daily/man_log.sh
+
 sleep 10
 
 # var_added
