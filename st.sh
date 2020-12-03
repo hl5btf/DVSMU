@@ -135,12 +135,12 @@ fi
 
 file=test.txt
 
-if [ -e $file ] && [[ ! -z `sudo grep "USRP_TYPE_TEXT" $file` ]]; then
+if [ -e $file ] && [[ ! -z `sudo grep "USRP_TYPE_TEXT" $file -a` ]]; then
 
-line_no_connect=$(grep -n "USRP_TYPE_TEXT" $file | cut -d: -f1 | tail -1)
-line_no_reset=$(grep -n "USRP reset" $file | cut -d: -f1 | tail -1)
+line_no_connect=$(sudo grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
+line_no_reset=$(sudo grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_reset" = "" ]; then line_no_reset=0; fi
-line_no_analog_start=$(grep -n "Analog_Bridge is starting" $file | cut -d: -f1 | tail -1)
+line_no_analog_start=$(sudo grep -n "Analog_Bridge is starting" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_analog_start" = "" ]; then line_no_analog_start=0; fi
 
 if [ $line_no_connect -gt $line_no_reset ]; then
@@ -199,12 +199,12 @@ if [ -e $file ] && [ -d $dir ]; then
 
         file=/var/log/dvswitch/user${user}/Analog_Bridge.log
 
-        if [[ ! -z `sudo grep "USRP_TYPE_TEXT" $file` ]]; then
+        if [[ ! -z `sudo grep "USRP_TYPE_TEXT" $file -a` ]]; then
 
-        line_no_connect=$(grep -n "USRP_TYPE_TEXT" $file | cut -d: -f1 | tail -1)
-        line_no_reset=$(grep -n "USRP reset" $file | cut -d: -f1 | tail -1)
+        line_no_connect=$(sudo grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
+        line_no_reset=$(sudo grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_reset" = "" ]; then line_no_reset=0; fi
-        line_no_analog_start=$(grep -n "Analog_Bridge is starting" $file | cut -d: -f1 | tail -1)
+        line_no_analog_start=$(sudo grep -n "Analog_Bridge is starting" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_analog_start" = "" ]; then line_no_analog_start=0; fi
 
         if [ $line_no_connect -gt $line_no_reset ]; then
