@@ -49,7 +49,7 @@ if [ "${line_contents:0:1}" = " " ]; then line_contents=${line_contents:1}; fi
 
 idx=$(expr index "$line_contents" ";")
 rmks="${line_contents#*;}"
-row_no=$(sudo grep -n "$line_contents" $file | cut -d: -f1)
+row_no=$(sudo grep -n "$line_contents" $file -a | cut -d: -f1)
 
 var1=$1; var3=$3
 var3=$(echo $var3 | sudo sed "s/\//""/g")
@@ -1041,7 +1041,7 @@ if [ "$TA" = "" ]; then TA=공백; fi
 file=/opt/user$USER_NO/dvsm.macro
 
 if [ -e $file ]; then
-	if [[ ! -z `grep "Advanced" $file` ]]; then
+	if [[ ! -z `sudo grep "Advanced" $file -a` ]]; then
 	macro_status="수정매크로사용중"
 	else macro_status="기본매크로사용중"
 	fi
@@ -1477,7 +1477,7 @@ fi
 
 file=test.txt
 
-if [ -e $file ] && [[ ! -z `sudo grep "USRP_TYPE_TEXT" $file` ]]; then
+if [ -e $file ] && [[ ! -z `sudo grep "USRP_TYPE_TEXT" $file -a` ]]; then
 
 line_no_connect=$(sudo grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
 line_no_reset=$(sudo grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
@@ -1541,7 +1541,7 @@ if [ -e $file ] && [ -d $dir ]; then
 
 	file=/var/log/dvswitch/user${user}/Analog_Bridge.log
 
-	if [[ ! -z `sudo grep "USRP_TYPE_TEXT" $file` ]]; then
+	if [[ ! -z `sudo grep "USRP_TYPE_TEXT" $file -a` ]]; then
 
 	line_no_connect=$(sudo grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
 	line_no_reset=$(sudo grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
