@@ -3,9 +3,9 @@
 #source /var/lib/dvswitch/dvs/var.txt
 
 #===================================
-SCRIPT_VERSION="1.5"
+SCRIPT_VERSION="1.6"
 SCRIPT_AUTHOR="HL5KY"
-SCRIPT_DATE="2020-11-25"
+SCRIPT_DATE="2020-12-03"
 #===================================
 
 if [ "$1" != "" ]; then
@@ -753,49 +753,58 @@ fi
 # Function log_error_msg
 #--------------------------------------------------------------
 function log_error_msg() {
-
+if [ $log_error_cnt = 1 ]; then :
+else
+log_error_cnt=$(($log_error_cnt+1))
 clear
 whiptail --msgbox "\
 $sp05 실시간 로그가 보이지 않으면,
 
 $sp05 PTT를 한번 잡은 후, 다시 실행해 보시기 바랍니다.
 " 10 60 1
+fi
 }
 
 #--------------------------------------------------------------
 # Function main_user_log
 #--------------------------------------------------------------
 function main_user_log() {
+log_error_cnt=0
 clear
 whiptail --msgbox "\
 
 $sp05 로그화면의 종료 명령은 q 또는 Ctrl-C
 " 9 50 1
 
-date=$(date '+%Y-%m-%d');
-file1=/var/log/mmdvm/MMDVM_Bridge-$date.log
+#---file1->MMDVM_Bridge.log-----------
+
+file1=/var/log/mmdvm/MMDVM_Bridge.log
+
+n=0
+until [ -e $file1 ] && [ -s $file1 ]; do
+if [ ! -e $file1 ] || [ ! -s $file1 ]; then
+        log_date=$(date -d "$n day ago" '+%Y-%m-%d')
+        file1=/var/log/mmdvm/MMDVM_Bridge-$log_date.log
+fi
+n=$(($n+1))
+done
+
+if [ $n -gt 1 ]; then log_error_msg; fi
+
+#---file2->Analog_Bridge.log--------------
+
 file2=/var/log/dvswitch/Analog_Bridge.log
 
-SIZE=`du $file1 | awk -F" " '{print $1}'`; clear
-if [ ! -e $file1 ] || [ "$SIZE" == 0 ]; then
-        date=$(date -d '1 day ago' '+%Y-%m-%d')
-        file1=/var/log/mmdvm/MMDVM_Bridge-$date.log
-        log_error_msg
+n=0
+until [ -e $file2 ] && [ -s $file2 ]; do
+if [ ! -e $file2 ] || [ ! -s $file2 ]; then
+        log_date=$(date -d "$n day ago" '+%Y-%m-%d')
+        file2=/var/log/dvswitch/Analog_Bridge-$log_date.log
 fi
+n=$(($n+1))
+done
 
-SIZE=`du $file2 | awk -F" " '{print $1}'`; clear
-if [ ! -e $file2 ] || [ "$SIZE" == 0 ]; then
-        date=$(date '+%Y-%m-%d')
-        file2=/var/log/dvswitch/Analog_Bridge-$date.log;
-        log_error_msg
-fi
-
-SIZE=`du $file2 | awk -F" " '{print $1}'`; clear
-if [ ! -e $file2 ] || [ "$SIZE" == 0 ]; then
-        date=$(date -d '1 day ago' '+%Y-%m-%d')
-        file2=/var/log/dvswitch/Analog_Bridge-$date.log;
-        log_error_msg
-fi
+if [ $n -gt 1 ]; then log_error_msg; fi
 
 multitail $file1 $file2
 ${DVS}dvsmu M
@@ -914,36 +923,42 @@ ${DVS}dvsmu $USER_NO; exit 0
 # Function sub_user_log
 #--------------------------------------------------------------
 function sub_user_log() {
+log_error_cnt=0
 clear
 whiptail --msgbox "\
 
 $sp05 로그화면의 종료 명령은 q 또는 Ctrl-C
 " 9 50 1
 
-date=$(date '+%Y-%m-%d');
-file1=/var/log/mmdvm/MMDVM_Bridge$USER_NO-$date.log;
+#---file1->MMDVM_Bridge.log-----------
+
+file1=/var/log/mmdvm/MMDVM_Bridge$USER_NO.log;
+
+n=0
+until [ -e $file1 ] && [ -s $file1 ]; do
+if [ ! -e $file1 ] || [ ! -s $file1 ]; then
+        log_date=$(date -d "$n day ago" '+%Y-%m-%d')
+        file1=/var/log/mmdvm/MMDVM_Bridge$USER_NO-$log_date.log
+fi
+n=$(($n+1))
+done
+
+if [ $n -gt 1 ]; then log_error_msg; fi
+
+#---file2->Analog_Bridge.log--------------
+
 file2=/var/log/dvswitch/user$USER_NO/Analog_Bridge.log;
 
-SIZE=`du $file1 | awk -F" " '{print $1}'`; clear
-if [ ! -e $file1 ] || [ "$SIZE" == 0 ]; then
-        date=$(date -d '1 day ago' '+%Y-%m-%d')
-        file1=/var/log/mmdvm/MMDVM_Bridge$USER_NO-$date.log;
-        log_error_msg
+n=0
+until [ -e $file2 ] && [ -s $file2 ]; do
+n=$(($n+1))
+if [ ! -e $file2 ] || [ ! -s $file2 ]; then
+        log_date=$(date -d "$n day ago" '+%Y-%m-%d')
+        file2=/var/log/dvswitch/user$USER_NO/Analog_Bridge-$log_date.log
 fi
+done
 
-SIZE=`du $file2 | awk -F" " '{print $1}'`; clear
-if [ ! -e $file2 ] || [ "$SIZE" == 0 ]; then
-        date=$(date '+%Y-%m-%d')
-        file2=/var/log/dvswitch/user$USER_NO/Analog_Bridge-$date.log;
-        log_error_msg
-fi
-
-SIZE=`du $file2 | awk -F" " '{print $1}'`; clear
-if [ ! -e $file2 ] || [ "$SIZE" == 0 ]; then
-        date=$(date -d '1 day ago' '+%Y-%m-%d')
-        file2=/var/log/dvswitch/user$USER_NO/Analog_Bridge-$date.log;
-        log_error_msg
-fi
+if [ $n -gt 1 ]; then log_error_msg; fi
 
 multitail $file1 $file2;
 ${DVS}dvsmu $USER_NO
@@ -1326,6 +1341,345 @@ esac
 
 
 ###############################################################
+# Function connection_status
+###############################################################
+function connection_status() {
+
+pse_wait
+
+#---------핫스팟 호출부호 추출 -------------------------------------------
+source /var/lib/dvswitch/dvs/var.txt
+        declare call_sign_M=$call_sign
+        if [ ${#call_sign} = 4 ]; then declare call_sign_M="$call_sign$sp02"; fi
+        if [ ${#call_sign} = 5 ]; then declare call_sign_M="$call_sign$sp01"; fi
+
+
+user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
+
+for user in $user; do
+source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
+if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
+        declare call_sign${user}=$call_sign
+        if [ ${#call_sign} = 4 ]; then declare call_sign${user}="$call_sign$sp02"; fi
+        if [ ${#call_sign} = 5 ]; then declare call_sign${user}="$call_sign$sp01"; fi
+fi
+done
+
+#echo $call_sign_M
+#echo $call_sign01
+#echo $call_sign02
+
+#---------- 핫스팟의 BM 연결상태 확인 ------------------------------------
+
+file1=/var/log/mmdvm/MMDVM_Bridge.log
+
+n=0
+until [ -e $file1 ] && [ -s $file1 ]; do
+if [ ! -e $file1 ] || [ ! -s $file1 ]; then
+        log_date=$(date -d "$n day ago" '+%Y-%m-%d')
+        file1=/var/log/mmdvm/MMDVM_Bridge-$log_date.log
+fi
+n=$(($n+1))
+done
+
+
+        tail -10 $file1 | sudo tee test.txt > /dev/null 2>&1
+        while read line
+        do
+        date_10min_ago=$(date -d '9 hour ago 10 minute ago' '+%Y%m%d%H%M%S')
+        dd=${line:3:22}
+        ddd=$(date -d "$dd" +"%Y%m%d%H%M%S")
+
+        if [ $ddd -gt $date_10min_ago ] && [[ $line =~ "failed" ]]; then
+                echo "${user} yes"
+                declare con_BM_M=NO; break
+        else declare con_BM_M=ok
+        fi
+        done < test.txt
+
+#echo $con_BM_M
+
+#------------ 클라이언트의 BM 연결상태 확인 --------------------------------
+user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
+
+for user in $user; do
+
+file=/var/lib/dvswitch/dvs/var${user}.txt
+dir=/opt/user${user}
+
+if [ -e $file ] && [ -d $dir ]; then
+
+	file1=/var/log/mmdvm/MMDVM_Bridge${user}.log;
+
+	n=0
+	until [ -e $file1 ] && [ -s $file1 ]; do
+	if [ ! -e $file1 ] || [ ! -s $file1 ]; then
+        	log_date=$(date -d "$n day ago" '+%Y-%m-%d')
+	        file1=/var/log/mmdvm/MMDVM_Bridge${user}-$log_date.log
+	fi
+	n=$(($n+1))
+	done
+
+        tail -10 $file1 | sudo tee test.txt > /dev/null 2>&1
+        while read line
+        do
+        date_10min_ago=$(date -d '9 hour ago 10 minute ago' '+%Y%m%d%H%M%S')
+        dd=${line:3:22}
+        ddd=$(date -d "$dd" +"%Y%m%d%H%M%S")
+
+        if [ $ddd -gt $date_10min_ago ] && [[ $line =~ "failed" ]]; then
+#               echo "${user} yes"
+                declare con_BM_${user}=NO; break
+        else declare con_BM_${user}=ok
+        fi
+        done < test.txt
+fi
+done
+
+
+#echo "con_BM_M=${con_BM_M}"
+#echo "01=$con_BM_01"
+#echo "02=$con_BM_02"
+#echo "03=$con_BM_03"
+#echo "04=$con_BM_04"
+#echo "05=$con_BM_05"
+#echo "06=$con_BM_06"
+#echo "07=$con_BM_07"
+#echo "08=$con_BM_08"
+#echo "09=$con_BM_09"
+#echo "10=$con_BM_10"
+#echo "11=$con_BM_11"
+#echo "15=$con_BM_15"
+#echo "16=$con_BM_16"
+
+
+#----------- 핫스팟의 연결시간 및 연결상태 확인 --------------------------
+file1=/var/log/dvswitch/Analog_Bridge.log
+
+log_date=$(date '+%Y-%m-%d')
+file2=/var/log/dvswitch/Analog_Bridge-$log_date.log
+
+until [ -e $file2 ] && [ -s $file2 ]; do
+n=$(($n+1))
+if [ ! -e $file2 ] || [ ! -s $file2 ]; then
+        log_date=$(date -d "$n day ago" '+%Y-%m-%d')
+        file2=/var/log/dvswitch/Analog_Bridge-$log_date.log
+fi
+done
+
+if [ -e $file2 ]; then
+        sudo cat $file2 | sudo tee test.txt > /dev/null 2>&1
+fi
+
+if [ -e $file1 ]; then
+        sudo cat $file1 | sudo tee -a test.txt > /dev/null 2>&1
+fi
+
+file=test.txt
+
+if [ -e $file ] && [[ ! -z `sudo grep "USRP_TYPE_TEXT" $file` ]]; then
+
+line_no_connect=$(sudo grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
+line_no_reset=$(sudo grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
+        if [ "$line_no_reset" = "" ]; then line_no_reset=0; fi
+line_no_analog_start=$(sudo grep -n "Analog_Bridge is starting" $file -a | cut -d: -f1 | tail -1)
+        if [ "$line_no_analog_start" = "" ]; then line_no_analog_start=0; fi
+
+if [ $line_no_connect -gt $line_no_reset ]; then
+        line=$(cat $file | sed -n ${line_no_connect}p)
+        else line=$(cat $file | sed -n ${line_no_reset}p)
+fi
+
+dd=${line:3:21}
+declare con_cl_time_M=$(date -d "${dd} 9 hour" +"%m-%d_%H:%M")
+#echo $con_cl_time_M
+
+line=$(cat $file | sed -n ${line_no_connect}p)
+callsign_cl_M_A=$(echo $line | cut -d '(' -f 2 | cut -d ')' -f 1)
+#echo $callsign_cl_M_A
+dmrid_cl_M=${line: -7:7}
+#echo $dmrid_cl_M
+dvswitch=/opt/MMDVM_Bridge/dvswitch.sh
+callsign=$($dvswitch lookup $dmrid_cl_M)
+callsign_cl_M=$(echo $callsign | awk '{print $2}')
+
+if [ "${#callsign_cl_M}" = 0 ]; then
+	declare callsign_cl_M="$callsign_cl_M_A"
+#	declare callsign_cl_M="------"
+fi
+
+if [ ${#callsign_cl_M} = 3 ]; then
+	declare callsign_cl_M="$callsign_cl_M$sp03"
+elif [ ${#callsign_cl_M} = 4 ]; then
+	declare callsign_cl_M="$callsign_cl_M$sp02"
+elif [ ${#callsign_cl_M} = 5 ]; then
+	declare callsign_cl_M="$callsign_cl_M$sp01"
+fi
+
+
+if [ $line_no_connect -gt $line_no_reset ] && [ $line_no_connect -gt $line_no_analog_start ]; then
+        declare con_cl_M=ok
+        else declare con_cl_M=NO
+fi
+
+else declare callsign_cl_M="------"
+
+fi
+
+
+#echo $con_cl_M
+
+#-------------- 클라이언트의 연결시간 및 연결상태 확인 --------------------
+user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
+
+for user in $user; do
+
+file=/var/lib/dvswitch/dvs/var${user}.txt
+dir=/opt/user${user}
+
+if [ -e $file ] && [ -d $dir ]; then
+
+	file=/var/log/dvswitch/user${user}/Analog_Bridge.log
+
+	if [[ ! -z `sudo grep "USRP_TYPE_TEXT" $file` ]]; then
+
+	line_no_connect=$(sudo grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
+	line_no_reset=$(sudo grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
+	if [ "$line_no_reset" = "" ]; then line_no_reset=0; fi
+	line_no_analog_start=$(sudo grep -n "Analog_Bridge is starting" $file -a | cut -d: -f1 | tail -1)
+	if [ "$line_no_analog_start" = "" ]; then line_no_analog_start=0; fi
+
+	if [ $line_no_connect -gt $line_no_reset ]; then
+        	line=$(cat $file | sed -n ${line_no_connect}p)
+	        else line=$(cat $file | sed -n ${line_no_reset}p)
+	fi
+
+	dd=${line:3:21}
+	declare con_cl_time_${user}=$(date -d "${dd} 9 hour" "+%m-%d_%H:%M")
+
+	line=$(cat $file | sed -n ${line_no_connect}p)
+	declare callsign_cl_A=$(echo $line | cut -d '(' -f 2 | cut -d ')' -f 1)
+	callsign_cl_A=`echo ${callsign_cl_A} | tr '[a-z]' '[A-Z]'`
+	declare dmrid_cl=${line: -7:7}
+	dvswitch=/opt/MMDVM_Bridge/dvswitch.sh
+	callsign=$($dvswitch lookup $dmrid_cl)
+	callsign_cl=$(echo $callsign | awk '{print $2}')
+
+	if [ "${#callsign_cl}" = 0 ]; then
+		declare callsign_cl="$callsign_cl_A"
+#		declare callsign_cl="------"
+	fi
+
+	if [ ${#callsign_cl} = 3 ]; then
+		declare callsign_cl_${user}="$callsign_cl$sp03"
+	elif [ ${#callsign_cl} = 4 ]; then
+		declare callsign_cl_${user}="$callsign_cl$sp02"
+	elif [ ${#callsign_cl} = 5 ]; then
+		declare callsign_cl_${user}="$callsign_cl$sp01"
+	elif [ ${#callsign_cl} = 6 ]; then
+		declare callsign_cl_${user}="$callsign_cl"
+	fi
+
+
+	if [ $line_no_connect -gt $line_no_reset ] && [ $line_no_connect -gt $line_no_analog_start ]; then
+        	declare con_cl_${user}=ok
+	        else declare con_cl_${user}=NO
+	fi
+
+	else declare callsign_cl_${user}="------"
+
+	fi
+fi
+done
+
+#echo "01=$callsign_cl_01"
+#echo "01=$con_cl_time_01"
+#echo "01=$dmrid_cl_01"
+#echo "02=$callsign_cl_02"
+#echo "02=$con_cl_time_02"
+#echo "03=$callsign_cl_03"
+#echo "03=$con_cl_time_03"
+#echo "04=$callsign_cl_04"
+#echo "04=$con_cl_time_04"
+#echo "05=$callsign_cl_05"
+#echo "05=$con_cl_time_05"
+#echo "06=$callsign_cl_06"
+#echo "06=$con_cl_time_06"
+#echo "07=$callsign_cl_07"
+#echo "07=$con_cl_time_07"
+#echo "08=$callsign_cl_08"
+#echo "08=$con_cl_time_08"
+#echo "09=$callsign_cl_09"
+#echo "09=$con_cl_time_09"
+#echo "15=$callsign_cl_15"
+#echo "15=$con_cl_time_15"
+
+
+clear
+whiptail --msgbox "\
+
+     <<< 핫스팟 및 클라이언트 연결상태 >>>
+
+
+       핫스팟 BM  클라이언트_최종연결_현재상태\
+
+   -----------------------------------------\
+
+   M   $call_sign_M $con_BM_M   $callsign_cl_M $con_cl_time_M  $con_cl_M\
+
+   =========================================\
+
+   01  $call_sign01 $con_BM_01   $callsign_cl_01 $con_cl_time_01  $con_cl_01\
+
+   02  $call_sign02 $con_BM_02   $callsign_cl_02 $con_cl_time_02  $con_cl_02\
+
+   03  $call_sign03 $con_BM_03   $callsign_cl_03 $con_cl_time_03  $con_cl_03\
+
+   04  $call_sign04 $con_BM_04   $callsign_cl_04 $con_cl_time_04  $con_cl_04\
+
+   05  $call_sign05 $con_BM_05   $callsign_cl_05 $con_cl_time_05  $con_cl_05\
+
+   06  $call_sign06 $con_BM_06   $callsign_cl_06 $con_cl_time_06  $con_cl_06\
+
+   07  $call_sign07 $con_BM_07   $callsign_cl_07 $con_cl_time_07  $con_cl_07\
+
+   08  $call_sign08 $con_BM_08   $callsign_cl_08 $con_cl_time_08  $con_cl_08\
+
+   09  $call_sign09 $con_BM_09   $callsign_cl_09 $con_cl_time_09  $con_cl_09\
+
+   10  $call_sign10 $con_BM_10   $callsign_cl_10 $con_cl_time_10  $con_cl_10\
+
+   11  $call_sign11 $con_BM_11   $callsign_cl_11 $con_cl_time_11  $con_cl_11\
+
+   12  $call_sign12 $con_BM_12   $callsign_cl_12 $con_cl_time_12  $con_cl_12\
+
+   13  $call_sign13 $con_BM_13   $callsign_cl_13 $con_cl_time_13  $con_cl_13\
+
+   14  $call_sign14 $con_BM_14   $callsign_cl_14 $con_cl_time_14  $con_cl_14\
+
+   15  $call_sign15 $con_BM_15   $callsign_cl_15 $con_cl_time_15  $con_cl_15\
+
+   16  $call_sign16 $con_BM_16   $callsign_cl_16 $con_cl_time_16  $con_cl_16\
+
+   17  $call_sign17 $con_BM_17   $callsign_cl_17 $con_cl_time_17  $con_cl_17\
+
+   18  $call_sign18 $con_BM_18   $callsign_cl_18 $con_cl_time_18  $con_cl_18\
+
+   19  $call_sign19 $con_BM_19   $callsign_cl_19 $con_cl_time_19  $con_cl_19\
+
+   20  $call_sign20 $con_BM_20   $callsign_cl_20 $con_cl_time_20  $con_cl_20\
+
+   =========================================\
+" 35 52 1
+
+${DVS}dvsmu; exit 0
+}
+#==============================================================
+# END of connection_status
+#==============================================================
+
+
+###############################################################
 # MAIN SCRIPT
 ###############################################################
 clear
@@ -1379,20 +1733,21 @@ then
 sel=$(whiptail --title " DVSwitch Multi User " --menu "\
                    dvsMU v.$SCRIPT_VERSION HL5KY
 \n
-" 37 60 28 \
+" 38 60 29 \
 "S" "시스템 모니터링" \
 "O" "시스템 최적화" \
+"C" "BM 및 클라이언트 연결상태 확인" \
 "M" "MAIN   $call_sign_M $dmr_id_M $ext_M $usrp_port_M talkerAlias" \
 "=" "============================================" \
-"1" "User01 $call_sign01 $dmr_id01 $ext01 $usrp_port01 $talkerAlias01" \
-"2" "User02 $call_sign02 $dmr_id02 $ext02 $usrp_port02 $talkerAlias02" \
-"3" "User03 $call_sign03 $dmr_id03 $ext03 $usrp_port03 $talkerAlias03" \
-"4" "User04 $call_sign04 $dmr_id04 $ext04 $usrp_port04 $talkerAlias04" \
-"5" "User05 $call_sign05 $dmr_id05 $ext05 $usrp_port05 $talkerAlias05" \
-"6" "User06 $call_sign06 $dmr_id06 $ext06 $usrp_port06 $talkerAlias06" \
-"7" "User07 $call_sign07 $dmr_id07 $ext07 $usrp_port07 $talkerAlias07" \
-"8" "User08 $call_sign08 $dmr_id08 $ext08 $usrp_port08 $talkerAlias08" \
-"9" "User09 $call_sign09 $dmr_id09 $ext09 $usrp_port09 $talkerAlias09" \
+"01" "User01 $call_sign01 $dmr_id01 $ext01 $usrp_port01 $talkerAlias01" \
+"02" "User02 $call_sign02 $dmr_id02 $ext02 $usrp_port02 $talkerAlias02" \
+"03" "User03 $call_sign03 $dmr_id03 $ext03 $usrp_port03 $talkerAlias03" \
+"04" "User04 $call_sign04 $dmr_id04 $ext04 $usrp_port04 $talkerAlias04" \
+"05" "User05 $call_sign05 $dmr_id05 $ext05 $usrp_port05 $talkerAlias05" \
+"06" "User06 $call_sign06 $dmr_id06 $ext06 $usrp_port06 $talkerAlias06" \
+"07" "User07 $call_sign07 $dmr_id07 $ext07 $usrp_port07 $talkerAlias07" \
+"08" "User08 $call_sign08 $dmr_id08 $ext08 $usrp_port08 $talkerAlias08" \
+"09" "User09 $call_sign09 $dmr_id09 $ext09 $usrp_port09 $talkerAlias09" \
 "10" "User10 $call_sign10 $dmr_id10 $ext10 $usrp_port10 $talkerAlias10" \
 "11" "User11 $call_sign11 $dmr_id11 $ext11 $usrp_port11 $talkerAlias11" \
 "12" "User12 $call_sign12 $dmr_id12 $ext12 $usrp_port12 $talkerAlias12" \
@@ -1418,20 +1773,21 @@ else
 sel=$(whiptail --title " DVSwitch Multi User " --menu "\
               dvsMU v.$SCRIPT_VERSION HL5KY
 \n
-" 37 50 28 \
+" 38 50 29 \
 "S" "시스템 모니터링" \
 "O" "시스템 최적화" \
+"C" "BM 및 클라이언트 연결상태 확인" \
 "M" "MAIN   $call_sign_M $dmr_id_M $ext_M $usrp_port_M" \
 "=" "===============================" \
-"1" "User01 $call_sign01 $dmr_id01 $ext01 $usrp_port01" \
-"2" "User02 $call_sign02 $dmr_id02 $ext02 $usrp_port02" \
-"3" "User03 $call_sign03 $dmr_id03 $ext03 $usrp_port03" \
-"4" "User04 $call_sign04 $dmr_id04 $ext04 $usrp_port04" \
-"5" "User05 $call_sign05 $dmr_id05 $ext05 $usrp_port05" \
-"6" "User06 $call_sign06 $dmr_id06 $ext06 $usrp_port06" \
-"7" "User07 $call_sign07 $dmr_id07 $ext07 $usrp_port07" \
-"8" "User08 $call_sign08 $dmr_id08 $ext08 $usrp_port08" \
-"9" "User09 $call_sign09 $dmr_id09 $ext09 $usrp_port09" \
+"01" "User01 $call_sign01 $dmr_id01 $ext01 $usrp_port01" \
+"02" "User02 $call_sign02 $dmr_id02 $ext02 $usrp_port02" \
+"03" "User03 $call_sign03 $dmr_id03 $ext03 $usrp_port03" \
+"04" "User04 $call_sign04 $dmr_id04 $ext04 $usrp_port04" \
+"05" "User05 $call_sign05 $dmr_id05 $ext05 $usrp_port05" \
+"06" "User06 $call_sign06 $dmr_id06 $ext06 $usrp_port06" \
+"07" "User07 $call_sign07 $dmr_id07 $ext07 $usrp_port07" \
+"08" "User08 $call_sign08 $dmr_id08 $ext08 $usrp_port08" \
+"09" "User09 $call_sign09 $dmr_id09 $ext09 $usrp_port09" \
 "10" "User10 $call_sign10 $dmr_id10 $ext10 $usrp_port10" \
 "11" "User11 $call_sign11 $dmr_id11 $ext11 $usrp_port11" \
 "12" "User12 $call_sign12 $dmr_id12 $ext12 $usrp_port12" \
@@ -1465,27 +1821,29 @@ $sp03 시스템 모니터의 종료 명령은 F10 또는 Ctrl-C
 htop; ${DVS}dvsmu ;;
 O)
 system_optimizer ;;
+C)
+connection_status ;;
 M)
 main_user_config ;;
 =)
 ${DVS}dvsmu ;;
-1)
+01)
 sub_user_config 01 ;;
-2)
+02)
 sub_user_config 02 ;;
-3)
+03)
 sub_user_config 03 ;;
-4)
+04)
 sub_user_config 04 ;;
-5)
+05)
 sub_user_config 05 ;;
-6)
+06)
 sub_user_config 06 ;;
-7)
+07)
 sub_user_config 07 ;;
-8)
+08)
 sub_user_config 08 ;;
-9)
+09)
 sub_user_config 09 ;;
 10)
 sub_user_config 10 ;;
