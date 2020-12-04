@@ -182,11 +182,11 @@ fi
 
 
         if [ $line_no_connect -gt $line_no_reset ] && [ $line_no_connect -gt $line_no_analog_start ]; then
-                declare con_cl_${user}=ok
-        elif [ $line_no_connect -gt $line_no_reset ] && [ $line_no_connect -gt $line_no_analog_start ]; then
-                declare con_cl_${user}=ok
+                declare con_cl_M=ok
+        elif [ $line_no_ipchange -gt $line_no_reset ] && [ $line_no_ipchange -gt $line_no_analog_start ]; then
+                declare con_cl_M=ok
         else
-		declare con_cl_${user}=NO
+		declare con_cl_M=NO
         fi
 
 else declare callsign_cl_M="------"
@@ -257,7 +257,7 @@ if [ -e $file ] && [ -d $dir ]; then
 
         if [ $line_no_connect -gt $line_no_reset ] && [ $line_no_connect -gt $line_no_analog_start ]; then
                 declare con_cl_${user}=ok
-	elif [ $line_no_connect -gt $line_no_reset ] && [ $line_no_connect -gt $line_no_analog_start ]; then
+	elif [ $line_no_ipchange -gt $line_no_reset ] && [ $line_no_ipchange -gt $line_no_analog_start ]; then
 		declare con_cl_${user}=ok
 	else
 		declare con_cl_${user}=NO
