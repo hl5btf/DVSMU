@@ -135,50 +135,59 @@ fi
 
 file=test.txt
 
-if [ -e $file ] && [[ ! -z `sudo grep "USRP_TYPE_TEXT" $file -a` ]]; then
+if [ -e $file ] && [[ ! -z `sudo grep "USRP server ip change" $file -a` ]]; then
 
+line_no_ipchange=$(sudo grep -n "USRP server ip change" $file -a | cut -d: -f1 | tail -1)
 line_no_connect=$(sudo grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
+	if [ "$line_no_connect" = "" ]; then line_no_connect=0; fi
 line_no_reset=$(sudo grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_reset" = "" ]; then line_no_reset=0; fi
 line_no_analog_start=$(sudo grep -n "Analog_Bridge is starting" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_analog_start" = "" ]; then line_no_analog_start=0; fi
 
-if [ $line_no_connect -gt $line_no_reset ]; then
-        line=$(cat $file | sed -n ${line_no_connect}p)
-        else line=$(cat $file | sed -n ${line_no_reset}p)
+if [ $line_no_ipchange -gt $line_no_reset ]; then
+        line=$(sudo cat $file | sudo sed -n ${line_no_ipchange}p)
+        else line=$(sudo cat $file | sudo sed -n ${line_no_reset}p)
 fi
 
 dd=${line:3:21}
 declare con_cl_time_M=$(date -d "${dd} 9 hour" +"%m-%d_%H:%M")
 #echo $con_cl_time_M
 
-line=$(cat $file | sed -n ${line_no_connect}p)
-callsign_cl_M_A=$(echo $line | cut -d '(' -f 2 | cut -d ')' -f 1)
-#echo $callsign_cl_M_A
-dmrid_cl_M=${line: -7:7}
-#echo $dmrid_cl_M
-dvswitch=/opt/MMDVM_Bridge/dvswitch.sh
-callsign=$($dvswitch lookup $dmrid_cl_M)
-callsign_cl_M=$(echo $callsign | awk '{print $2}')
+if [ $line_no_ipchange -gt $line_no_connect ]; then
+	callsign_cl=pyUC
+	else
+	line=$(sudo cat $file | sudo sed -n ${line_no_connect}p)
+	callsign_cl_M_A=$(echo $line | cut -d '(' -f 2 | cut -d ')' -f 1)
+	#echo $callsign_cl_M_A
+	dmrid_cl_M=${line: -7:7}
+	#echo $dmrid_cl_M
+	dvswitch=/opt/MMDVM_Bridge/dvswitch.sh
+	callsign=$($dvswitch lookup $dmrid_cl_M)
+	callsign_cl_M=$(echo $callsign | awk '{print $2}')
 
-if [ "${#callsign_cl_M}" = 0 ]; then
-        declare callsign_cl_M="$callsign_cl_M_A"
-#       declare callsign_cl_M="------"
+	if [ "${#callsign_cl_M}" = 0 ]; then
+        	declare callsign_cl_M="$callsign_cl_M_A"
+	#       declare callsign_cl_M="------"
+	fi
 fi
 
-if [ ${#callsign_cl_M} = 3 ]; then
-        declare callsign_cl_M="$callsign_cl_M$sp03"
-elif [ ${#callsign_cl_M} = 4 ]; then
-        declare callsign_cl_M="$callsign_cl_M$sp02"
-elif [ ${#callsign_cl_M} = 5 ]; then
-        declare callsign_cl_M="$callsign_cl_M$sp01"
-fi
+	if [ ${#callsign_cl_M} = 3 ]; then
+        	declare callsign_cl_M="$callsign_cl_M$sp03"
+	elif [ ${#callsign_cl_M} = 4 ]; then
+        	declare callsign_cl_M="$callsign_cl_M$sp02"
+	elif [ ${#callsign_cl_M} = 5 ]; then
+        	declare callsign_cl_M="$callsign_cl_M$sp01"
+	fi
 
 
-if [ $line_no_connect -gt $line_no_reset ] && [ $line_no_connect -gt $line_no_analog_start ]; then
-        declare con_cl_M=ok
-        else declare con_cl_M=NO
-fi
+        if [ $line_no_connect -gt $line_no_reset ] && [ $line_no_connect -gt $line_no_analog_start ]; then
+                declare con_cl_${user}=ok
+        elif [ $line_no_connect -gt $line_no_reset ] && [ $line_no_connect -gt $line_no_analog_start ]; then
+                declare con_cl_${user}=ok
+        else
+		declare con_cl_${user}=NO
+        fi
 
 else declare callsign_cl_M="------"
 
@@ -199,34 +208,41 @@ if [ -e $file ] && [ -d $dir ]; then
 
         file=/var/log/dvswitch/user${user}/Analog_Bridge.log
 
-        if [[ ! -z `sudo grep "USRP_TYPE_TEXT" $file -a` ]]; then
+        if [[ ! -z `sudo grep "USRP server ip change" $file -a` ]]; then
 
+	line_no_ipchange=$(sudo grep -n "USRP server ip change" $file -a | cut -d: -f1 | tail -1)
         line_no_connect=$(sudo grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
+	if [ "$line_no_connect" = "" ]; then line_no_connect=0; fi
         line_no_reset=$(sudo grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_reset" = "" ]; then line_no_reset=0; fi
         line_no_analog_start=$(sudo grep -n "Analog_Bridge is starting" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_analog_start" = "" ]; then line_no_analog_start=0; fi
 
-        if [ $line_no_connect -gt $line_no_reset ]; then
-                line=$(cat $file | sed -n ${line_no_connect}p)
-                else line=$(cat $file | sed -n ${line_no_reset}p)
+        if [ $line_no_ipchange -gt $line_no_reset ]; then
+                line=$(sudo cat $file | sudo sed -n ${line_no_ipchange}p)
+                else line=$(sudo cat $file | sudo sed -n ${line_no_reset}p)
         fi
 
         dd=${line:3:21}
         declare con_cl_time_${user}=$(date -d "${dd} 9 hour" "+%m-%d_%H:%M")
 
-        line=$(cat $file | sed -n ${line_no_connect}p)
-        declare callsign_cl_A=$(echo $line | cut -d '(' -f 2 | cut -d ')' -f 1)
-        callsign_cl_A=`echo ${callsign_cl_A} | tr '[a-z]' '[A-Z]'`
-        declare dmrid_cl=${line: -7:7}
-        dvswitch=/opt/MMDVM_Bridge/dvswitch.sh
-        callsign=$($dvswitch lookup $dmrid_cl)
-        callsign_cl=$(echo $callsign | awk '{print $2}')
+	if [ $line_no_ipchange -gt $line_no_connect ]; then
+		callsign_cl=pyUC
+		else
 
-        if [ "${#callsign_cl}" = 0 ]; then
-                declare callsign_cl="$callsign_cl_A"
-#               declare callsign_cl="------"
-        fi
+	        line=$(sudo cat $file | sudo sed -n ${line_no_connect}p)
+        	declare callsign_cl_A=$(echo $line | cut -d '(' -f 2 | cut -d ')' -f 1)
+	        callsign_cl_A=`echo ${callsign_cl_A} | tr '[a-z]' '[A-Z]'`
+        	declare dmrid_cl=${line: -7:7}
+	        dvswitch=/opt/MMDVM_Bridge/dvswitch.sh
+        	callsign=$($dvswitch lookup $dmrid_cl)
+	        callsign_cl=$(echo $callsign | awk '{print $2}')
+
+	        if [ "${#callsign_cl}" = 0 ]; then
+        	        declare callsign_cl="$callsign_cl_A"
+#               	declare callsign_cl="------"
+	        fi
+	fi
 
         if [ ${#callsign_cl} = 3 ]; then
                 declare callsign_cl_${user}="$callsign_cl$sp03"
@@ -241,7 +257,10 @@ if [ -e $file ] && [ -d $dir ]; then
 
         if [ $line_no_connect -gt $line_no_reset ] && [ $line_no_connect -gt $line_no_analog_start ]; then
                 declare con_cl_${user}=ok
-                else declare con_cl_${user}=NO
+	elif [ $line_no_connect -gt $line_no_reset ] && [ $line_no_connect -gt $line_no_analog_start ]; then
+		declare con_cl_${user}=ok
+	else
+		declare con_cl_${user}=NO
         fi
 
         else declare callsign_cl_${user}="------"
