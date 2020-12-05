@@ -1459,6 +1459,7 @@ file1=/var/log/dvswitch/Analog_Bridge.log
 log_date=$(date '+%Y-%m-%d')
 file2=/var/log/dvswitch/Analog_Bridge-$log_date.log
 
+n=0
 until [ -e $file2 ] && [ -s $file2 ]; do
 n=$(($n+1))
 if [ ! -e $file2 ] || [ ! -s $file2 ]; then

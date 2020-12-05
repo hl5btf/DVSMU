@@ -110,13 +110,13 @@ done
 #echo "15=$con_BM_15"
 #echo "16=$con_BM_16"
 
-
 #----------- 핫스팟의 연결시간 및 연결상태 확인 --------------------------
 file1=/var/log/dvswitch/Analog_Bridge.log
 
 log_date=$(date '+%Y-%m-%d')
 file2=/var/log/dvswitch/Analog_Bridge-$log_date.log
 
+n=0
 until [ -e $file2 ] && [ -s $file2 ]; do
 n=$(($n+1))
 if [ ! -e $file2 ] || [ ! -s $file2 ]; then
@@ -152,6 +152,7 @@ fi
 
 dd=${line:3:21}
 declare con_cl_time_M=$(date -d "${dd} 9 hour" +"%m-%d_%H:%M")
+
 #echo $con_cl_time_M
 
 if [ $line_no_ipchange -gt $line_no_connect ]; then
@@ -193,7 +194,7 @@ else declare callsign_cl_M="------"
 
 fi
 
-
+#echo $callsign_cl_M
 #echo $con_cl_M
 
 #-------------- 클라이언트의 연결시간 및 연결상태 확인 --------------------
