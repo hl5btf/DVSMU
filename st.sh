@@ -50,7 +50,7 @@ if [ -e $file1 ]; then
         ddd=$(date -d "$dd" +"%Y%m%d%H%M%S")
 
         if [ $ddd -gt $date_10min_ago ] && [[ $line =~ "failed" ]]; then
-                echo "${user} yes"
+#                echo "${user} failed"
                 declare con_BM_M=NO; break
         else declare con_BM_M=ok
         fi
@@ -66,10 +66,11 @@ user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
 
 for user in $user; do
 
-file=/var/lib/dvswitch/dvs/var${user}.txt
+#file=/var/lib/dvswitch/dvs/var${user}.txt
 dir=/opt/user${user}
 
-if [ -e $file ] && [ -d $dir ]; then
+#if [ -e $file ] && [ -d $dir ]; then
+if [ -d $dir ]; then
 
         file1=/var/log/mmdvm/MMDVM_Bridge${user}.log;
 
@@ -82,6 +83,7 @@ if [ -e $file ] && [ -d $dir ]; then
         fi
         n=$(($n+1))
         done
+
 
 	if [ -e $file1 ]; then
 	        tail -10 $file1 | sudo tee test.txt > /dev/null 2>&1
@@ -137,7 +139,7 @@ done
 
 
 if [ -s $file2 ]; then
-        sudo cat $file2 | sudo tee test.txt > /dev/null 2>&1
+        cat $file2 | sudo tee test.txt > /dev/null 2>&1
 fi
 
 
@@ -146,30 +148,30 @@ n=$(($n-1))
 if [ ! -e $file2 ] || [ ! -s $file2 ]; then
         log_date=$(date -d "$n day ago" '+%Y-%m-%d')
         file2=/var/log/dvswitch/Analog_Bridge-$log_date.log
-	sudo cat $file2 | sudo tee -a test.txt > /dev/null 2>&1
+	cat $file2 | sudo tee -a test.txt > /dev/null 2>&1
 fi
 done
 
 
 if [ -s $file1 ]; then
-        sudo cat $file1 | sudo tee -a test.txt > /dev/null 2>&1
+        cat $file1 | sudo tee -a test.txt > /dev/null 2>&1
 fi
 
 file=test.txt
 
-if [ -e $file ] && [[ ! -z `sudo grep "change" $file -a` ]]; then
+if [ -e $file ] && [[ ! -z `grep "change" $file -a` ]]; then
 
-line_no_ipchange=$(sudo grep -n "change" $file -a | cut -d: -f1 | tail -1)
-line_no_connect=$(sudo grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
+line_no_ipchange=$(grep -n "change" $file -a | cut -d: -f1 | tail -1)
+line_no_connect=$(grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
 	if [ "$line_no_connect" = "" ]; then line_no_connect=0; fi
-line_no_reset=$(sudo grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
+line_no_reset=$(grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_reset" = "" ]; then line_no_reset=0; fi
-line_no_analog_start=$(sudo grep -n "starting" $file -a | cut -d: -f1 | tail -1)
+line_no_analog_start=$(grep -n "starting" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_analog_start" = "" ]; then line_no_analog_start=0; fi
 
 if [ $line_no_ipchange -gt $line_no_reset ]; then
-        line=$(sudo cat $file | sudo sed -n ${line_no_ipchange}p)
-        else line=$(sudo cat $file | sudo sed -n ${line_no_reset}p)
+        line=$(cat $file | sed -n ${line_no_ipchange}p)
+        else line=$(cat $file | sed -n ${line_no_reset}p)
 fi
 
 dd=${line:3:21}
@@ -180,7 +182,7 @@ declare con_cl_time_M=$(date -d "${dd} 9 hour" +"%m-%d_%H:%M")
 if [ $line_no_ipchange -gt $line_no_connect ]; then
 	callsign_cl=pyUC
 	else
-	line=$(sudo cat $file | sudo sed -n ${line_no_connect}p)
+	line=$(cat $file | sed -n ${line_no_connect}p)
 	callsign_cl_M_A=$(echo $line | cut -d '(' -f 2 | cut -d ')' -f 1)
 	#echo $callsign_cl_M_A
 	dmrid_cl_M=${line: -7:7}
@@ -224,26 +226,27 @@ user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
 
 for user in $user; do
 
-file=/var/lib/dvswitch/dvs/var${user}.txt
+#file=/var/lib/dvswitch/dvs/var${user}.txt
 dir=/opt/user${user}
 
-if [ -e $file ] && [ -d $dir ]; then
+#if [ -e $file ] && [ -d $dir ]; then
+if [ -d $dir ]; then
 
         file=/var/log/dvswitch/user${user}/Analog_Bridge.log
 
-        if [[ ! -z `sudo grep "change" $file -a` ]]; then
+        if [[ ! -z `grep "change" $file -a` ]]; then
 
-	line_no_ipchange=$(sudo grep -n "change" $file -a | cut -d: -f1 | tail -1)
-        line_no_connect=$(sudo grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
+	line_no_ipchange=$(grep -n "change" $file -a | cut -d: -f1 | tail -1)
+        line_no_connect=$(grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
 	if [ "$line_no_connect" = "" ]; then line_no_connect=0; fi
-        line_no_reset=$(sudo grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
+        line_no_reset=$(grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_reset" = "" ]; then line_no_reset=0; fi
-        line_no_analog_start=$(sudo grep -n "starting" $file -a | cut -d: -f1 | tail -1)
+        line_no_analog_start=$(grep -n "starting" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_analog_start" = "" ]; then line_no_analog_start=0; fi
 
         if [ $line_no_ipchange -gt $line_no_reset ]; then
-                line=$(sudo cat $file | sudo sed -n ${line_no_ipchange}p)
-                else line=$(sudo cat $file | sudo sed -n ${line_no_reset}p)
+                line=$(cat $file | sed -n ${line_no_ipchange}p)
+                else line=$(cat $file | sed -n ${line_no_reset}p)
         fi
 
         dd=${line:3:21}
@@ -253,7 +256,7 @@ if [ -e $file ] && [ -d $dir ]; then
 		callsign_cl=pyUC
 		else
 
-	        line=$(sudo cat $file | sudo sed -n ${line_no_connect}p)
+	        line=$(cat $file | sed -n ${line_no_connect}p)
         	declare callsign_cl_A=$(echo $line | cut -d '(' -f 2 | cut -d ')' -f 1)
 	        callsign_cl_A=`echo ${callsign_cl_A} | tr '[a-z]' '[A-Z]'`
         	declare dmrid_cl=${line: -7:7}
