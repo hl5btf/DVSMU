@@ -32,7 +32,8 @@ done
 file1=/var/log/mmdvm/MMDVM_Bridge.log
 
 n=0
-until [ -e $file1 ] && [ -s $file1 ]; do
+#until [ -e $file1 ] && [ -s $file1 ]; do
+until [ -s $file1 ] || [ $n = 5 ]; do
 if [ ! -e $file1 ] || [ ! -s $file1 ]; then
         log_date=$(date -d "$n day ago" '+%Y-%m-%d')
         file1=/var/log/mmdvm/MMDVM_Bridge-$log_date.log
@@ -40,7 +41,7 @@ fi
 n=$(($n+1))
 done
 
-
+if [ -e $file1 ]; then
         tail -10 $file1 | sudo tee test.txt > /dev/null 2>&1
         while read line
         do
@@ -54,6 +55,9 @@ done
         else declare con_BM_M=ok
         fi
         done < test.txt
+else
+con_BM_M=??
+fi
 
 #echo $con_BM_M
 
@@ -70,7 +74,8 @@ if [ -e $file ] && [ -d $dir ]; then
         file1=/var/log/mmdvm/MMDVM_Bridge${user}.log;
 
         n=0
-        until [ -e $file1 ] && [ -s $file1 ]; do
+#        until [ -e $file1 ] && [ -s $file1 ]; do
+	until [ -s $file1 ] || [ $n = 5 ]; do
         if [ ! -e $file1 ] || [ ! -s $file1 ]; then
                 log_date=$(date -d "$n day ago" '+%Y-%m-%d')
                 file1=/var/log/mmdvm/MMDVM_Bridge${user}-$log_date.log
@@ -78,19 +83,23 @@ if [ -e $file ] && [ -d $dir ]; then
         n=$(($n+1))
         done
 
-        tail -10 $file1 | sudo tee test.txt > /dev/null 2>&1
-        while read line
-        do
-        date_10min_ago=$(date -d '9 hour ago 10 minute ago' '+%Y%m%d%H%M%S')
-        dd=${line:3:22}
-        ddd=$(date -d "$dd" +"%Y%m%d%H%M%S")
+	if [ -e $file1 ]; then
+	        tail -10 $file1 | sudo tee test.txt > /dev/null 2>&1
+        	while read line
+	        do
+        	date_10min_ago=$(date -d '9 hour ago 10 minute ago' '+%Y%m%d%H%M%S')
+	        dd=${line:3:22}
+        	ddd=$(date -d "$dd" +"%Y%m%d%H%M%S")
 
-        if [ $ddd -gt $date_10min_ago ] && [[ $line =~ "failed" ]]; then
-#               echo "${user} yes"
-                declare con_BM_${user}=NO; break
-        else declare con_BM_${user}=ok
-        fi
-        done < test.txt
+	        if [ $ddd -gt $date_10min_ago ] && [[ $line =~ "failed" ]]; then
+#       	        echo "${user} yes"
+                	declare con_BM_${user}=NO; break
+	        else declare con_BM_${user}=ok
+        	fi
+	        done < test.txt
+	else
+	con_BM_${user}=??
+	fi
 fi
 done
 
@@ -113,36 +122,49 @@ done
 #----------- 핫스팟의 연결시간 및 연결상태 확인 --------------------------
 file1=/var/log/dvswitch/Analog_Bridge.log
 
-log_date=$(date '+%Y-%m-%d')
+n=5
+log_date=$(date -d "$n day ago" '+%Y-%m-%d')
 file2=/var/log/dvswitch/Analog_Bridge-$log_date.log
 
-n=0
-until [ -e $file2 ] && [ -s $file2 ]; do
-n=$(($n+1))
+#until [ -e $file2 ] && [ -s $file2 ]; do
+until [ -s $file2 ] || [ $n = 0 ]; do
+n=$(($n-1))
 if [ ! -e $file2 ] || [ ! -s $file2 ]; then
         log_date=$(date -d "$n day ago" '+%Y-%m-%d')
         file2=/var/log/dvswitch/Analog_Bridge-$log_date.log
 fi
 done
 
-if [ -e $file2 ]; then
+
+if [ -s $file2 ]; then
         sudo cat $file2 | sudo tee test.txt > /dev/null 2>&1
 fi
 
-if [ -e $file1 ]; then
+
+until [ $n = 0 ]; do
+n=$(($n-1))
+if [ ! -e $file2 ] || [ ! -s $file2 ]; then
+        log_date=$(date -d "$n day ago" '+%Y-%m-%d')
+        file2=/var/log/dvswitch/Analog_Bridge-$log_date.log
+	sudo cat $file2 | sudo tee -a test.txt > /dev/null 2>&1
+fi
+done
+
+
+if [ -s $file1 ]; then
         sudo cat $file1 | sudo tee -a test.txt > /dev/null 2>&1
 fi
 
 file=test.txt
 
-if [ -e $file ] && [[ ! -z `sudo grep "USRP server ip change" $file -a` ]]; then
+if [ -e $file ] && [[ ! -z `sudo grep "change" $file -a` ]]; then
 
-line_no_ipchange=$(sudo grep -n "USRP server ip change" $file -a | cut -d: -f1 | tail -1)
+line_no_ipchange=$(sudo grep -n "change" $file -a | cut -d: -f1 | tail -1)
 line_no_connect=$(sudo grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
 	if [ "$line_no_connect" = "" ]; then line_no_connect=0; fi
 line_no_reset=$(sudo grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_reset" = "" ]; then line_no_reset=0; fi
-line_no_analog_start=$(sudo grep -n "Analog_Bridge is starting" $file -a | cut -d: -f1 | tail -1)
+line_no_analog_start=$(sudo grep -n "starting" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_analog_start" = "" ]; then line_no_analog_start=0; fi
 
 if [ $line_no_ipchange -gt $line_no_reset ]; then
@@ -209,14 +231,14 @@ if [ -e $file ] && [ -d $dir ]; then
 
         file=/var/log/dvswitch/user${user}/Analog_Bridge.log
 
-        if [[ ! -z `sudo grep "USRP server ip change" $file -a` ]]; then
+        if [[ ! -z `sudo grep "change" $file -a` ]]; then
 
-	line_no_ipchange=$(sudo grep -n "USRP server ip change" $file -a | cut -d: -f1 | tail -1)
+	line_no_ipchange=$(sudo grep -n "change" $file -a | cut -d: -f1 | tail -1)
         line_no_connect=$(sudo grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
 	if [ "$line_no_connect" = "" ]; then line_no_connect=0; fi
         line_no_reset=$(sudo grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_reset" = "" ]; then line_no_reset=0; fi
-        line_no_analog_start=$(sudo grep -n "Analog_Bridge is starting" $file -a | cut -d: -f1 | tail -1)
+        line_no_analog_start=$(sudo grep -n "starting" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_analog_start" = "" ]; then line_no_analog_start=0; fi
 
         if [ $line_no_ipchange -gt $line_no_reset ]; then
