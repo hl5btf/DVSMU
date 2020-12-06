@@ -180,7 +180,7 @@ declare con_cl_time_M=$(date -d "${dd} 9 hour" +"%m-%d_%H:%M")
 #echo $con_cl_time_M
 
 if [ $line_no_ipchange -gt $line_no_connect ]; then
-	callsign_cl=pyUC
+	callsign_cl_M=pyUC
 	else
 	line=$(cat $file | sed -n ${line_no_connect}p)
 	callsign_cl_M_A=$(echo $line | cut -d '(' -f 2 | cut -d ')' -f 1)
