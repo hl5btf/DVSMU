@@ -21,3 +21,4 @@ sudo find $log_dir -name '*.log' -mtime +4 -delete
 
 log_dir=/var/log/mmdvm
 sudo find $log_dir -name '*.log' -mtime +4 -delete
+
