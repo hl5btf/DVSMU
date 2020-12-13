@@ -57,13 +57,13 @@ sudo rm /etc/cron.daily/man_log.sh
 sudo wget -O /etc/cron.daily/man_log https://raw.githubusercontent.com/hl5btf/DVSMU/main/cron/man_log > /dev/null 2>&1
 sudo chmod +x /etc/cron.daily/man_log
 
-file=/etc/crontab
-if [[ -z `sudo grep "time" $file` ]]; then
-        echo " " | sudo tee -a $file
-        echo "#time=4" | sudo tee -a $file
-        echo "0 \$time * * * root sudo reboot" | sudo tee -a $file
-        sudo systemctl restart cron
-fi
+#file=/etc/crontab
+#if [[ -z `sudo grep "time" $file` ]]; then
+#        echo " " | sudo tee -a $file
+#        echo "#time=4" | sudo tee -a $file
+#        echo "0 \$time * * * root sudo reboot" | sudo tee -a $file
+#        sudo systemctl restart cron
+#fi
 
 
 sleep 10
