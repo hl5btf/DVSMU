@@ -14,11 +14,28 @@ for user in $user; do
         fi
 done
 
-
+#----------------------------------------------------------
 log_dir=/var/log/dvswitch
 sudo find $log_dir -name '*.log' -mtime +4 -delete
 
 
 log_dir=/var/log/mmdvm
 sudo find $log_dir -name '*.log' -mtime +4 -delete
+
+#----------------------------------------------------------
+cmd="sudo systemctl restart analog_bridge"
+
+user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
+
+for user in $user; do
+source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
+if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
+        declare cmd_add=analog_bridge${user}
+        cmd="$cmd $cmd_add"
+fi
+done
+
+$cmd
+
+
 
