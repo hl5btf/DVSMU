@@ -3,9 +3,9 @@
 #source /var/lib/dvswitch/dvs/var.txt
 
 #===================================
-SCRIPT_VERSION="1.6"
+SCRIPT_VERSION="1.7"
 SCRIPT_AUTHOR="HL5KY"
-SCRIPT_DATE="2020-12-03"
+SCRIPT_DATE="2020-12-12"
 #===================================
 
 if [ "$1" != "" ]; then
@@ -587,20 +587,22 @@ ${DVS}dvsmu; exit 0
 ###############################################################
 function dvswitch_upgrade() {
 clear
+source /var/lib/dvswitch/dvs/lan/korean.txt
 
 if (whiptail --title " DVSwitch 업그레이드 " --yesno "\
+$sp02(dvs에서 주사용자의 DVSwitch를 업그레이드 한 후, 본 작업을 진행하는것이 좋습니다)
+
 $sp03 주사용자와 추가사용자의 DVSwitch 프로그램을 비교한 후 업그레이드합니다.
 
-$sp03 주사용자의 DVSwitch를 업그레이드 한 후, 본 작업을 진행하시기 바랍니다.
-
-$sp03 진행하시겠습니까?  $T005
-" 12 85);
+$sp03 비교작업을 진행하시겠습니까?  $T005
+" 12 90);
         then :
-        else ${DVS}dvsmu; exit 0
+        else ${DVS}dvsmu A; exit 0
 fi
 
 #-----------------------------------------------------------
-TERM=ansi whiptail --title "확인중" --infobox "$T006" 8 60
+
+pse_wait
 
 user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
 
@@ -631,10 +633,10 @@ else
 $sp06 주사용자와 동일한 버전을 사용중입니다.
         " 9 60 1
 
-        ${DVS}dvsmu; exit 0
+        ${DVS}dvsmu A; exit 0
 fi
 
-source /var/lib/dvswitch/dvs/var.txt
+source /var/lib/dvswitch/dvs/lan/korean.txt
 
 if (whiptail --title " DVSwitch 업그레이드 " --yesno "\
 $sp03 주사용자의 DVSwitch 프로그램 중 일부가 업그레이드되었습니다.
@@ -644,9 +646,9 @@ $sp03 추가사용자 DVSwitch를 업그레이드/재설정 하시겠습니까? 
 $sp03 $T005
 " 12 85);
         then :
-        else ${DVS}dvsmu; exit 0
+        else ${DVS}dvsmu A; exit 0
 fi
-if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
+if [ $? != 0 ]; then ${DVS}dvsmu A; exit 0; fi
 
 #-----------------------------------------------------------
 user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
@@ -678,7 +680,7 @@ whiptail --msgbox "\
 $sp04 업그레이드 및 설정이 완료되었습니다.
 " 9 50 1
 
-${DVS}dvsmu; exit 0
+${DVS}dvsmu A; exit 0
 }
 #==============================================================
 # END of dvswitch_upgrade
@@ -691,8 +693,7 @@ ${DVS}dvsmu; exit 0
 function dvsmu_upgrade() {
 
 clear
-source /var/lib/dvswitch/dvs/var.txt
-
+source /var/lib/dvswitch/dvs/lan/korean.txt
 TERM=ansi whiptail --title "확인중" --infobox "$T006" 8 60
 
 random_char=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 12 | sed 1q)
@@ -713,7 +714,7 @@ if [ $new_ver = $crnt_ver ]; then
 $sp04 현재 v.${crnt_ver}  최신 버전을 사용중입니다.
         " 9 50 1
 
-        ${DVS}dvsmu; exit 0
+        ${DVS}dvsmu A; exit 0
 else
 #-----------------------------------------------------------
 	clear
@@ -738,9 +739,9 @@ $sp10 $T005
 $sp08 업그레이드가 완료되었습니다.
 	" 9 50 1
 
-	${DVS}dvsmu; exit 0
+	${DVS}dvsmu A; exit 0
 
-        else ${DVS}dvsmu; exit 0
+        else ${DVS}dvsmu A; exit 0
 	fi
 fi
 }
@@ -772,9 +773,10 @@ function main_user_log() {
 log_error_cnt=0
 clear
 whiptail --msgbox "\
+$sp08 로그시간 = UTC
 
-$sp05 로그화면의 종료 명령은 q 또는 Ctrl-C
-" 9 50 1
+$sp08 로그 종료 명령은 q 또는 Ctrl-C
+" 10 50 1
 
 #---file1->MMDVM_Bridge.log-----------
 
@@ -789,7 +791,11 @@ fi
 n=$(($n+1))
 done
 
-if [ $n -gt 1 ]; then log_error_msg; fi
+date_utc=$(date -d '9 hour ago' '+%Y-%m-%d')
+
+if [ $date_utc = $log_date ]; then :
+else log_error_msg
+fi
 
 #---file2->Analog_Bridge.log--------------
 
@@ -804,7 +810,11 @@ fi
 n=$(($n+1))
 done
 
-if [ $n -gt 1 ]; then log_error_msg; fi
+date_utc=$(date -d '9 hour ago' '+%Y-%m-%d')
+
+if [ $date_utc = $log_date ]; then :
+else log_error_msg
+fi
 
 multitail $file1 $file2
 ${DVS}dvsmu M
@@ -826,7 +836,7 @@ sel3=$(whiptail --title " Main User Configuration " --menu "\
 \n
 $sp05 MAIN_USER  $call_sign $dmr_id $ext $usrp_port
 -------------------------------------------------------
-" 22 50 11 \
+" 21 50 10 \
 "1" "실시간 로그 확인" \
 "2" "var.txt" \
 "3" "Analog_Bridge.ini" \
@@ -836,8 +846,7 @@ $sp05 MAIN_USER  $call_sign $dmr_id $ext $usrp_port
 "7" "dvsm.macro" \
 "8" "dvsm.sh" \
 "9" "서비스 재시작" \
-"10" "시스템 리부팅" \
-"11" "Back to MAIN" \
+"10" "Back to MAIN" \
 3>&1 1>&2 2>&3)
 
 if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
@@ -863,8 +872,6 @@ sudo nano /opt/Analog_Bridge/dvsm.sh; ${DVS}dvsmu M ;;
 pse_wait
 ${DVS}88_restart.sh; ${DVS}dvsmu M ;;
 10)
-sudo reboot ;;
-11)
 ${DVS}dvsmu; exit 0 ;;
 esac
 
@@ -874,11 +881,10 @@ sel3=$(whiptail --title " Main User Configuration " --menu "\
 \n
 $sp05 MAIN_USER  $call_sign $dmr_id $ext $usrp_port
 -------------------------------------------------------
-" 15 50 4 \
+" 14 50 3 \
 "1" "실시간 로그 확인" \
 "2" "서비스 재시작" \
-"3" "시스템 리부팅" \
-"4" "Back to MAIN" \
+"3" "Back to MAIN" \
 3>&1 1>&2 2>&3)
 
 if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
@@ -890,8 +896,6 @@ main_user_log ;;
 pse_wait
 ${DVS}88_restart.sh; ${DVS}dvsmu M ;;
 3)
-sudo reboot ;;
-4)
 ${DVS}dvsmu; exit 0 ;;
 esac
 
@@ -926,9 +930,10 @@ function sub_user_log() {
 log_error_cnt=0
 clear
 whiptail --msgbox "\
+$sp08 로그시간 = UTC
 
-$sp05 로그화면의 종료 명령은 q 또는 Ctrl-C
-" 9 50 1
+$sp08 로그 종료 명령은 q 또는 Ctrl-C
+" 10 50 1
 
 #---file1->MMDVM_Bridge.log-----------
 
@@ -943,7 +948,11 @@ fi
 n=$(($n+1))
 done
 
-if [ $n -gt 1 ]; then log_error_msg; fi
+date_utc=$(date -d '9 hour ago' '+%Y-%m-%d')
+
+if [ $date_utc = $log_date ]; then :
+else log_error_msg
+fi
 
 #---file2->Analog_Bridge.log--------------
 
@@ -958,7 +967,11 @@ if [ ! -e $file2 ] || [ ! -s $file2 ]; then
 fi
 done
 
-if [ $n -gt 1 ]; then log_error_msg; fi
+date_utc=$(date -d '9 hour ago' '+%Y-%m-%d')
+
+if [ $date_utc = $log_date ]; then :
+else log_error_msg
+fi
 
 multitail $file1 $file2;
 ${DVS}dvsmu $USER_NO
@@ -968,6 +981,8 @@ ${DVS}dvsmu $USER_NO
 # Function TA_input
 #--------------------------------------------------------------
 function TA_input() {
+
+USER_NO=$1
 
 source /var/lib/dvswitch/dvs/var$USER_NO.txt > /dev/null 2>&1
 TA_in=$(whiptail --title "talkerAlias" --inputbox "\
@@ -1095,7 +1110,7 @@ sudo \cp -f /opt/user$1/dvsm.basic /opt/user$1/dvsm.macro; ${DVS}dvsmu $USER_NO 
 10)
 sudo \cp -f /opt/user$1/dvsm.adv /opt/user$1/dvsm.macro; ${DVS}dvsmu $USER_NO ;;
 11)
-TA_input ;;
+TA_input $USER_NO ;;
 12)
 restart $USER_NO ;;
 13)
@@ -1135,7 +1150,7 @@ sudo \cp -f /opt/user$1/dvsm.basic /opt/user$1/dvsm.macro; ${DVS}dvsmu $USER_NO 
 5)
 sudo \cp -f /opt/user$1/dvsm.adv /opt/user$1/dvsm.macro; ${DVS}dvsmu $USER_NO ;;
 6)
-TA_input ;;
+TA_input $USER_NO ;;
 7)
 user_delete $USER_NO ;;
 8)
@@ -1311,10 +1326,10 @@ sel=$(whiptail --title " 시스템 최적화 " --menu "\
 "5" "대시보드      $lighttpd_sts" \
 "6" "시스템모니터  $monit_sts" \
 "7" "웹브라우저SSH $shellinabox_sts" \
-"8" "Back to Main" \
+"8" "Back" \
 3>&1 1>&2 2>&3)
 
-if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
+if [ $? != 0 ]; then ${DVS}dvsmu A; exit 0; fi
 
 case $sel in
 1)
@@ -1332,7 +1347,7 @@ change_status monit ;;
 7)
 change_status shellinabox ;;
 8)
-${DVS}dvsmu; exit 0 ;;
+${DVS}dvsmu A; exit 0 ;;
 esac
 }
 #==============================================================
@@ -1341,10 +1356,79 @@ esac
 
 
 ###############################################################
+# Function set_reboot
+###############################################################
+function set_reboot() {
+
+file=/etc/crontab
+
+if [[ ! -z `sudo grep "time" $file` ]]; then
+        line_no=$(grep -n "time=" $file -a | cut -d: -f1)
+        line=$(cat $file | sed -n ${line_no}p)
+        timeset=$(echo $line | cut -d '=' -f 2)
+        timeset_info="매일$timeset시에 리부팅"
+else
+        timeset=""
+        timeset_info="설정없음"
+fi
+
+
+source /var/lib/dvswitch/dvs/var.txt
+
+sel=$(whiptail --title " 리부팅 시간설정 " --menu "\
+
+$sp09 현재설정: $timeset_info
+-----------------------------------------
+" 13 45 3 \
+"1" "리부팅 설정 및 변경" \
+"2" "리부팅 설정삭제" \
+"3" "Back" \
+3>&1 1>&2 2>&3)
+
+if [ $? != 0 ]; then ${DVS}dvsmu A; exit 0; fi
+
+case $sel in
+1)
+until [ "$new_timeset" != "" ]; do
+new_timeset=$(whiptail --title "$T009" --inputbox "시간입력( 0 ~ 23 )" 10 60 ${timeset} 3>&1 1>&2 2>&3)
+if [ $? != 0 ]; then ${DVS}dvsmu R; exit 0; fi
+done
+sudo sed -i -e "/time=/d" $file > /dev/null 2>&1
+sudo sed -i -e "/reboot/d" $file > /dev/null 2>&1
+echo "#time=$new_timeset" | sudo tee -a $file > /dev/null 2>&1
+echo "0 $new_timeset * * * root sudo reboot" | sudo tee -a $file > /dev/null 2>&1
+new_timeset=$((new_timeset-1))
+sudo sed -i -e "/daily/ c 59 $new_timeset * * * root test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )" $file > /dev/null 2>&1
+sudo systemctl restart cron
+${DVS}dvsmu R; exit 0 ;;
+2)
+if (whiptail --title " 설정 삭제 " --yesno "\
+
+$sp05 매일1회 리부팅 설정을 삭제하시겠습니까?
+
+" 9 60); then
+sudo sed -i -e "/time=/d" $file
+sudo sed -i -e "/reboot/d" $file
+sudo sed -i -e "/daily/ c 25 6 * * * root test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )" $file > /dev/null 2>&1
+sudo systemctl restart cron
+${DVS}dvsmu R; exit 0
+else ${DVS}dvsmu R; exit 0
+fi ;;
+3)
+${DVS}dvsmu A; exit 0 ;;
+esac
+}
+#==============================================================
+# END of set_reboot
+#==============================================================
+
+
+###############################################################
 # Function connection_status
 ###############################################################
 function connection_status() {
 
+source /var/lib/dvswitch/dvs/lan/korean.txt
 pse_wait
 
 #---------핫스팟 호출부호 추출 -------------------------------------------
@@ -1374,7 +1458,8 @@ done
 file1=/var/log/mmdvm/MMDVM_Bridge.log
 
 n=0
-until [ -e $file1 ] && [ -s $file1 ]; do
+#until [ -e $file1 ] && [ -s $file1 ]; do
+until [ -s $file1 ] || [ $n = 5 ]; do
 if [ ! -e $file1 ] || [ ! -s $file1 ]; then
         log_date=$(date -d "$n day ago" '+%Y-%m-%d')
         file1=/var/log/mmdvm/MMDVM_Bridge-$log_date.log
@@ -1382,7 +1467,7 @@ fi
 n=$(($n+1))
 done
 
-
+if [ -e $file1 ]; then
         tail -10 $file1 | sudo tee test.txt > /dev/null 2>&1
         while read line
         do
@@ -1391,11 +1476,14 @@ done
         ddd=$(date -d "$dd" +"%Y%m%d%H%M%S")
 
         if [ $ddd -gt $date_10min_ago ] && [[ $line =~ "failed" ]]; then
-                echo "${user} yes"
+#                echo "${user} failed"
                 declare con_BM_M=NO; break
         else declare con_BM_M=ok
         fi
         done < test.txt
+else
+con_BM_M=??
+fi
 
 #echo $con_BM_M
 
@@ -1404,15 +1492,17 @@ user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
 
 for user in $user; do
 
-file=/var/lib/dvswitch/dvs/var${user}.txt
+#file=/var/lib/dvswitch/dvs/var${user}.txt
 dir=/opt/user${user}
 
-if [ -e $file ] && [ -d $dir ]; then
+#if [ -e $file ] && [ -d $dir ]; then
+if [ -d $dir ]; then
 
         file1=/var/log/mmdvm/MMDVM_Bridge${user}.log;
 
         n=0
-        until [ -e $file1 ] && [ -s $file1 ]; do
+#        until [ -e $file1 ] && [ -s $file1 ]; do
+        until [ -s $file1 ] || [ $n = 5 ]; do
         if [ ! -e $file1 ] || [ ! -s $file1 ]; then
                 log_date=$(date -d "$n day ago" '+%Y-%m-%d')
                 file1=/var/log/mmdvm/MMDVM_Bridge${user}-$log_date.log
@@ -1420,19 +1510,24 @@ if [ -e $file ] && [ -d $dir ]; then
         n=$(($n+1))
         done
 
-        tail -10 $file1 | sudo tee test.txt > /dev/null 2>&1
-        while read line
-        do
-        date_10min_ago=$(date -d '9 hour ago 10 minute ago' '+%Y%m%d%H%M%S')
-        dd=${line:3:22}
-        ddd=$(date -d "$dd" +"%Y%m%d%H%M%S")
 
-        if [ $ddd -gt $date_10min_ago ] && [[ $line =~ "failed" ]]; then
-#               echo "${user} yes"
-                declare con_BM_${user}=NO; break
-        else declare con_BM_${user}=ok
+        if [ -e $file1 ]; then
+                tail -10 $file1 | sudo tee test.txt > /dev/null 2>&1
+                while read line
+                do
+                date_10min_ago=$(date -d '9 hour ago 10 minute ago' '+%Y%m%d%H%M%S')
+                dd=${line:3:22}
+                ddd=$(date -d "$dd" +"%Y%m%d%H%M%S")
+
+                if [ $ddd -gt $date_10min_ago ] && [[ $line =~ "failed" ]]; then
+#                       echo "${user} yes"
+                        declare con_BM_${user}=NO; break
+                else declare con_BM_${user}=ok
+                fi
+                done < test.txt
+        else
+        con_BM_${user}=??
         fi
-        done < test.txt
 fi
 done
 
@@ -1452,55 +1547,53 @@ done
 #echo "15=$con_BM_15"
 #echo "16=$con_BM_16"
 
-
 #----------- 핫스팟의 연결시간 및 연결상태 확인 --------------------------
 file1=/var/log/dvswitch/Analog_Bridge.log
 
-log_date=$(date '+%Y-%m-%d')
-file2=/var/log/dvswitch/Analog_Bridge-$log_date.log
+echo "" | sudo tee test.txt > /dev/null 2>&1
 
-n=0
-until [ -e $file2 ] && [ -s $file2 ]; do
-n=$(($n+1))
-if [ ! -e $file2 ] || [ ! -s $file2 ]; then
-        log_date=$(date -d "$n day ago" '+%Y-%m-%d')
-        file2=/var/log/dvswitch/Analog_Bridge-$log_date.log
+n=5
+until [ $n = 0 ]; do
+n=$(($n-1))
+log_date=$(date -d "$n day ago" '+%Y-%m-%d')
+file2=/var/log/dvswitch/Analog_Bridge-$log_date.log
+#sudo nano $file2
+if [ -e $file2 ]; then
+        cat $file2 | sudo tee -a test.txt > /dev/null 2>&1
 fi
 done
 
-if [ -e $file2 ]; then
-        sudo cat $file2 | sudo tee test.txt > /dev/null 2>&1
-fi
 
-if [ -e $file1 ]; then
-        sudo cat $file1 | sudo tee -a test.txt > /dev/null 2>&1
+if [ -s $file1 ]; then
+        cat $file1 | sudo tee -a test.txt > /dev/null 2>&1
 fi
 
 file=test.txt
 
-if [ -e $file ] && [[ ! -z `sudo grep "USRP server ip change" $file -a` ]]; then
+if [ -e $file ] && [[ ! -z `grep "change" $file -a` ]]; then
 
-line_no_ipchange=$(sudo grep -n "USRP server ip change" $file -a | cut -d: -f1 | tail -1)
-line_no_connect=$(sudo grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
+line_no_ipchange=$(grep -n "change" $file -a | cut -d: -f1 | tail -1)
+line_no_connect=$(grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_connect" = "" ]; then line_no_connect=0; fi
-line_no_reset=$(sudo grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
+line_no_reset=$(grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_reset" = "" ]; then line_no_reset=0; fi
-line_no_analog_start=$(sudo grep -n "Analog_Bridge is starting" $file -a | cut -d: -f1 | tail -1)
+line_no_analog_start=$(grep -n "starting" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_analog_start" = "" ]; then line_no_analog_start=0; fi
 
 if [ $line_no_ipchange -gt $line_no_reset ]; then
-        line=$(sudo cat $file | sudo sed -n ${line_no_ipchange}p)
-        else line=$(sudo cat $file | sudo sed -n ${line_no_reset}p)
+        line=$(cat $file | sed -n ${line_no_ipchange}p)
+        else line=$(cat $file | sed -n ${line_no_reset}p)
 fi
 
 dd=${line:3:21}
 declare con_cl_time_M=$(date -d "${dd} 9 hour" +"%m-%d_%H:%M")
+
 #echo $con_cl_time_M
 
 if [ $line_no_ipchange -gt $line_no_connect ]; then
-        callsign_cl=pyUC
+        callsign_cl_M=pyUC
         else
-        line=$(sudo cat $file | sudo sed -n ${line_no_connect}p)
+        line=$(cat $file | sed -n ${line_no_connect}p)
         callsign_cl_M_A=$(echo $line | cut -d '(' -f 2 | cut -d ')' -f 1)
         #echo $callsign_cl_M_A
         dmrid_cl_M=${line: -7:7}
@@ -1532,12 +1625,11 @@ fi
                 declare con_cl_M=NO
         fi
 
-
 else declare callsign_cl_M="------"
 
 fi
 
-
+#echo $callsign_cl_M
 #echo $con_cl_M
 
 #-------------- 클라이언트의 연결시간 및 연결상태 확인 --------------------
@@ -1545,26 +1637,27 @@ user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
 
 for user in $user; do
 
-file=/var/lib/dvswitch/dvs/var${user}.txt
+#file=/var/lib/dvswitch/dvs/var${user}.txt
 dir=/opt/user${user}
 
-if [ -e $file ] && [ -d $dir ]; then
+#if [ -e $file ] && [ -d $dir ]; then
+if [ -d $dir ]; then
 
         file=/var/log/dvswitch/user${user}/Analog_Bridge.log
 
-        if [[ ! -z `sudo grep "USRP server ip change" $file -a` ]]; then
+        if [[ ! -z `grep "change" $file -a` ]]; then
 
-        line_no_ipchange=$(sudo grep -n "USRP server ip change" $file -a | cut -d: -f1 | tail -1)
-        line_no_connect=$(sudo grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
+        line_no_ipchange=$(grep -n "change" $file -a | cut -d: -f1 | tail -1)
+        line_no_connect=$(grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_connect" = "" ]; then line_no_connect=0; fi
-        line_no_reset=$(sudo grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
+        line_no_reset=$(grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_reset" = "" ]; then line_no_reset=0; fi
-        line_no_analog_start=$(sudo grep -n "Analog_Bridge is starting" $file -a | cut -d: -f1 | tail -1)
+        line_no_analog_start=$(grep -n "starting" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_analog_start" = "" ]; then line_no_analog_start=0; fi
 
         if [ $line_no_ipchange -gt $line_no_reset ]; then
-                line=$(sudo cat $file | sudo sed -n ${line_no_ipchange}p)
-                else line=$(sudo cat $file | sudo sed -n ${line_no_reset}p)
+                line=$(cat $file | sed -n ${line_no_ipchange}p)
+                else line=$(cat $file | sed -n ${line_no_reset}p)
         fi
 
         dd=${line:3:21}
@@ -1574,7 +1667,7 @@ if [ -e $file ] && [ -d $dir ]; then
                 callsign_cl=pyUC
                 else
 
-                line=$(sudo cat $file | sudo sed -n ${line_no_connect}p)
+                line=$(cat $file | sed -n ${line_no_connect}p)
                 declare callsign_cl_A=$(echo $line | cut -d '(' -f 2 | cut -d ')' -f 1)
                 callsign_cl_A=`echo ${callsign_cl_A} | tr '[a-z]' '[A-Z]'`
                 declare dmrid_cl=${line: -7:7}
@@ -1606,7 +1699,6 @@ if [ -e $file ] && [ -d $dir ]; then
         else
                 declare con_cl_${user}=NO
         fi
-
 
         else declare callsign_cl_${user}="------"
 
@@ -1694,10 +1786,69 @@ whiptail --msgbox "\
    =========================================\
 " 35 52 1
 
-${DVS}dvsmu; exit 0
+${DVS}dvsmu A; exit 0
 }
 #==============================================================
 # END of connection_status
+#==============================================================
+
+
+###############################################################
+# Function sys_admin
+###############################################################
+function sys_admin() {
+
+sel=$(whiptail --title " 시스템 관리 " --menu "\
+\n
+" 17 50 9 \
+"1" "시스템 모니터링" \
+"2" "시스템 최적화" \
+"3" "시스템 리부팅" \
+"4" "1일1회 리부팅 설정" \
+"5" "BM 및 클라이언트 연결상태 확인" \
+"6" "추가사용자 DVSwitch 업그레이드" \
+"7" "dvsMU (Multi User) 업그레이드" \
+"8" "Back to Main" \
+3>&1 1>&2 2>&3)
+
+if [ $? != 0 ]; then ${DVS}dvsmu; exit 0
+fi
+
+case $sel in
+1)
+clear
+whiptail --msgbox "\
+
+$sp03 시스템 모니터의 종료 명령은 F10 또는 Ctrl-C
+" 9 57 1
+
+htop; ${DVS}dvsmu A ;;
+2)
+system_optimizer ;;
+3)
+clear
+source /var/lib/dvswitch/dvs/lan/korean.txt
+if (whiptail --title " 시스템 리부팅 " --yesno "\
+
+$sp10 지금 리부팅 하시겠습니까?
+" 9 50);
+then sudo reboot
+else ${DVS}dvsmu A; exit 0
+fi ;;
+4)
+set_reboot ;;
+5)
+connection_status ;;
+6)
+dvswitch_upgrade ;;
+7)
+dvsmu_upgrade ;;
+8)
+${DVS}dvsmu; exit 0 ;;
+esac
+}
+#==============================================================
+# END of sys_admin
 #==============================================================
 
 
@@ -1712,9 +1863,10 @@ fi
 
 USER_NO=$1
 
+if [ "$USER_NO" = A ]; then sys_admin; fi
 if [ "$USER_NO" = M ]; then main_user_config; fi
-
 if [ "$USER_NO" = O ]; then system_optimizer; fi
+if [ "$USER_NO" = R ]; then set_reboot; fi
 
 if [ x${USER_NO} != x ] && [ ${#USER_NO} = 2 ]; then sub_user_config $USER_NO; fi
 
@@ -1755,10 +1907,8 @@ then
 sel=$(whiptail --title " DVSwitch Multi User " --menu "\
                    dvsMU v.$SCRIPT_VERSION HL5KY
 \n
-" 38 60 29 \
-"S" "시스템 모니터링" \
-"O" "시스템 최적화" \
-"C" "BM 및 클라이언트 연결상태 확인" \
+" 34 60 25 \
+"A" "시스템 관리" \
 "M" "MAIN   $call_sign_M $dmr_id_M $ext_M $usrp_port_M talkerAlias" \
 "=" "============================================" \
 "01" "User01 $call_sign01 $dmr_id01 $ext01 $usrp_port01 $talkerAlias01" \
@@ -1782,8 +1932,6 @@ sel=$(whiptail --title " DVSwitch Multi User " --menu "\
 "19" "User19 $call_sign19 $dmr_id19 $ext19 $usrp_port19 $talkerAlias19" \
 "20" "User20 $call_sign20 $dmr_id20 $ext20 $usrp_port20 $talkerAlias20" \
 "=" "============================================" \
-"D" "추가사용자 DVSwitch 업그레이드" \
-"U" "dvsMU (Multi User) 업그레이드" \
 "X" "종 료" \
 3>&1 1>&2 2>&3)
 
@@ -1795,10 +1943,8 @@ else
 sel=$(whiptail --title " DVSwitch Multi User " --menu "\
               dvsMU v.$SCRIPT_VERSION HL5KY
 \n
-" 38 50 29 \
-"S" "시스템 모니터링" \
-"O" "시스템 최적화" \
-"C" "BM 및 클라이언트 연결상태 확인" \
+" 34 50 25 \
+"A" "시스템 관리" \
 "M" "MAIN   $call_sign_M $dmr_id_M $ext_M $usrp_port_M" \
 "=" "===============================" \
 "01" "User01 $call_sign01 $dmr_id01 $ext01 $usrp_port01" \
@@ -1822,8 +1968,6 @@ sel=$(whiptail --title " DVSwitch Multi User " --menu "\
 "19" "User19 $call_sign19 $dmr_id19 $ext19 $usrp_port19" \
 "20" "User20 $call_sign20 $dmr_id20 $ext20 $usrp_port20" \
 "=" "===============================" \
-"D" "추가사용자 DVSwitch 업그레이드" \
-"U" "dvsMU (Multi User) 업그레이드" \
 "X" "종 료" \
 3>&1 1>&2 2>&3)
 
@@ -1833,18 +1977,8 @@ fi
 
 
 case $sel in
-S)
-clear
-whiptail --msgbox "\
-
-$sp03 시스템 모니터의 종료 명령은 F10 또는 Ctrl-C
-" 9 57 1
-
-htop; ${DVS}dvsmu ;;
-O)
-system_optimizer ;;
-C)
-connection_status ;;
+A)
+sys_admin ;;
 M)
 main_user_config ;;
 =)
@@ -1891,10 +2025,6 @@ sub_user_config 19 ;;
 sub_user_config 20 ;;
 " ")
 ${DVS}dvsmu ;;
-D)
-dvswitch_upgrade ;;
-U)
-dvsmu_upgrade ;;
 X)
 exit 0 ;;
 esac
