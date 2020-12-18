@@ -1,20 +1,6 @@
 #!/bin/bash
 
-
-user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
-
-for user in $user; do
-        log_dir=/var/log/dvswitch/user${user}
-        if [ -d $log_dir ]; then
-                file=/var/log/dvswitch/user${user}/Analog_Bridge.log
-                date=$(date -d '4 day ago' '+%Y-%m-%d')
-                row_no=$(grep -n $date $file | cut -d: -f1 | head -1)
-                if [ "$row_no" = "" ]; then row_no=1; fi
-                sudo sed -i -e "1,${row_no}d" $file
-        fi
-done
-
-#----------------------------------------------------------
+#=================================================================
 log_dir=/var/log/dvswitch
 sudo find $log_dir -name '*.log' -mtime +4 -delete
 
@@ -22,17 +8,112 @@ sudo find $log_dir -name '*.log' -mtime +4 -delete
 log_dir=/var/log/mmdvm
 sudo find $log_dir -name '*.log' -mtime +4 -delete
 
-#----------------------------------------------------------
-cmd="sudo systemctl restart analog_bridge"
+#=================================================================
+# Analog_Bridge.log의 내용에서 오래된 내용을 삭제하는 루틴
+# 클라이언트가 사용중이면 수정하지 않도록 함.
 
+cmd="sudo systemctl restart"
+
+#----------- main_user의 클라이언트 연결상태 확인 --------------------------
+file1=/var/log/dvswitch/Analog_Bridge.log
+
+echo "" | sudo tee test.txt > /dev/null 2>&1
+
+n=5
+until [ $n = 0 ]; do
+n=$(($n-1))
+log_date=$(date -d "$n day ago" '+%Y-%m-%d')
+file2=/var/log/dvswitch/Analog_Bridge-$log_date.log
+
+if [ -e $file2 ]; then
+        cat $file2 | sudo tee -a test.txt > /dev/null 2>&1
+fi
+done
+
+
+if [ -s $file1 ]; then
+        cat $file1 | sudo tee -a test.txt > /dev/null 2>&1
+fi
+
+file=test.txt
+
+if [ -e $file ] && [[ ! -z `grep "change" $file -a` ]]; then
+line_no_ipchange=$(grep -n "change" $file -a | cut -d: -f1 | tail -1)
+line_no_connect=$(grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
+        if [ "$line_no_connect" = "" ]; then line_no_connect=0; fi
+line_no_reset=$(grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
+        if [ "$line_no_reset" = "" ]; then line_no_reset=0; fi
+line_no_analog_start=$(grep -n "starting" $file -a | cut -d: -f1 | tail -1)
+        if [ "$line_no_analog_start" = "" ]; then line_no_analog_start=0; fi
+
+
+        if [ $line_no_connect -gt $line_no_reset ] && [ $line_no_connect -gt $line_no_analog_start ]; then
+                declare con_cl_M=ok
+        elif [ $line_no_ipchange -gt $line_no_reset ] && [ $line_no_ipchange -gt $line_no_analog_start ]; then
+                declare con_cl_M=ok
+        else
+                declare con_cl_M=NO
+        fi
+else declare con_cl_M=NO
+fi
+
+if [ $con_cl_M = "NO" ]; then
+cmd="$cmd analog_bridge"
+fi
+
+#-------------- sub_user의 클라이언트 연결상태 확인 --------------------
 user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
 
 for user in $user; do
-source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
-if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
-        declare cmd_add=analog_bridge${user}
-        cmd="$cmd $cmd_add"
+
+dir=/opt/user${user}
+
+if [ -d $dir ]; then
+
+file=/var/log/dvswitch/user${user}/Analog_Bridge.log
+
+if [[ ! -z `grep "change" $file -a` ]]; then
+
+        line_no_ipchange=$(grep -n "change" $file -a | cut -d: -f1 | tail -1)
+        line_no_connect=$(grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
+        if [ "$line_no_connect" = "" ]; then line_no_connect=0; fi
+        line_no_reset=$(grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
+        if [ "$line_no_reset" = "" ]; then line_no_reset=0; fi
+        line_no_analog_start=$(grep -n "starting" $file -a | cut -d: -f1 | tail -1)
+        if [ "$line_no_analog_start" = "" ]; then line_no_analog_start=0; fi
+
+        if [ $line_no_ipchange -gt $line_no_reset ]; then
+                line=$(cat $file | sed -n ${line_no_ipchange}p)
+                else line=$(cat $file | sed -n ${line_no_reset}p)
+        fi
+
+
+        if [ $line_no_connect -gt $line_no_reset ] && [ $line_no_connect -gt $line_no_analog_start ]; then
+                declare con_cl_user=ok
+        elif [ $line_no_ipchange -gt $line_no_reset ] && [ $line_no_ipchange -gt $line_no_analog_start ]; then
+                declare con_cl_user=ok
+        else
+                declare con_cl_user=NO
+        fi
+
+else declare con_cl_user=NO
+
 fi
+
+if [ $con_cl_user = "NO" ]; then
+	declare cmd_add=analog_bridge${user}
+	cmd="$cmd $cmd_add"
+
+        file=/var/log/dvswitch/user${user}/Analog_Bridge.log
+        date=$(date -d '4 day ago' '+%Y-%m-%d')
+        row_no=$(grep -n $date $file | cut -d: -f1 | head -1)
+        if [ "$row_no" = "" ]; then row_no=1; fi
+        sudo sed -i -e "1,${row_no}d" $file
+
+fi
+
+fi
+
 done
 
 $cmd
