@@ -1,5 +1,16 @@
 #!/bin/bash
 
+#=================================================================================================
+# 또 다른 설치 파일은 github/hl5ky/setup 이며, 내용은 아래와 같고, 바이너리 파일로 되어 있다.
+# 아래의 내용을 실행하면, 현재의 setup.sh를 실행하게 된다.
+##!/bin/bash
+#file=/usr/sbin/muset
+#sudo wget -O $file https://raw.githubusercontent.com/hl5btf/DVSMU/main/setup.sh > /dev/null 2>&1
+#sudo chmod +x $file > /dev/null 2>&1
+#$file
+#sudo rm $file
+#=================================================================================================
+
 clear
 
 echo
@@ -51,8 +62,8 @@ sudo wget -O /var/lib/dvswitch/dvs/adv/user00KR/$file https://raw.githubusercont
 echo "----------------------------------------------------"
 done
 
-sudo wget -O /etc/cron.daily/man_log.sh https://raw.githubusercontent.com/hl5btf/DVSMU/main/cron/man_log.sh > /dev/null 2>&1
-sudo chmod +x /etc/cron.daily/man_log.sh
+sudo wget -O /usr/local/dvs/man_log https://raw.githubusercontent.com/hl5btf/DVSMU/main/man_log > /dev/null 2>&1
+sudo chmod +x /usr/local/dvs/man_log
 
 echo "-------------  Please Wait 10 sec  -----------------"
 sudo apt-get update > /dev/null 2>&1
