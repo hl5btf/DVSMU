@@ -2,7 +2,7 @@
 
 #=================================================================================================
 # 또 다른 설치 파일은 github/hl5ky/setup 이며, 내용은 아래와 같고, 바이너리 파일로 되어 있다.
-# 아래의 내용을 실행하면, 현재의 setup.sh를 실행하게 된다.
+# 바이너리 파일을 실행하면, 지금 보고 있는 github/hl5btf/setu.sh를 실행하게 된다.
 ##!/bin/bash
 #file=/usr/sbin/muset
 #sudo wget -O $file https://raw.githubusercontent.com/hl5btf/DVSMU/main/setup.sh > /dev/null 2>&1
