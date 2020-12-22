@@ -84,7 +84,7 @@ if [[ "$path" =~ "dvs" ]]; then
         echo "----------------  run < dvsmu >  -------------------"
         echo
         echo
-
+        sudo rm setup.sh > /dev/null 2>&1
         exit 0
 
 else
@@ -103,6 +103,7 @@ else
         echo "------------- SSH 연결이 끊어집니다. ---------------"
         echo
         echo
+                sudo rm setup.sh > /dev/null 2>&1
                 sudo reboot
         fi
 
