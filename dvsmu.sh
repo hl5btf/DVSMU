@@ -3,9 +3,9 @@
 #source /var/lib/dvswitch/dvs/var.txt
 
 #===================================
-SCRIPT_VERSION="1.7"
+SCRIPT_VERSION="1.8"
 SCRIPT_AUTHOR="HL5KY"
-SCRIPT_DATE="2020-12-12"
+SCRIPT_DATE="2020-12-22"
 #===================================
 
 if [ "$1" != "" ]; then
@@ -732,10 +732,10 @@ $sp10 $T005
         sudo chmod +x ${DVS}${random_char}.sh > /dev/null 2>&1;
         ${DVS}${random_char}.sh > /dev/null 2>&1;
         sudo rm ${DVS}${random_char}.sh > /dev/null 2>&1;
-
+#-----------------------------------------------------------
 	clear
 	whiptail --msgbox "\
-#-----------------------------------------------------------
+
 $sp08 업그레이드가 완료되었습니다.
 	" 9 50 1
 
@@ -1362,14 +1362,16 @@ function set_reboot() {
 
 file=/etc/crontab
 
-if [[ ! -z `sudo grep "time" $file` ]]; then
+if [[ ! -z `sudo grep "reboot=" $file` ]]; then
         line_no=$(grep -n "time=" $file -a | cut -d: -f1)
         line=$(cat $file | sed -n ${line_no}p)
         timeset=$(echo $line | cut -d '=' -f 2)
-        timeset_info="매일$timeset시에 리부팅"
+        timesetplusone=$(($timeset+1))
+        timeset_info_1="매일$timeset ~ $timesetplusone시"
+        timeset_info_2="사용하지 않는 시간에 리부팅"
 else
         timeset=""
-        timeset_info="설정없음"
+        timeset_info_1="설정없음"
 fi
 
 
@@ -1377,28 +1379,31 @@ source /var/lib/dvswitch/dvs/var.txt
 
 sel=$(whiptail --title " 리부팅 시간설정 " --menu "\
 
-$sp09 현재설정: $timeset_info
+$sp01 현재설정: $timeset_info_1
+$sp01           $timeset_info_2
 -----------------------------------------
-" 13 45 3 \
+" 14 45 3 \
 "1" "리부팅 설정 및 변경" \
 "2" "리부팅 설정삭제" \
 "3" "Back" \
 3>&1 1>&2 2>&3)
 
-if [ $? != 0 ]; then ${DVS}dvsmu A; exit 0; fi
+if [ $? != 0 ]; then
+ ${DVS}dvsmu A; exit 0; fi
 
 case $sel in
 1)
 until [ "$new_timeset" != "" ]; do
 new_timeset=$(whiptail --title "$T009" --inputbox "시간입력( 0 ~ 23 )" 10 60 ${timeset} 3>&1 1>&2 2>&3)
-if [ $? != 0 ]; then ${DVS}dvsmu R; exit 0; fi
+if [ $? != 0 ]; then
+ ${DVS}dvsmu R; exit 0; fi
 done
-sudo sed -i -e "/time=/d" $file > /dev/null 2>&1
-sudo sed -i -e "/reboot/d" $file > /dev/null 2>&1
-echo "#time=$new_timeset" | sudo tee -a $file > /dev/null 2>&1
-echo "0 $new_timeset * * * root sudo reboot" | sudo tee -a $file > /dev/null 2>&1
-new_timeset=$((new_timeset-1))
-sudo sed -i -e "/daily/ c 59 $new_timeset * * * root test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )" $file > /dev/null 2>&1
+
+sudo sed -i -e "/time=/ c #time=$new_timeset" $file
+sudo sed -i -e "/man_log/ c 0 $new_timeset * * * root /usr/local/dvs/man_log" $file
+if [[ -z `sudo grep "reboot=yes" $file` ]]; then
+        echo "#reboot=yes" | sudo tee -a $file > /dev/null 2>&1
+fi
 sudo systemctl restart cron
 ${DVS}dvsmu R; exit 0 ;;
 2)
@@ -1407,9 +1412,9 @@ if (whiptail --title " 설정 삭제 " --yesno "\
 $sp05 매일1회 리부팅 설정을 삭제하시겠습니까?
 
 " 9 60); then
-sudo sed -i -e "/time=/d" $file
-sudo sed -i -e "/reboot/d" $file
-sudo sed -i -e "/daily/ c 25 6 * * * root test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )" $file > /dev/null 2>&1
+sudo sed -i -e "/time=/ c #time=5" $file
+sudo sed -i -e "/man_log/ c 0 5 * * * root /usr/local/dvs/man_log" $file
+sudo sed -i -e "/reboot=/d" $file
 sudo systemctl restart cron
 ${DVS}dvsmu R; exit 0
 else ${DVS}dvsmu R; exit 0
@@ -1431,7 +1436,7 @@ function connection_status() {
 source /var/lib/dvswitch/dvs/lan/korean.txt
 pse_wait
 
-#---------핫스팟 호출부호 추출 -------------------------------------------
+#---------main 및sub user의 핫스팟 호출부호 추출 -------------------------------------------
 source /var/lib/dvswitch/dvs/var.txt
         declare call_sign_M=$call_sign
         if [ ${#call_sign} = 4 ]; then declare call_sign_M="$call_sign$sp02"; fi
@@ -1453,7 +1458,7 @@ done
 #echo $call_sign01
 #echo $call_sign02
 
-#---------- 핫스팟의 BM 연결상태 확인 ------------------------------------
+#---------- main_user의 BM 연결상태 확인 ------------------------------------
 
 file1=/var/log/mmdvm/MMDVM_Bridge.log
 
@@ -1487,7 +1492,7 @@ fi
 
 #echo $con_BM_M
 
-#------------ 클라이언트의 BM 연결상태 확인 --------------------------------
+#------------ sub_user의 BM 연결상태 확인 --------------------------------
 user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
 
 for user in $user; do
@@ -1547,7 +1552,7 @@ done
 #echo "15=$con_BM_15"
 #echo "16=$con_BM_16"
 
-#----------- 핫스팟의 연결시간 및 연결상태 확인 --------------------------
+#----------- main_user의 클라이언트 연결시간 및 연결상태 확인 --------------------------
 file1=/var/log/dvswitch/Analog_Bridge.log
 
 echo "" | sudo tee test.txt > /dev/null 2>&1
@@ -1632,7 +1637,7 @@ fi
 #echo $callsign_cl_M
 #echo $con_cl_M
 
-#-------------- 클라이언트의 연결시간 및 연결상태 확인 --------------------
+#-------------- sub_user의 클라이언트 연결시간 및 연결상태 확인 --------------------
 user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
 
 for user in $user; do
