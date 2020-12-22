@@ -1,4 +1,4 @@
-#setup.sh : dvsMU 설치를 위한 파일. 두 가지 방법으로 실행이 가능함.
-1. 이 파일을 직접 실행하는 방법.
-2. github/hl5ky/setup(바이너리파일)을 실행하면, setup.sh가 실행됨.
+setup.sh : dvsMU 설치를 위한 파일. 두 가지 방법으로 실행이 가능함.
+    1. 이 파일을 직접 실행하는 방법.
+    2. github/hl5ky/setup(바이너리파일)을 실행하면, setup.sh가 실행됨.
 
