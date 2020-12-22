@@ -71,6 +71,7 @@ sudo sed -i -e "/daily/ c 25 6    * * *   root    test -x /usr/sbin/anacron || (
 echo "333"
 #---- man_log 실행을 위한 초기 설정 -----------------
 # 기존설정이 있다면, 새로운 초기설정으로 변경 / 없으면 초기설정
+file=/etc/crontab
 if [[ ! -z `sudo grep "time" $file` ]]; then
 	line_no=$(grep -n "time=" $file -a | cut -d: -f1)
 	line=$(cat $file | sed -n ${line_no}p)
