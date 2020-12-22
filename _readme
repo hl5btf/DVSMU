@@ -1,9 +1,15 @@
+▶ DVSwitch이미지에 dvsMU를 추가하는 방법
+config.sh를 다운로드 하여, 실행한다.
+순서
+sudo wget -O config.sh https://raw.githubusercontent.com/hl5btf/DVSMU/main/config.sh
+sudo chmod +x config.sh
+./config.sh
+
 #=====================================================================================
-▶ setup은 2가지 방법으로 실행이 가능함.
-    1. 이 파일을 직접 실행하는 방법.
-    2. github/hl5ky/setup(바이너리파일)을 실행하면, setup.sh가 실행됨.
-
-
+▶ dvsMU를 설치하는 방법은 2가지가 있다.
+    1. setup.sh를 직접 실행하는 방법.
+    2. github/hl5ky/setup(바이너리파일)을 실행하여, setup.sh가 실행되게 하는 방법. (github/hl5ky/dvsmu 에 설명이 있음)
+    
 #=====================================================================================
 ▶ dvsMU를 사용하기 위해서 일부 파일은 DVSwitch와 달리 아래와 같이 수정해야 함. (github의 파일들은 수정되어 있음)
 
