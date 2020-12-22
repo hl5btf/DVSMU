@@ -55,10 +55,10 @@ sudo chmod +x /usr/local/dvs/dvsmu
 #---- /etc/cron.daily/man_log 삭제 및 man_log 다시 다운로드----
 sudo rm /etc/cron.daily/man_log
 sudo rm /etc/cron.daily/man_log.sh
-
+echo "111"
 sudo wget -O /usr/local/dvs/man_log https://raw.githubusercontent.com/hl5btf/DVSMU/main/man_log > /dev/null 2>&1
 sudo chmod +x /usr/local/dvs/man_log
-
+echo "222"
 #---- /etc/crontab의 daily 부분 시간을 최초 상태로 되돌리기--------------
 #file=/etc/crontab
 #line_no=$(grep -n "daily" $file -a | cut -d: -f1)
@@ -68,7 +68,7 @@ sudo chmod +x /usr/local/dvs/man_log
 #if [ $min != 25 ]; then
 sudo sed -i -e "/daily/ c 25 6    * * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )" $file
 #fi
-
+echo "333"
 #---- man_log 실행을 위한 초기 설정 -----------------
 # 기존설정이 있다면, 새로운 초기설정으로 변경 / 없으면 초기설정
 if [[ ! -z `sudo grep "time" $file` ]]; then
@@ -82,7 +82,7 @@ else
 	echo "#time=5" | sudo tee -a $file > /dev/null 2>&1
 	echo "0 5 * * * root /usr/local/dvs/man_log" | sudo tee -a $file > /dev/null 2>&1
 fi
-
+echo "444"
 sleep 10
 
 # var_added
