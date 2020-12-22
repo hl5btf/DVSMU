@@ -8,7 +8,8 @@
 #sudo wget -O $file https://raw.githubusercontent.com/hl5btf/DVSMU/main/setup.sh > /dev/null 2>&1
 #sudo chmod +x $file > /dev/null 2>&1
 #$file
-#sudo rm $file
+#sudo rm $file > /dev/null 2>&1
+#sudo rm setup > /dev/null 2>&1
 #=================================================================================================
 
 clear
@@ -82,7 +83,6 @@ if [[ "$path" =~ "dvs" ]]; then
         echo
         echo
 
-        sudo rm ./setup > /dev/null 2>&1
         exit 0
 
 else
@@ -101,7 +101,6 @@ else
         echo "------------- SSH 연결이 끊어집니다. ---------------"
         echo
         echo
-                sudo rm ./setup > /dev/null 2>&1
                 sudo reboot
         fi
 
