@@ -45,7 +45,6 @@ file=/opt/user${user}/DVSwitch.ini
 fi
 done
 }
-#----변수가 추가될때 처리하는 루틴 끝 부분-------------------------------------------------------
 
 ################################################
 # MAIN PROGRAM
@@ -53,18 +52,36 @@ done
 sudo wget -O /usr/local/dvs/dvsmu https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu
 sudo chmod +x /usr/local/dvs/dvsmu
 
+#---- /etc/cron.daily/man_log 삭제 및 man_log 다시 다운로드----
+sudo rm /etc/cron.daily/man_log
 sudo rm /etc/cron.daily/man_log.sh
-sudo wget -O /etc/cron.daily/man_log https://raw.githubusercontent.com/hl5btf/DVSMU/main/cron/man_log > /dev/null 2>&1
-sudo chmod +x /etc/cron.daily/man_log
 
+sudo wget -O /usr/local/dvs/man_log https://raw.githubusercontent.com/hl5btf/DVSMU/main/man_log > /dev/null 2>&1
+sudo chmod +x /usr/local/dvs/man_log
+
+#---- /etc/crontab의 daily 부분 시간을 최초 상태로 되돌리기--------------
 #file=/etc/crontab
-#if [[ -z `sudo grep "time" $file` ]]; then
-#        echo " " | sudo tee -a $file
-#        echo "#time=4" | sudo tee -a $file
-#        echo "0 \$time * * * root sudo reboot" | sudo tee -a $file
-#        sudo systemctl restart cron
+#line_no=$(grep -n "daily" $file -a | cut -d: -f1)
+#line=$(cat $file | sed -n ${line_no}p)
+#min=${line:0:2}
+
+#if [ $min != 25 ]; then
+sudo sed -i -e "/daily/ c 25 6    * * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )" $file
 #fi
 
+#---- man_log 실행을 위한 초기 설정 -----------------
+# 기존설정이 있다면, 새로운 초기설정으로 변경 / 없으면 초기설정
+if [[ ! -z `sudo grep "time" $file` ]]; then
+	line_no=$(grep -n "time=" $file -a | cut -d: -f1)
+	line=$(cat $file | sed -n ${line_no}p)
+	time=$(echo $line | cut -d '=' -f 2)
+
+	sudo sed -i -e "/reboot/ c 0 $time * * * root /usr/local/dvs/man_log" $file
+	echo "#reboot=yes" | sudo tee -a $file > /dev/null 2>&1
+else
+	echo "#time=5" | sudo tee -a $file > /dev/null 2>&1
+	echo "0 5 * * * root /usr/local/dvs/man_log" | sudo tee -a $file > /dev/null 2>&1
+fi
 
 sleep 10
 
