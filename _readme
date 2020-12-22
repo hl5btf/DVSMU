@@ -1,4 +1,59 @@
-setup.sh : dvsMU 설치를 위한 파일. 두 가지 방법으로 실행이 가능함.
+#-----------------------------------------------------------------------
+▶ setup.sh : dvsMU 설치를 위한 파일. 두 가지 방법으로 실행이 가능함.
     1. 이 파일을 직접 실행하는 방법.
     2. github/hl5ky/setup(바이너리파일)을 실행하면, setup.sh가 실행됨.
 
+#-----------------------------------------------------------------------
+▶ dvsMU를 사용하기 위해서 일부 파일은 DVSwitch와 달리 아래와 같이 수정해야 함.
+
+adv_dmr.txt (user00KR 의 내용도 수정)
+*bm,.    Brandmeister
+*dmrplus,.    DMRPlus
+*tgif,.    TGIF
+*other1,.    QRM
+*mainmenu,---- MAIN MENU ----
+
+adv_tgref.txt (user00KR 의 내용도 수정)
+*push_tg_ref,Download(DBupdate+Favorite)
+*managetg,Add/Del TG/Ref
+*mainmenu,---- MAIN MENU ----
+
+adv_tools.txt (user00KR 의 내용도 수정)
+*44,44 Drop Dynamic TGs
+*temp,Check Temp.
+*ver,DVSwitch Version?
+*88,88 Restart DVSwitch Services(2sec)
+*mainmenu,---- MAIN MENU ----
+
+dvsm.macro
+DVSWITCH=/opt/userUSER_NO/dvswitch.sh 수정
+
+dvsm.sh
+source /var/lib/dvswitch/dvs/varUSER_NO.txt
+
+{tgdb} -> {tgdb_user} 변경
+
+
+#################################################################
+#  RESTART
+#################################################################
+if [ "$1" = "restart" ]; then
+        sudo systemctl restart mmdvm_bridgeUSER_NO
+        sudo systemctl restart analog_bridgeUSER_NO
+        sudo systemctl restart md380-emuUSER_NO
+
+
+#################################################################
+#  Change MODE  모든 모드의 내용 변경
+#################################################################
+elif [ "$1" = "dstar" ]; then
+#        if [ ${mode_now} = "DSTAR" ]; then
+        ${MESSAGE} " only DMR is available "
+#        sudo systemctl restart ircddbgatewayd
+#        else
+#        sudo systemctl restart ircddbgatewayd
+#       sleep 12
+#        ${MODESET} DSTAR
+#        ${DVSWITCH} tlvAudio AUDIO_USE_GAIN ${txgain_dstar}
+#        fi
+#-----------------------------------------------------------------------
