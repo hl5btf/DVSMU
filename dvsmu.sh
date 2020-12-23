@@ -715,8 +715,19 @@ $sp04 현재 v.${crnt_ver}  최신 버전을 사용중입니다.
         " 9 50 1
 
         ${DVS}dvsmu A; exit 0
-else
-#-----------------------------------------------------------
+
+elif [ "$new_ver" = "" ]; then
+        clear
+        whiptail --msgbox "\
+
+$sp08 버전 확인이 되지 않습니다.
+
+$sp08 다시 확인하시기 바랍니다.
+        " 11 50 1
+
+        ${DVS}dvsmu A; exit 0
+
+elif [ $new_ver != $crnt_ver ]; then
 	clear
         if (whiptail --title " dvsMU 업그레이드 " --yesno "\
 $sp10 최신버전(v.$new_ver)으로 업그레이드가 가능합니다.
@@ -732,7 +743,7 @@ $sp10 $T005
         sudo chmod +x ${DVS}${random_char}.sh > /dev/null 2>&1;
         ${DVS}${random_char}.sh > /dev/null 2>&1;
         sudo rm ${DVS}${random_char}.sh > /dev/null 2>&1;
-#-----------------------------------------------------------
+
 	clear
 	whiptail --msgbox "\
 
