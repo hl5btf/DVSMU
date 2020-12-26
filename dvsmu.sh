@@ -699,11 +699,11 @@ TERM=ansi whiptail --title "확인중" --infobox "$T006" 8 60
 random_char=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 12 | sed 1q)
 sudo wget -O ${DVS}${random_char} https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu_ver > /dev/null 2>&1
 
-source /usr/local/dvs/${random_char}
+source /usr/local/dvs/${random_char} > /dev/null 2>&1
 new_ver=$ver
 
 source /var/lib/dvswitch/dvs/var.txt
-sudo rm ${DVS}${random_char}
+sudo rm ${DVS}${random_char} > /dev/null 2>&1
 crnt_ver=$(dvsmu -v)
 #-----------------------------------------------------------
 if [ $new_ver = $crnt_ver ]; then
