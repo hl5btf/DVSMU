@@ -1,14 +1,10 @@
 ## 이미지에 dvsMU 추가
-DVSwitch이미지에 dvsMU를 추가하는 방법 (setup.sh를 이용하여 설치를 하여도 결과는 동일함)
-
-config.sh를 다운로드 하여, 실행한다.
+DVSwitch이미지에 dvsMU를 추가하는 방법 (setup.sh를 이용하여 설치를 하여도 결과는 동일함) - config.sh를 다운로드 하여, 실행한다.
 
 순서
 
 sudo wget -O config.sh https://raw.githubusercontent.com/hl5btf/DVSMU/main/config.sh
-
 sudo chmod +x config.sh
-
 ./config.sh
 
 
