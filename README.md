@@ -5,6 +5,7 @@ sudo wget -O config.sh https://raw.githubusercontent.com/hl5btf/DVSMU/main/confi
 sudo chmod +x config.sh
 ./config.sh
 
+
 #=====================================================================================
 ▶ dvsMU를 설치하는 방법은 2가지가 있다.
     1. setup.sh를 직접 실행하는 방법.
