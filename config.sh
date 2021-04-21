@@ -1,6 +1,12 @@
 #!/bin/bash
 
 
+file=/etc/crontab
+echo "#reboot=yes" | sudo tee -a $file > /dev/null 2>&1
+echo "#time=3" | sudo tee -a $file > /dev/null 2>&1
+echo "0 3 * * * root /usr/local/dvs/man_log" | sudo tee -a $file > /dev/null 2>&1
+
+
 dir=/usr/local/dvs
 files="dvsmu man_log"
 for file in $files; do
