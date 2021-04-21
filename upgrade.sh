@@ -80,8 +80,8 @@ if [[ ! -z `sudo grep "time" $file` ]]; then
 	sudo sed -i -e "/reboot/ c 0 $time * * * root /usr/local/dvs/man_log" $file
 	echo "#reboot=yes" | sudo tee -a $file > /dev/null 2>&1
 else
-	echo "#time=5" | sudo tee -a $file > /dev/null 2>&1
-	echo "0 5 * * * root /usr/local/dvs/man_log" | sudo tee -a $file > /dev/null 2>&1
+	echo "#time=3" | sudo tee -a $file > /dev/null 2>&1
+	echo "0 3 * * * root /usr/local/dvs/man_log" | sudo tee -a $file > /dev/null 2>&1
 fi
 
 sleep 10
