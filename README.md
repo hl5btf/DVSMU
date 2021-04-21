@@ -26,7 +26,7 @@ sudo chmod +x config.sh
 
 dvsMU를 사용하기 위해서 일부 파일은 DVSwitch와 달리 아래와 같이 수정해야 함. (github의 파일들은 수정되어 있음)
 
-▶adv_dmr.txt (user00KR 의 내용도 수정)
+==== adv_dmr.txt (user00KR 의 내용도 수정)
 *bm,.    Brandmeister
 *dmrplus,.    DMRPlus
 *tgif,.    TGIF
