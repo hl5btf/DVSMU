@@ -34,7 +34,7 @@ done
 
 sudo mkdir /var/lib/dvswitch/dvs/adv/user00EN
 dir=/var/lib/dvswitch/dvs/adv/user00EN
-files="adv_audio.txt adv_dmr.txt adv_hotspot.txt adv_main.txt adv_managetg.txt adv_resetfvrt.txt adv_rxgain.txt adv_tgref.txt adv_tools.txt adv_txgain"
+files="adv_audio.txt adv_dmr.txt adv_hotspot.txt adv_main.txt adv_managetg.txt adv_resetfvrt.txt adv_rxgain.txt adv_tgref.txt adv_tools.txt adv_txgain.txt"
 for file in $files; do
 sudo wget -O ${dir}/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/EN/$file
 done
@@ -42,7 +42,7 @@ done
 
 sudo mkdir /var/lib/dvswitch/dvs/adv/user00KR
 dir=/var/lib/dvswitch/dvs/adv/user00KR
-files="adv_audio.txt adv_dmr.txt adv_hotspot.txt adv_main.txt adv_managetg.txt adv_resetfvrt.txt adv_rxgain.txt adv_tgref.txt adv_tools.txt adv_txgain"
+files="adv_audio.txt adv_dmr.txt adv_hotspot.txt adv_main.txt adv_managetg.txt adv_resetfvrt.txt adv_rxgain.txt adv_tgref.txt adv_tools.txt adv_txgain.txt"
 for file in $files; do
 sudo wget -O ${dir}/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/KR/$file
 done
