@@ -14,7 +14,8 @@ sudo chmod +x config.sh
     2. github/hl5ky/setup(바이너리파일)을 실행하여, setup.sh가 실행되게 하는 방법. (github/hl5ky/dvsmu 에 설명이 있음)
     
 #=====================================================================================
-▶ dvsMU를 사용하기 위해서 일부 파일은 DVSwitch와 달리 아래와 같이 수정해야 함. (github의 파일들은 수정되어 있음)
+▶ dvsMU를 사용하기 위해서 일부 파일은 DVSwitch와 달리 아래와 같이 수정해야 함.
+   (github의 파일들은 수정되어 있고, setup을 실행하면 수정된 파일이 적용됨)
 
 ▶adv_dmr.txt (user00KR 의 내용도 수정)
 *bm,.    Brandmeister
