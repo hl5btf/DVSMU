@@ -8,8 +8,10 @@ function var_added() {
 #sudo wget -O /var/lib/dvswitch/dvs/var00.txt https://raw.githubusercontent.com/hl5btf/DVSMU/main/var00.txt > /dev/null 2>&1
 
 # When updating, the stanzas will be appended to varxx.txt, if not exist.
+# each item needs space in between. no qutation marks are needed
 new_var=""
 # default value will be applied once, at the first time
+# each item needs space in between. if the item is character, it needs quotation marks.
 new_val=()
 
 user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
