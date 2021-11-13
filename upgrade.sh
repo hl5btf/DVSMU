@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# dvsMU 개발시에, 정식 발표버전과 그 이전 버전의 내용이 달라짐. 이에 따라 정식버전 발표시에 그 이전의 내용과 다른 내용을 수정하는 프로그램.
+# 또한 차후에 변수가 추가될때를 고려하여 변수가 추가되는 루틴을 미리 작성해 둠.
+
 #----변수가 추가될때 처리하는 루틴 시작부분-------------------------------------------------------
 function var_added() {
 #sudo wget -O /var/lib/dvswitch/dvs/var00.txt https://raw.githubusercontent.com/hl5btf/DVSMU/main/var00.txt > /dev/null 2>&1
@@ -78,9 +81,9 @@ if [[ ! -z `sudo grep "time" $file` ]]; then
 	time=$(echo $line | cut -d '=' -f 2)
 
 	sudo sed -i -e "/reboot/ c 0 $time * * * root /usr/local/dvs/man_log" $file
-	echo "#reboot=yes" | sudo tee -a $file > /dev/null 2>&1
+	echo "reboot=yes" | sudo tee -a $file > /dev/null 2>&1
 else
-	echo "#time=3" | sudo tee -a $file > /dev/null 2>&1
+	echo "time=3" | sudo tee -a $file > /dev/null 2>&1
 	echo "0 3 * * * root /usr/local/dvs/man_log" | sudo tee -a $file > /dev/null 2>&1
 fi
 
