@@ -69,9 +69,10 @@ sudo wget -O /usr/local/dvs/man_log https://raw.githubusercontent.com/hl5btf/DVS
 sudo chmod +x /usr/local/dvs/man_log
 
 file=/etc/crontab
-echo "#reboot=yes" | sudo tee -a $file > /dev/null 2>&1
-echo "#time=3" | sudo tee -a $file > /dev/null 2>&1
+echo "reboot=yes" | sudo tee -a $file > /dev/null 2>&1
+echo "time=3" | sudo tee -a $file > /dev/null 2>&1
 echo "0 3 * * * root /usr/local/dvs/man_log" | sudo tee -a $file > /dev/null 2>&1
+echo "30 6 * * * root /usr/local/dvs/DMRIds_chk.sh" | sudo tee -a $file > /dev/null 2>&1
 
 echo "-------------  Please Wait 10 sec  -----------------"
 sudo apt-get update > /dev/null 2>&1
