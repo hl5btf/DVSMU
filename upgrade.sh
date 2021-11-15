@@ -5,6 +5,53 @@
 # 차후에 upgrade 할 내용이 있으면 여기에 계속 주가하면 됨.
 # 차후에 변수가 추가될때를 고려하여 변수가 추가되는 루틴을 미리 작성해 둠.
 
+#----주파수가 000000000으로 되어 있으면 430000000로 변경하는 루틴 ---------------------------------
+function freq_0_to_430() {
+
+update_ini="sudo ${MB}dvswitch.sh updateINIFileValue"
+
+source /var/lib/dvswitch/dvs/var.txt > /dev/null 2>&1
+if [ $rx_freq = 000000000 ]; then
+	file=/var/lib/dvswitch/dvs/var.txt
+	tag=rx_freq; value=430000000
+	sudo sed -i -e "/^$tag=/ c $tag=$value" $file
+	tag=tx_freq; value=430000000
+	sudo sed -i -e "/^$tag=/ c $tag=$value" $file
+fi
+
+source /opt/MMDVM_Bridge/MMDVM_Bridge.ini > /dev/null 2>&1
+if [ $RXFrequency = "000000000" ]; then
+	file=/opt/MMDVM_Bridge/MMDVM_Bridge.ini
+	section=Info; tag=RXFrequency; value=430000000
+	$update_ini $file $section $tag $value
+	section=Info; tag=TXFrequency; value=430000000
+	$update_ini $file $section $tag $value
+fi
+
+user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
+for user in $user; do
+source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
+if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
+	if [ $rx_freq = 000000000 ]; then
+		file=/var/lib/dvswitch/dvs/var${user}.txt
+		tag=rx_freq; value=430000000
+		sudo sed -i -e "/^$tag=/ c $tag=$value" $file
+		tag=tx_freq; value=430000000
+		sudo sed -i -e "/^$tag=/ c $tag=$value" $file
+	fi
+
+	source /opt/user${user}/MMDVM_Bridge.ini > /dev/null 2>&1
+	if [ $RXFrequency = "000000000" ]; then
+		file=/opt/user${user}/MMDVM_Bridge.ini
+		section=Info; tag=RXFrequency; value=430000000
+		$update_ini $file $section $tag $value
+		section=Info; tag=TXFrequency; value=430000000
+		$update_ini $file $section $tag $value
+	fi
+fi
+done
+}
+
 #----변수가 추가될때 처리하는 루틴 시작부분-------------------------------------------------------
 function var_added() {
 #sudo wget -O /var/lib/dvswitch/dvs/var00.txt https://raw.githubusercontent.com/hl5btf/DVSMU/main/var00.txt > /dev/null 2>&1
@@ -92,6 +139,8 @@ else
 fi
 
 sleep 10
+
+freq_0_to_430
 
 # var_added
 
