@@ -5,7 +5,48 @@
 # 차후에 upgrade 할 내용이 있으면 여기에 계속 주가하면 됨.
 # 차후에 변수가 추가될때를 고려하여 변수가 추가되는 루틴을 미리 작성해 둠.
 
-#----주파수가 000000000으로 되어 있으면 430000000로 변경하는 루틴 ---------------------------------
+#------ man_log 다운로드 및 crontab 설정 ----------------------------------------------------------
+function set_crontab() {
+FILE_CRON=/etc/crontab
+
+if [ ! -e $EILE_CRON ]; then
+	sudo wget -O /usr/local/dvs/man_log https://raw.githubusercontent.com/hl5btf/DVSMU/main/man_log > /dev/null 2>&1
+	sudo chmod +x /usr/local/dvs/man_log
+fi
+
+cron_daily_time=$(sed -n -e '/cron.daily/p' $FILE_CRON | cut -f 2 -d' ')
+cron_daily_min=$(sed -n -e '/cron.daily/p' $FILE_CRON | cut -f 1 -d' ')
+cron_daily_min_plus_2=$((cron_daily_min + 2))
+cron_daily_min_plus_3=$((cron_daily_min + 3))
+
+# <<<25 6    * * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )>>>
+
+if [[ ! -z `sudo grep "time" $FILE_CRON` ]]; then
+	sudo sed -i -e "/time/ c time=3" $FILE_CRON
+else
+	echo "time=3" | sudo tee -a $FILE_CRON
+fi
+
+if [[ ! -z `sudo grep "man_log" $FILE_CRON` ]]; then
+	sudo sed -i -e "/man_log/ c 0 3 * * * root /usr/local/dvs/man_log" $FILE_CRON
+else
+	echo "0 3 * * * root /usr/local/dvs/man_log" | sudo tee -a $FILE_CRON
+fi
+
+if [[ ! -z `sudo grep "reboot" $FILE_CRON` ]]; then
+	sudo sed -i -e "/reboot/ c reboot=yes" $FILE_CRON
+else
+	echo "reboot=yes" | sudo tee -a $FILE_CRON
+fi
+
+if [[ ! -z `sudo grep "DMRIds" $FILE_CRON` ]]; then
+	sudo sed -i -e "/DMRIds/ c $cron_daily_min_plus_2 $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh" $FILE_CRON
+else
+	echo "$cron_daily_min_plus_2 $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh" | sudo tee -a $FILE_CRON
+fi
+}
+
+#---- 주파수가 000000000으로 되어 있으면 430000000로 변경하는 루틴 ---------------------------------
 function freq_0_to_430() {
 
 update_ini="sudo ${MB}dvswitch.sh updateINIFileValue"
