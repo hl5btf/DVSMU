@@ -45,6 +45,10 @@ sudo wget -O /usr/local/dvs/dvsmu https://raw.githubusercontent.com/hl5btf/DVSMU
 sudo chmod +x /usr/local/dvs/dvsmu
 echo "----------------------------------------------------"
 
+file=DMRIds_chk.sh
+sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
+sudo chmod +x /usr/local/dvs/$file
+
 sudo mkdir /var/lib/dvswitch/dvs/adv/user00 > /dev/null 2>&1
 sudo wget -O /var/lib/dvswitch/dvs/adv/user00/dvsm.macro https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsm.macro > /dev/null 2>&1
 sudo wget -O /var/lib/dvswitch/dvs/adv/user00/dvsm.adv https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsm.adv > /dev/null 2>&1
@@ -72,7 +76,7 @@ file=/etc/crontab
 echo "reboot=yes" | sudo tee -a $file > /dev/null 2>&1
 echo "time=3" | sudo tee -a $file > /dev/null 2>&1
 echo "0 3 * * * root /usr/local/dvs/man_log" | sudo tee -a $file > /dev/null 2>&1
-echo "30 6 * * * root /usr/local/dvs/DMRIds_chk.sh" | sudo tee -a $file > /dev/null 2>&1
+echo "27 6 * * * root /usr/local/dvs/DMRIds_chk.sh" | sudo tee -a $file > /dev/null 2>&1
 
 echo "-------------  Please Wait 10 sec  -----------------"
 sudo apt-get update > /dev/null 2>&1
