@@ -395,10 +395,9 @@ tx_freq=${rx_MHz:0:3}${rx_MHz:4:4}"00"
 
 #tx_freq=${tx_MHz:0:3}${tx_MHz:4:4}"00"
 
-
 if [ x${bm_password} = x ]; then bm_password=passw0rd; fi
 
-bm_password=$(whiptail --title "$T009" --inputbox "브랜드마이스터 비밀번호" 10 60 3>&1 1>&2 2>&3)
+bm_password=$(whiptail --title "$T009" --inputbox "브랜드마이스터 비밀번호" 10 60 ${bm_password} 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
 
 if [[ $T218 =~ Latitude ]]; then T218=$T218; else T218="Latitude : $T218"; fi
