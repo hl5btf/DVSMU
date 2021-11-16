@@ -13,6 +13,7 @@ sudo \cp -f ${DVS}dvsmu.sh ${HOME}dvsmu.sh
 
 ${SHC}shc -r -v -T -f ${HOME}dvsmu.sh
 sudo mv ${HOME}dvsmu.sh.x ${HOME}dvsmu
+sudo \cp -f ${HOME}dvsmu ${DVS}dvsmu
 
 
 # 아래와 같이 다운로드가 가능함 =====================================
