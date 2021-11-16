@@ -51,6 +51,18 @@ function freq_0_to_430() {
 
 update_ini="sudo ${MB}dvswitch.sh updateINIFileValue"
 
+source /var/lib/dvswitch/dvs/var00.txt > /dev/null 2>&1
+if [ $rx_freq = 000000000 ]; then
+	file=/var/lib/dvswitch/dvs/var.txt
+	tag=rx_freq; value=430000000
+	sudo sed -i -e "/^$tag=/ c $tag=$value" $file
+	tag=tx_freq; value=430000000
+	sudo sed -i -e "/^$tag=/ c $tag=$value" $file
+fi
+
+# 만약 password의 값이 있다면 함께 수정.
+sudo sed -i -e "/^bm_password=/ c bm_password=" $file
+
 source /var/lib/dvswitch/dvs/var.txt > /dev/null 2>&1
 if [ $rx_freq = 000000000 ]; then
 	file=/var/lib/dvswitch/dvs/var.txt
