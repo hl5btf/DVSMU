@@ -3,9 +3,9 @@
 #source /var/lib/dvswitch/dvs/var.txt
 
 #===================================
-SCRIPT_VERSION="1.8"
+SCRIPT_VERSION="1.9"
 SCRIPT_AUTHOR="HL5KY"
-SCRIPT_DATE="2020-12-22"
+SCRIPT_DATE="2021-11-16"
 #===================================
 
 if [ "$1" != "" ]; then
@@ -102,6 +102,8 @@ file=/opt/user$USER_NO/Analog_Bridge.ini
 	$update_ini $file USRP rxPort $usrp_port
 	declare emu_port=$(($USER_NO_NO+2470))
 	$update_ini $file GENERAL emulatorAddress 127.0.0.1:$emu_port
+	dmr="ambeMode = DMR"
+	sudo sed -i "/^ambeMode/ c $dmr" $file
 
 if [ "$2" = "upgrade" ]; then
 let "complete=complete+15"
@@ -204,6 +206,9 @@ function file_copy_and_initialize() {
 sudo cp /opt/Analog_Bridge/* /opt/user$1
 sudo cp /opt/MMDVM_Bridge/* /opt/user$1
 sudo cp /opt/md380-emu/* /opt/user$1
+
+file=/opt/user$1/MMDVM_Bridge.ini
+	$update_ini $file "DMR Network" Password none
 
 sudo \cp -f ${adv}user00/dvsm.* /opt/user$1
 
@@ -337,6 +342,8 @@ done
 done
 
 #----------- USRP PORT 입력 중복 확인 끝 부분-----------------------
+source /var/lib/dvswitch/dvs/var.txt
+bm_address_M=$bm_address
 
 source /var/lib/dvswitch/dvs/var$1.txt
 USER_NO=$1
@@ -345,13 +352,27 @@ USER_NO=$1
 call_sign=$call_sign_in; rpt_id=$rpt_id_in; dmr_id=$dmr_id_in; usrp_port=$usrp_port_in
 
 
+rx_MHz=${rx_freq:0:3}"."${rx_freq:3:4}
+
+rx_MHz=$(whiptail --title " $T009 " --inputbox "송수신 주파수(xxx.xxxx MHz)" 10 60 ${rx_MHz} 3>&1 1>&2 2>&3)
+if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
+
+until [ ${#rx_MHz} = 8 ]; do
+rx_MHz=$(whiptail --title " $T009 " --inputbox "송수신 주파파수(xxx.xxxx MHz, 소수점 4자리)" 10 60 ${rx_MHz} 3>&1 1>&2 2>&3)
+if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
+done
+
+rx_freq=${rx_MHz:0:3}${rx_MHz:4:4}"00"
+tx_freq=${rx_MHz:0:3}${rx_MHz:4:4}"00"
+
+
 #rx_MHz=${rx_freq:0:3}"."${rx_freq:3:4}
 
-#if [[ $T213 =~ RXFrequency ]]; then T213=$T213; else T213="RXFrequency : $T213"; fi
+#if [[ $T213 =~ Frequency ]]; then T213=$T213; else T213="RXFrequency : $T213"; fi
 #rx_MHz=$(whiptail --title " $T009 " --inputbox "$T213" 10 60 ${rx_MHz} 3>&1 1>&2 2>&3)
 #if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
 
-#if [[ $T216 =~ RXFrequency ]]; then T216=$T216; else T216="RXFrequency : $T216"; fi
+#if [[ $T216 =~ Frequency ]]; then T216=$T216; else T216="RXFrequency : $T216"; fi
 #until [ ${#rx_MHz} = 8 ]; do
 #rx_MHz=$(whiptail --title " $T009 " --inputbox "$T216" 10 60 ${rx_MHz} 3>&1 1>&2 2>&3)
 #if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
@@ -362,11 +383,11 @@ call_sign=$call_sign_in; rpt_id=$rpt_id_in; dmr_id=$dmr_id_in; usrp_port=$usrp_p
 
 #tx_MHz=${tx_freq:0:3}"."${tx_freq:3:4}
 
-#if [[ $T214 =~ TXFrequency ]]; then T214=$T214; else T214="TXFrequency : $T214"; fi
+#if [[ $T214 =~ Frequency ]]; then T214=$T214; else T214="TXFrequency : $T214"; fi
 #tx_MHz=$(whiptail --title " $T009 " --inputbox "$T214" 10 60 ${tx_MHz} 3>&1 1>&2 2>&3)
 #if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
 
-#if [[ $T217 =~ TXFrequency ]]; then T217=$T217; else T217="TXFrequency : $T217"; fi
+#if [[ $T217 =~ Frequency ]]; then T217=$T217; else T217="TXFrequency : $T217"; fi
 #until [ ${#tx_MHz} = 8 ]; do
 #tx_MHz=$(whiptail --title " $T009 " --inputbox "$T217" 10 60 ${tx_MHz} 3>&1 1>&2 2>&3)
 #if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
@@ -377,7 +398,7 @@ call_sign=$call_sign_in; rpt_id=$rpt_id_in; dmr_id=$dmr_id_in; usrp_port=$usrp_p
 
 if [ x${bm_password} = x ]; then bm_password=passw0rd; fi
 
-bm_password=$(whiptail --title "$T009" --inputbox "브랜드마이스터 비밀번호" 10 60 ${bm_password} 3>&1 1>&2 2>&3)
+bm_password=$(whiptail --title "$T009" --inputbox "브랜드마이스터 비밀번호" 10 60 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
 
 if [[ $T218 =~ Latitude ]]; then T218=$T218; else T218="Latitude : $T218"; fi
@@ -435,9 +456,7 @@ update_var usrp_port ${usrp_port}
 let "complete=complete+10"
 echo -e "$complete"
 
-# update_var bm_master South_Korea_4501
-update_var bm_address bm.dv.or.kr
-#update_var bm_password passw0rd
+update_var bm_address ${bm_address_M}
 update_var bm_password ${bm_password}
 update_var bm_port 62031
 
@@ -447,8 +466,8 @@ if [ ${dmr_id:0:3} = 450  ]; then
 	update_var dmrplus_port 55555
 fi
 
-#update_var rx_freq ${rx_freq}
-#update_var tx_freq ${tx_freq}
+update_var rx_freq ${rx_freq}
+update_var tx_freq ${tx_freq}
 #update_var pwr 0
 update_var lat ${lat}
 update_var lon ${lon}
@@ -458,11 +477,11 @@ update_var lctn "${lctn}"
 
 # 한번 입력한 내용은 var00.txt에 반영하여 default로 사용
 file=/var/lib/dvswitch/dvs/var00.txt
-	sudo sed -i "/^bm_password=/ c bm_password=${bm_password}" $file
 	sudo sed -i "/^lctn=/ c lctn=\"${lctn}\"" $file
 	sudo sed -i "/^lat=/ c lat=${lat}" $file
 	sudo sed -i "/^lon=/ c lon=${lon}" $file
-
+        sudo sed -i "/^rx_freq=/ c rx_freq=${rx_freq}" $file
+        sudo sed -i "/^tx_freq=/ c tx_freq=${tx_freq}" $file
 #update_var desc "${desc}"
 
 #------varxx.txt 수정 끝부분 ---------------------------------
@@ -1498,7 +1517,7 @@ if [ -e $file1 ]; then
         fi
         done < test.txt
 else
-con_BM_M=??
+con_BM_M=?? > /dev/null 2>&1
 fi
 
 #echo $con_BM_M
@@ -1542,7 +1561,7 @@ if [ -d $dir ]; then
                 fi
                 done < test.txt
         else
-        con_BM_${user}=??
+        con_BM_${user}=?? > /dev/null 2>&1
         fi
 fi
 done
