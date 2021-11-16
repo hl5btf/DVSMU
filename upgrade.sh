@@ -156,8 +156,13 @@ done
 ################################################
 # MAIN PROGRAM
 ################################################
-sudo wget -O /usr/local/dvs/dvsmu https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu
-sudo chmod +x /usr/local/dvs/dvsmu
+file=dvsmu
+sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
+sudo chmod +x /usr/local/dvs/$file
+
+file=DMRIds_chk.sh
+sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
+sudo chmod +x /usr/local/dvs/$file
 
 sleep 10
 
