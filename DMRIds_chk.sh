@@ -50,7 +50,7 @@ fi
 #--------------------------------------------------------------
 function err_log() {
 
-time=`date -d '14 hour' +%Y-%m-%d'  '%H:%M:%S`
+time=`date +%Y-%m-%d'  '%H:%M:%S`
 
 echo $time $err_type | sudo tee -a ${DVS}DMRIds.log > /dev/null 2>&1
 
