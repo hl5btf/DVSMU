@@ -18,6 +18,9 @@ dvsMU에서 업그레이할때를 고려한 작업
 
 새로운 dvs 이미지 만드는 방법
 1. 직전의 dvs 이미지를 다운로드 하여 SD카드에 설치한다. https://drive.google.com/drive/u/0/folders/1ORv7ehiaA3olCU5YMU7j8d4y7i2xTj08
+   (SD카드에 이미지 설치한후, /boot/dvsconfig.txt의 내용중, chg를 73으로 해 둔다)
+   (RPI부팅시, dvsstart.sh가 실행되어 자동세팅되는것을 방지하기 위한 것임)
+   (이와 같이 했다면, 나중에 USB리더기에 넣고 이미지를 만들때, chg값을 1로 만들고 이미지를 만들어야 함)
 2. 다운로드 한 파일을 SD카드로 업로드한다. 또는 github에서 다운로드한다.
     dvsMU의 경우는 이렇게 다운로드한다. sudo wget -O /usr/local/dvs/dvsmu https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu
 3. DVSwitch가 업그레이드되었다면, DVSwitch도 업그레이드한다. sudo apt-get update     sudo apt-get upgrade -y
