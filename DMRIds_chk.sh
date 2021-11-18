@@ -5,7 +5,7 @@ source /var/lib/dvswitch/dvs/var.txt
 #===================================
 SCRIPT_VERSION="1.0"
 SCRIPT_AUTHOR="HL5KY"
-SCRIPT_DATE="2021-11-16"
+SCRIPT_DATE="2021-11-18"
 #===================================
 
 FILE_DAT=/var/lib/mmdvm/DMRIds.dat
@@ -17,8 +17,11 @@ LIB=/var/lib/mmdvm
 FILE_THIS=${DVS}DMRIds_chk.sh
 FILE_CRON=/etc/crontab
 
-MIN_FILE_SIZE=4579118
-MIN_NUMBER_HL=1428
+ORG_FILE_SIZE=4585788
+ORG_NUMBER_HL=1439
+
+MIN_FILE_SIZE=4584788
+MIN_NUMBER_HL=1429
 
 MAX_LOG_LINE=300
 
@@ -118,7 +121,7 @@ if [ $min = $cron_daily_min_plus_2 ]; then
 	file_size_chk
 	if [ $chk_result = no ]; then
 		set_chk_time_agn_1min
-		err_type=dat_file_size_err; err_log
+		err_type="dat_file_size_err DAT: $FILE_SIZE < B4: ORG_FILE_SIZE"; err_log
 		cp_bak_to_dat
 		exit
 	fi
@@ -126,7 +129,7 @@ if [ $min = $cron_daily_min_plus_2 ]; then
 	hl_num_chk
 	if [ $chk_result = no ]; then
 		set_chk_time_agn_1min
-		err_type=dat_file_hl_num_err; err_log
+		err_type="dat_file_hl_num_err DAT: $NUMBER_HL < B4: $ORG_NUMBER_HL"; err_log
                 cp_bak_to_dat
                 exit
 	fi
@@ -134,7 +137,7 @@ if [ $min = $cron_daily_min_plus_2 ]; then
         callsign_chk
         if [ $chk_result = no ]; then
 		set_chk_time_agn_1min
-		err_type=dat_file_callsign_err; err_log
+		err_type="dat_file_callsign_err $CALLSIGN"; err_log
                 cp_bak_to_dat
                 exit
         fi
@@ -149,21 +152,21 @@ else
 	file_size_chk
 	if [ $chk_result = no ]; then
 		set_chk_time_agn_10min
-		err_type=new_file_size_err; err_log
+		err_type="new_file_size_err NEW: $FILE_SIZE < B4: ORG_FILE_SIZE"; err_log
 		exit
 	fi
 
 	hl_num_chk
 	if [ $chk_result = no ]; then
 		set_chk_time_agn_10min
-		err_type=new_file_hl_num_err; err_log
+		err_type="new_file_hl_num_err NEW: $NUMBER_HL < B4: $ORG_NUMBER_HL"; err_log
 		exit
 	fi
 
 	callsign_chk
         if [ $chk_result = no ]; then
                 set_chk_time_agn_10min
-		err_type=new_file_callsign_err; err_log
+		err_type="new_file_callsign_err $CALLSIGN"; err_log
 		exit
         fi
 
@@ -172,8 +175,12 @@ else
 
         sudo sed -i -e "/DMRIds/ c $cron_daily_min_plus_2 $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh" $FILE_CRON
 
+        sudo sed -i -e "/^ORG_FILE_SIZE/ c ORG_FILE_SIZE=$FILE_SIZE" $FILE_THIS
+
 	NEW_MIN_FILE_SIZE=$(($FILE_SIZE-1000))
 	sudo sed -i -e "/^MIN_FILE_SIZE/ c MIN_FILE_SIZE=$NEW_MIN_FILE_SIZE" $FILE_THIS
+
+        sudo sed -i -e "/^ORG_NUMBER_HL/ c ORG_NUMBER_HL=$NUMBER_HL" $FILE_THIS
 
 	NEW_MIN_NUMBER_HL=$(($NUMBER_HL-10))
 	sudo sed -i -e "/^MIN_NUMBER_HL/ c MIN_NUMBER_HL=$NEW_MIN_NUMBER_HL" $FILE_THIS
