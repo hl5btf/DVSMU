@@ -27,13 +27,14 @@ CHK_CALLSIGNS="HL5KY HL5BTF HL5BHH HL5PPT HL2DRY DS5QDR DS5ANY DS5TUK JA2HWE ZL1
 min=$(sed -n -e '/DMRIds/p' $FILE_CRON | cut -f 1 -d' ')
 
 cron_daily_time=$(sed -n -e '/cron.daily/p' $FILE_CRON | cut -f 2 -d' ')
+cron_daily_time=$(echo $cron_daily_time | cut -f1 -d' ')
 cron_daily_min=$(sed -n -e '/cron.daily/p' $FILE_CRON | cut -f 1 -d' ')
 cron_daily_min_plus_2=$((cron_daily_min + 2))
 cron_daily_min_plus_3=$((cron_daily_min + 3))
 
 #--------------------------------------------------------------
 function set_chk_time_agn_1min() {
-sudo sed -i -e "/DMRIds/ c $cron_daily_min_plus_3 $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh" /etc/crontab
+sudo sed -i -e "/DMRIds/ c $cron_daily_min_plus_3 $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh" $FILE_CRON
 }
 #--------------------------------------------------------------
 function set_chk_time_agn_10min() {
@@ -169,7 +170,7 @@ else
 
 # when all checks for new file are ok, excute followings
 
-        sudo sed -i -e "/DMRIds/ c $cron_daily_min_plus_2 $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh" /etc/crontab
+        sudo sed -i -e "/DMRIds/ c $cron_daily_min_plus_2 $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh" $FILE_CRON
 
 	NEW_MIN_FILE_SIZE=$(($FILE_SIZE-1000))
 	sudo sed -i -e "/^MIN_FILE_SIZE/ c MIN_FILE_SIZE=$NEW_MIN_FILE_SIZE" $FILE_THIS
