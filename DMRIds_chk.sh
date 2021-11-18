@@ -52,9 +52,7 @@ else
 fi
 }
 #--------------------------------------------------------------
-function err_log() {
-
-time=`date +%Y-%m-%d'  '%H:%M:%S`
+function logging() {
 
 sudo sed -i '1 i\'$log_line'' ${DVS}DMRIds.log > /dev/null 2>&1
 
@@ -121,7 +119,7 @@ if [ $min = $cron_daily_min_plus_2 ]; then
 	file_size_chk
 	if [ $chk_result = no ]; then
 		set_chk_time_agn_1min
-		err_type="$time  dat_file_size_err DAT: $FILE_SIZE < B4: ORG_FILE_SIZE"; err_log
+		log_line="$time  dat_file_size_err DAT: $FILE_SIZE < B4: ORG_FILE_SIZE"; logging
 		cp_bak_to_dat
 		exit
 	fi
@@ -129,7 +127,7 @@ if [ $min = $cron_daily_min_plus_2 ]; then
 	hl_num_chk
 	if [ $chk_result = no ]; then
 		set_chk_time_agn_1min
-		err_type="$time  dat_file_hl_num_err DAT: $NUMBER_HL < B4: $ORG_NUMBER_HL"; err_log
+		log_line="$time  dat_file_hl_num_err DAT: $NUMBER_HL < B4: $ORG_NUMBER_HL"; logging
                 cp_bak_to_dat
                 exit
 	fi
@@ -137,12 +135,14 @@ if [ $min = $cron_daily_min_plus_2 ]; then
         callsign_chk
         if [ $chk_result = no ]; then
 		set_chk_time_agn_1min
-		err_type="$time  dat_file_callsign_err $CALLSIGN"; err_log
+		log_line="$time  dat_file_callsign_err $CALLSIGN"; logging
                 cp_bak_to_dat
                 exit
         fi
 
 	sudo cp -f $FILE_DAT $FILE_BAK
+	log_line="$time  DMRIds.dat is OK"; logging
+	log_line="--------------------------------------------------"; logging
 
 else
         FILE_CHK=/var/lib/mmdvm/DMRIds.new
@@ -152,21 +152,21 @@ else
 	file_size_chk
 	if [ $chk_result = no ]; then
 		set_chk_time_agn_10min
-		err_type="$time  new_file_size_err NEW: $FILE_SIZE < B4: ORG_FILE_SIZE"; err_log
+		log_line="$time  new_file_size_err NEW: $FILE_SIZE < B4: ORG_FILE_SIZE"; logging
 		exit
 	fi
 
 	hl_num_chk
 	if [ $chk_result = no ]; then
 		set_chk_time_agn_10min
-		err_type="$time  new_file_hl_num_err NEW: $NUMBER_HL < B4: $ORG_NUMBER_HL"; err_log
+		log_line="$time  new_file_hl_num_err NEW: $NUMBER_HL < B4: $ORG_NUMBER_HL"; logging
 		exit
 	fi
 
 	callsign_chk
         if [ $chk_result = no ]; then
                 set_chk_time_agn_10min
-		err_type="$time  new_file_callsign_err $CALLSIGN"; err_log
+		log_line="$time  new_file_callsign_err $CALLSIGN"; logging
 		exit
         fi
 
@@ -187,5 +187,8 @@ else
 
 	sudo cp -f $FILE_NEW $FILE_DAT
 	sudo cp -f $FILE_NEW $FILE_BAK
+	log_line="$time  new DMRIds.dat is OK"; logging
+	log_line="--------------------------------------------------"; logging
+
 fi
 
