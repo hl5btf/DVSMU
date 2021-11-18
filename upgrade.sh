@@ -164,6 +164,9 @@ file=DMRIds_chk.sh
 sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
 sudo chmod +x /usr/local/dvs/$file
 
+# sudo wget -O /usr/local/dvs/dvsmu https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu
+# sudo wget -O /usr/local/dvs/DMRIds_chk.sh https://raw.githubusercontent.com/hl5btf/DVSMU/main/DMRIds_chk.sh
+
 sleep 10
 
 set_crontab
