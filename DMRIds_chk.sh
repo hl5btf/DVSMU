@@ -13,7 +13,6 @@ FILE_NEW=/var/lib/mmdvm/DMRIds.new
 FILE_BAK=/var/lib/mmdvm/DMRIds.bak
 LIB=/var/lib/mmdvm
 
-
 FILE_THIS=${DVS}DMRIds_chk.sh
 FILE_CRON=/etc/crontab
 
