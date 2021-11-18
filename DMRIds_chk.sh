@@ -28,6 +28,7 @@ CHK_CALLSIGNS="HL5KY HL5BTF HL5BHH HL5PPT HL2DRY DS5QDR DS5ANY DS5TUK JA2HWE ZL1
 
 min=$(sed -n -e '/DMRIds/p' $FILE_CRON | cut -f 1 -d' ')
 
+time=`date +%Y-%m-%d'  '%H:%M:%S`
 cron_daily_time=$(sed -n -e '/cron.daily/p' $FILE_CRON | cut -f 2 -d' ')
 cron_daily_time=$(echo $cron_daily_time | cut -f1 -d' ')
 cron_daily_min=$(sed -n -e '/cron.daily/p' $FILE_CRON | cut -f 1 -d' ')
@@ -55,12 +56,12 @@ function err_log() {
 
 time=`date +%Y-%m-%d'  '%H:%M:%S`
 
-echo $time $err_type | sudo tee -a ${DVS}DMRIds.log > /dev/null 2>&1
+sudo sed -i '1 i\'$log_line'' ${DVS}DMRIds.log > /dev/null 2>&1
 
 line=`cat ${DVS}DMRIds.log | wc -l`
 
 if [ $line -gt $MAX_LOG_LINE ]; then
-	sudo sed -i '1d' ${DVS}DMRIds.log
+	sudo sed -i '$ d' ${DVS}DMRIds.log
 fi
 }
 #--------------------------------------------------------------
@@ -120,7 +121,7 @@ if [ $min = $cron_daily_min_plus_2 ]; then
 	file_size_chk
 	if [ $chk_result = no ]; then
 		set_chk_time_agn_1min
-		err_type="dat_file_size_err DAT: $FILE_SIZE < B4: ORG_FILE_SIZE"; err_log
+		err_type="$time  dat_file_size_err DAT: $FILE_SIZE < B4: ORG_FILE_SIZE"; err_log
 		cp_bak_to_dat
 		exit
 	fi
@@ -128,7 +129,7 @@ if [ $min = $cron_daily_min_plus_2 ]; then
 	hl_num_chk
 	if [ $chk_result = no ]; then
 		set_chk_time_agn_1min
-		err_type="dat_file_hl_num_err DAT: $NUMBER_HL < B4: $ORG_NUMBER_HL"; err_log
+		err_type="$time  dat_file_hl_num_err DAT: $NUMBER_HL < B4: $ORG_NUMBER_HL"; err_log
                 cp_bak_to_dat
                 exit
 	fi
@@ -136,7 +137,7 @@ if [ $min = $cron_daily_min_plus_2 ]; then
         callsign_chk
         if [ $chk_result = no ]; then
 		set_chk_time_agn_1min
-		err_type="dat_file_callsign_err $CALLSIGN"; err_log
+		err_type="$time  dat_file_callsign_err $CALLSIGN"; err_log
                 cp_bak_to_dat
                 exit
         fi
@@ -151,21 +152,21 @@ else
 	file_size_chk
 	if [ $chk_result = no ]; then
 		set_chk_time_agn_10min
-		err_type="new_file_size_err NEW: $FILE_SIZE < B4: ORG_FILE_SIZE"; err_log
+		err_type="$time  new_file_size_err NEW: $FILE_SIZE < B4: ORG_FILE_SIZE"; err_log
 		exit
 	fi
 
 	hl_num_chk
 	if [ $chk_result = no ]; then
 		set_chk_time_agn_10min
-		err_type="new_file_hl_num_err NEW: $NUMBER_HL < B4: $ORG_NUMBER_HL"; err_log
+		err_type="$time  new_file_hl_num_err NEW: $NUMBER_HL < B4: $ORG_NUMBER_HL"; err_log
 		exit
 	fi
 
 	callsign_chk
         if [ $chk_result = no ]; then
                 set_chk_time_agn_10min
-		err_type="new_file_callsign_err $CALLSIGN"; err_log
+		err_type="$time  new_file_callsign_err $CALLSIGN"; err_log
 		exit
         fi
 
