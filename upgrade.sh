@@ -16,8 +16,8 @@ fi
 
 cron_daily_time=$(sed -n -e '/cron.daily/p' $FILE_CRON | cut -f 2 -d' ')
 cron_daily_min=$(sed -n -e '/cron.daily/p' $FILE_CRON | cut -f 1 -d' ')
-cron_daily_min_plus_2=$((cron_daily_min + 2))
 cron_daily_min_plus_3=$((cron_daily_min + 3))
+cron_daily_min_plus_4=$((cron_daily_min + 4))
 
 # <<<25 6    * * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )>>>
 
@@ -40,9 +40,9 @@ else
 fi
 
 if [[ ! -z `sudo grep "DMRIds" $FILE_CRON` ]]; then
-	sudo sed -i -e "/DMRIds/ c $cron_daily_min_plus_2 $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh" $FILE_CRON
+	sudo sed -i -e "/DMRIds/ c $cron_daily_min_plus_3 $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh" $FILE_CRON
 else
-	echo "$cron_daily_min_plus_2 $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh" | sudo tee -a $FILE_CRON
+	echo "$cron_daily_min_plus_3 $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh" | sudo tee -a $FILE_CRON
 fi
 }
 
