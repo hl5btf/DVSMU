@@ -76,7 +76,7 @@ file=/etc/crontab
 echo "reboot=yes" | sudo tee -a $file > /dev/null 2>&1
 echo "time=3" | sudo tee -a $file > /dev/null 2>&1
 echo "0 3 * * * root /usr/local/dvs/man_log" | sudo tee -a $file > /dev/null 2>&1
-echo "27 6 * * * root /usr/local/dvs/DMRIds_chk.sh" | sudo tee -a $file > /dev/null 2>&1
+echo "28 6 * * * root /usr/local/dvs/DMRIds_chk.sh" | sudo tee -a $file > /dev/null 2>&1
 
 echo "-------------  Please Wait 10 sec  -----------------"
 sudo apt-get update > /dev/null 2>&1
