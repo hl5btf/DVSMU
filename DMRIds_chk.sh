@@ -22,22 +22,22 @@ ORG_NUMBER_HL=1439
 MIN_FILE_SIZE=4584788
 MIN_NUMBER_HL=1429
 
-MAX_LOG_LINE=300
+MAX_LOG_LINE=500
 
 CHK_CALLSIGNS="HL5KY HL5BTF HL5BHH HL5PPT HL2DRY DS5QDR DS5ANY DS5TUK JA2HWE ZL1SN"
 
 min=$(sed -n -e '/DMRIds/p' $FILE_CRON | cut -f 1 -d' ')
 
-time=`date +%Y-%m-%d'  '%H:%M:%S`
+time=$(date +%Y-%m-%d'  '%H:%M:%S)
 cron_daily_time=$(sed -n -e '/cron.daily/p' $FILE_CRON | cut -f 2 -d' ')
 cron_daily_time=$(echo $cron_daily_time | cut -f1 -d' ')
 cron_daily_min=$(sed -n -e '/cron.daily/p' $FILE_CRON | cut -f 1 -d' ')
-cron_daily_min_plus_2=$((cron_daily_min + 2))
 cron_daily_min_plus_3=$((cron_daily_min + 3))
+cron_daily_min_plus_4=$((cron_daily_min + 4))
 
 #--------------------------------------------------------------
 function set_chk_time_agn_1min() {
-sudo sed -i -e "/DMRIds/ c $cron_daily_min_plus_3 $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh" $FILE_CRON
+sudo sed -i -e "/DMRIds/ c $cron_daily_min_plus_4 $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh" $FILE_CRON
 }
 #--------------------------------------------------------------
 function set_chk_time_agn_10min() {
@@ -46,7 +46,7 @@ min=$(sed -n -e '/DMRIds/p' $FILE_CRON | cut -f 1 -d' ')
 new_min=$((min + 10))
 
 if [ $new_min -ge 60 ]; then
-	sudo sed -i -e "/DMRIds/ c $cron_daily_min_plus_2 $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh" $FILE_CRON
+	sudo sed -i -e "/DMRIds/ c $cron_daily_min_plus_3 $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh" $FILE_CRON
 else
 	sudo sed -i -e "/DMRIds/ c $new_min $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh" $FILE_CRON
 fi
@@ -54,7 +54,7 @@ fi
 #--------------------------------------------------------------
 function logging() {
 
-sudo sed -i '1 i\'$log_line'' ${DVS}DMRIds.log > /dev/null 2>&1
+sudo sed -i "1 i\\$log_line" ${DVS}DMRIds.log > /dev/null 2>&1
 
 line=`cat ${DVS}DMRIds.log | wc -l`
 
@@ -112,7 +112,7 @@ done
 # MAIN
 #==============================================================
 
-if [ $min = $cron_daily_min_plus_2 ]; then
+if [ $min = $cron_daily_min_plus_3 ]; then
 
 	FILE_CHK=/var/lib/mmdvm/DMRIds.dat
 
@@ -142,7 +142,7 @@ if [ $min = $cron_daily_min_plus_2 ]; then
 
 	sudo cp -f $FILE_DAT $FILE_BAK
 	log_line="$time  DMRIds.dat is OK"; logging
-	log_line="--------------------------------------------------"; logging
+	log_line=--------------------------------------------------; logging
 
 else
         FILE_CHK=/var/lib/mmdvm/DMRIds.new
@@ -173,7 +173,7 @@ else
 
 # when all checks for new file are ok, excute followings
 
-        sudo sed -i -e "/DMRIds/ c $cron_daily_min_plus_2 $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh" $FILE_CRON
+        sudo sed -i -e "/DMRIds/ c $cron_daily_min_plus_3 $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh" $FILE_CRON
 
         sudo sed -i -e "/^ORG_FILE_SIZE/ c ORG_FILE_SIZE=$FILE_SIZE" $FILE_THIS
 
@@ -188,7 +188,7 @@ else
 	sudo cp -f $FILE_NEW $FILE_DAT
 	sudo cp -f $FILE_NEW $FILE_BAK
 	log_line="$time  new DMRIds.dat is OK"; logging
-	log_line="--------------------------------------------------"; logging
+	log_line=--------------------------------------------------; logging
 
 fi
 
