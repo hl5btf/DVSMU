@@ -53,7 +53,7 @@ update_ini="sudo ${MB}dvswitch.sh updateINIFileValue"
 
 source /var/lib/dvswitch/dvs/var00.txt > /dev/null 2>&1
 if [ $rx_freq = 000000000 ]; then
-	file=/var/lib/dvswitch/dvs/var.txt
+	file=/var/lib/dvswitch/dvs/var00.txt
 	tag=rx_freq; value=430000000
 	sudo sed -i -e "/^$tag=/ c $tag=$value" $file
 	tag=tx_freq; value=430000000
