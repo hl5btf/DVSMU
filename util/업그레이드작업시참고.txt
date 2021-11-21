@@ -39,10 +39,10 @@ dvsmu, DMRIds_chk.sh, upgrade.sh 다운로드
       sudo wget -O /usr/local/dvs/DMRIds_chk.sh https://raw.githubusercontent.com/hl5btf/DVSMU/main/DMRIds_chk.sh
       sudo wget -O /usr/local/dvs/upgrade.sh https://raw.githubusercontent.com/hl5btf/DVSMU/main/upgrade.sh
 
-이미지파일의 /etc/crontab 시간관련 내용이 바뀌면 수정해야 하는 내용
-      1. HL5BTF github의 DVSMU\setup.sh 수정
-      2. HL5BTF github의 DVSMU\config.sh 수정
-      3. HL5BTF github의 DVSMU\upgrade.sh의 아래 내용 수정
+이미지파일의 /etc/crontab 시간관련 내용이 바뀌면 확인해야 하는 내용
+      1. HL5BTF github의 DVSMU\setup.sh 확인
+      2. HL5BTF github의 DVSMU\config.sh 확인
+      3. HL5BTF github의 DVSMU\upgrade.sh의 아래 내용 확인
          cron_daily_min_plus_3=$((cron_daily_min + 3))
          cron_daily_min_plus_4=$((cron_daily_min + 4))
 
