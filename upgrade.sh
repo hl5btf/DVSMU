@@ -7,14 +7,16 @@
 
 #====== crontab 설정 (man_log 및 DMRIds_chk.sh의 실행을 위한 설정) =============================================
 function set_crontab() {
+
 FILE_CRON=/etc/crontab
 
+# <<<crontab에서 daily가 있는 줄의 내용 : 25 6    * * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )>>>
+
 cron_daily_time=$(sed -n -e '/cron.daily/p' $FILE_CRON | cut -f 2 -d' ')
+cron_daily_time=$(echo $cron_daily_time | cut -f1 -d' ')
 cron_daily_min=$(sed -n -e '/cron.daily/p' $FILE_CRON | cut -f 1 -d' ')
 cron_daily_min_plus_3=$((cron_daily_min + 3))
 cron_daily_min_plus_4=$((cron_daily_min + 4))
-
-# <<<crontab에서 daily가 있는 줄의 내용 : 25 6    * * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )>>>
 
 if [[ ! -z `sudo grep "time" $FILE_CRON` ]]; then
 	sudo sed -i -e "/time/ c time=3" $FILE_CRON
