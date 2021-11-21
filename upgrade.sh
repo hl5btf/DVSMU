@@ -5,21 +5,16 @@
 # 차후에 upgrade 할 내용이 있으면 여기에 계속 주가하면 됨.
 # 차후에 변수가 추가될때를 고려하여 변수가 추가되는 루틴을 미리 작성해 둠.
 
-#====== man_log 다운로드 및 crontab 설정 =====================================================
+#====== crontab 설정 (man_log 및 DMRIds_chk.sh의 실행을 위한 설정) =============================================
 function set_crontab() {
 FILE_CRON=/etc/crontab
-
-if [ ! -e $EILE_CRON ]; then
-	sudo wget -O /usr/local/dvs/man_log https://raw.githubusercontent.com/hl5btf/DVSMU/main/man_log > /dev/null 2>&1
-	sudo chmod +x /usr/local/dvs/man_log
-fi
 
 cron_daily_time=$(sed -n -e '/cron.daily/p' $FILE_CRON | cut -f 2 -d' ')
 cron_daily_min=$(sed -n -e '/cron.daily/p' $FILE_CRON | cut -f 1 -d' ')
 cron_daily_min_plus_3=$((cron_daily_min + 3))
 cron_daily_min_plus_4=$((cron_daily_min + 4))
 
-# <<<25 6    * * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )>>>
+# <<<crontab에서 daily가 있는 줄의 내용 : 25 6    * * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )>>>
 
 if [[ ! -z `sudo grep "time" $FILE_CRON` ]]; then
 	sudo sed -i -e "/time/ c time=3" $FILE_CRON
@@ -160,11 +155,16 @@ file=dvsmu
 sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
 sudo chmod +x /usr/local/dvs/$file
 
+file=man_log
+sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
+sudo chmod +x /usr/local/dvs/$file
+
 file=DMRIds_chk.sh
 sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
 sudo chmod +x /usr/local/dvs/$file
 
 # sudo wget -O /usr/local/dvs/dvsmu https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu
+# sudo wget -O /usr/local/dvs/man_log https://raw.githubusercontent.com/hl5btf/DVSMU/main/man_log
 # sudo wget -O /usr/local/dvs/DMRIds_chk.sh https://raw.githubusercontent.com/hl5btf/DVSMU/main/DMRIds_chk.sh
 
 sleep 10
