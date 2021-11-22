@@ -18,6 +18,7 @@ DVSwitch 또는 dvsMU의 변경내용이 있을때 작업 방법 및 순서
 
 dvsMU에서 업그레이할때를 고려한 작업
       1. github의 upgrade.sh파일을 수정하여 업그레이드시 처리할 내용을 추가한다.
+      2. github의 dvsMU_ver 내용을 변경한다.
 
 
 새로운 dvs 이미지 만드는 방법
