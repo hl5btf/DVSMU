@@ -47,8 +47,8 @@ fi
 
 file=test.txt
 
-if [ -e $file ] && [[ ! -z `grep "change" $file -a` ]]; then
-line_no_ipchange=$(grep -n "change" $file -a | cut -d: -f1 | tail -1)
+if [ -e $file ] && [[ ! -z `grep "ip change" $file -a` ]]; then
+line_no_ipchange=$(grep -n "ip change" $file -a | cut -d: -f1 | tail -1)
 line_no_connect=$(grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_connect" = "" ]; then line_no_connect=0; fi
 line_no_reset=$(grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
@@ -91,9 +91,9 @@ if [ -d $dir ]; then
 
 file=/var/log/dvswitch/user${user}/Analog_Bridge.log
 
-if [[ ! -z `grep "change" $file -a` ]]; then
+if [[ ! -z `grep "ip change" $file -a` ]]; then
 
-        line_no_ipchange=$(grep -n "change" $file -a | cut -d: -f1 | tail -1)
+        line_no_ipchange=$(grep -n "ip change" $file -a | cut -d: -f1 | tail -1)
         line_no_connect=$(grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_connect" = "" ]; then line_no_connect=0; fi
         line_no_reset=$(grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
