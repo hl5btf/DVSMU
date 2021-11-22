@@ -1,3 +1,4 @@
+
 alias dv="cd /usr/local/dvs"
 alias data="cd /var/lib/dvswitch/dvs"
 alias adv="cd /var/lib/dvswitch/dvs/adv"
@@ -23,3 +24,5 @@ alias mb="cd /opt/MMDVM_Bridge"
 
 
 /boot/
+
+
