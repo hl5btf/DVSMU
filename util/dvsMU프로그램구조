@@ -1,0 +1,13 @@
+Function별 내용
+
+user_delete : 사용자 삭제
+dvswitch_upgrade
+dvsmu_upgrade
+main_user_log
+main_user_config
+sub_user_log
+sub_user_config
+system_optimizer : 최적화
+set_reboot : 시스템 리부팅 설정
+connection_status : BM 및 클라이언트 연결상태 확인
+sys_main : 시스템 관리
