@@ -67,6 +67,7 @@ line_no_analog_start=$(grep -n "starting" $file -a | cut -d: -f1 | tail -1)
 else declare con_cl_M=NO
 fi
 
+sudo rm $file
 echo $con_cl_M
 
 }
