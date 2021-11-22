@@ -12,7 +12,7 @@ DVSwitch 또는 dvsMU의 변경내용이 있을때 작업 방법 및 순서
          또는 이미 사용하고 있는 SD카드를 사용한다.
       2. DVSwitch의 업그레이드가 있으면, DVSwitch부터 업그레이드한다. udo apt-get update     sudo apt-get upgrade -y
       3. 변경할 내용을 수정한다. 테스트한다.
-      4. 테스트가 완료되면, 변경된 파일을 컴퓨터에 다운로드한다.
+      4. 테스트가 완료되면, 변경 또는 추가한 파일을 컴퓨터에 다운로드한다.
       5. HL5BTF의 github에 올린다.
 
 
@@ -23,7 +23,7 @@ dvsMU에서 업그레이할때를 고려한 작업
 새로운 dvs 이미지 만드는 방법
       1. Google_Drive에 있는 기존의 이미지를 받아서 SD카드에 설치 https://drive.google.com/drive/u/0/folders/1ORv7ehiaA3olCU5YMU7j8d4y7i2xTj08
          (SD카드에 이미지 설치한후, /boot/dvsconfig.txt의 내용중, chg를 73으로 해 둔다)
-      2. DVSwitch의 업그레이드가 있으면, DVSwitch부터 업그레이드한다. udo apt-get update     sudo apt-get upgrade -y
+      2. DVSwitch의 업그레이드가 있으면, DVSwitch부터 업그레이드한다. sudo apt-get update     sudo apt-get upgrade -y
       3. 변경된 파일 또는 추가한 파일이 있으면, github에서 다운로드한다.
          ex) sudo wget -O /usr/local/dvs/dvsmu https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu
       4. /boot/dvsconfig.txt의 내용중 chg값을 1로 수정한다.
