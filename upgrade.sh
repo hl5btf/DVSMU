@@ -165,6 +165,11 @@ file=DMRIds_chk.sh
 sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
 sudo chmod +x /usr/local/dvs/$file
 
+file=dvsmu.log
+sudo wget -O /var/log/dvswitch/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
+
+# 필요시 아래와 같이 다운로드 가능
+# sudo wget -O /var/log/dvswitch/dvsmu.log https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu.log
 # sudo wget -O /usr/local/dvs/dvsmu https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu
 # sudo wget -O /usr/local/dvs/man_log https://raw.githubusercontent.com/hl5btf/DVSMU/main/man_log
 # sudo wget -O /usr/local/dvs/DMRIds_chk.sh https://raw.githubusercontent.com/hl5btf/DVSMU/main/DMRIds_chk.sh
