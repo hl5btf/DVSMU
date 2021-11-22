@@ -25,9 +25,7 @@ dvsMU에서 업그레이할때를 고려한 작업
          (SD카드에 이미지 설치한후, /boot/dvsconfig.txt의 내용중, chg를 73으로 해 둔다)
       2. DVSwitch의 업그레이드가 있으면, DVSwitch부터 업그레이드한다. udo apt-get update     sudo apt-get upgrade -y
       3. 변경된 파일 또는 추가한 파일이 있으면, github에서 다운로드한다.
-         dvsMU의 경우는 이렇게 다운로드한다. sudo wget -O /usr/local/dvs/dvsmu https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu
-         (이와 같이 했다면, 나중에 USB리더기에 넣고 이미지를 만들때, chg값을 1로 만들고 이미지를 만들어야 함)
-         (dvsstart.sh 와 관련된 내용은 맨 아래의 내용 참조)
+         ex) sudo wget -O /usr/local/dvs/dvsmu https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu
       4. /boot/dvsconfig.txt의 내용중 chg값을 1로 수정한다.
       5. SD카드의 내용을 그대로 이미지를 만든다.
       6. VirtualBox에서 이미지의 크기를 줄인다.
