@@ -40,6 +40,7 @@ dvsmu, DMRIds_chk.sh, upgrade.sh 다운로드
       
 
 Virtual Box에서 파일크기 줄이기
+      Win32DiskImager로 만든 이미지를 D:\VirtualBox_Share 폴더로 복사한다.
       VIRTUAL BOX 실행후 아래 시행
       터미널모드
       cd /mnt
