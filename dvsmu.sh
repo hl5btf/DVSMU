@@ -3,9 +3,9 @@
 #source /var/lib/dvswitch/dvs/var.txt
 
 #===================================
-SCRIPT_VERSION="1.9"
+SCRIPT_VERSION="1.91"
 SCRIPT_AUTHOR="HL5KY"
-SCRIPT_DATE="2021-11-16"
+SCRIPT_DATE="2021-11-22"
 #===================================
 
 if [ "$1" != "" ]; then
@@ -1842,7 +1842,8 @@ sel=$(whiptail --title " 시스템 관리 " --menu "\
 "5" "BM 및 클라이언트 연결상태 확인" \
 "6" "추가사용자 DVSwitch 업그레이드" \
 "7" "dvsMU (Multi User) 업그레이드" \
-"8" "Back to Main" \
+"8" "dvsmu.log 열기" \
+"9" "Back to Main" \
 3>&1 1>&2 2>&3)
 
 if [ $? != 0 ]; then ${DVS}dvsmu; exit 0
@@ -1878,6 +1879,9 @@ dvswitch_upgrade ;;
 7)
 dvsmu_upgrade ;;
 8)
+sudo nano /var/log/dvswitch/dvsmu.log
+${DVS}dvsmu A; exit 0 ;;
+9)
 ${DVS}dvsmu; exit 0 ;;
 esac
 }
