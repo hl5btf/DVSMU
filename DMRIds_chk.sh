@@ -15,6 +15,7 @@ LIB=/var/lib/mmdvm
 
 FILE_THIS=${DVS}DMRIds_chk.sh
 FILE_CRON=/etc/crontab
+FILE_LOG=/var/log/dvswitch/dvsmu.log
 
 ORG_FILE_SIZE=4585788
 ORG_NUMBER_HL=1439
@@ -54,12 +55,12 @@ fi
 #--------------------------------------------------------------
 function logging() {
 
-sudo sed -i "1 i\\$log_line" ${DVS}DMRIds.log > /dev/null 2>&1
+sudo sed -i "1 i\\$log_line" $FILE_LOG > /dev/null 2>&1
 
-line=`cat ${DVS}DMRIds.log | wc -l`
+line=`cat $FILE_LOG | wc -l`
 
 if [ $line -gt $MAX_LOG_LINE ]; then
-	sudo sed -i '$ d' ${DVS}DMRIds.log
+	sudo sed -i '$ d' $FILE_LOG
 fi
 }
 #--------------------------------------------------------------
@@ -111,6 +112,11 @@ done
 #==============================================================
 # MAIN
 #==============================================================
+
+if [ ! -e $FILE_LOG ]; then
+	echo "$time  Start a new dvsMU Log" | sudo tee $FILE_LOG > /dev/null 2>&1
+	log_line=--------------------------------------------------; logging
+fi
 
 if [ $min = $cron_daily_min_plus_3 ]; then
 

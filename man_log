@@ -1,6 +1,7 @@
 #!/bin/bash
 
-
+time_now=$(date +%Y-%m-%d'  '%H:%M:%S)
+FILE_LOG=/var/log/dvswitch/dvsmu.log
 
 #=====================================================
 # Function time_chk
@@ -142,6 +143,12 @@ done
 # MAIN Program
 ######################################################
 
+if [ ! -e $FILE_LOG ]; then
+	echo "$time_now  Start a new dvsMU Log" | sudo tee $FILE_LOG > /dev/null 2>&1
+	log_line=--------------------------------------------------
+	sudo sed -i "1 i\\$log_line" $FILE_LOG
+fi
+
 con_cl_M=$(main_user_connection_chk)
 
 sub_user_connection_chk
@@ -173,6 +180,8 @@ if [ $con_cl_M = "NO" ] && [ $con_cl_one_of_sub_users = "NO" ]; then
 	sudo sed -i -e "/man_log/ c 0 $time * * * root /usr/local/dvs/man_log" $file
 
 	if [[ ! -z `sudo grep "reboot=yes" $file` ]]; then
+		log_line="$time_now  REBOOT"
+		sudo sed -i "1 i\\$log_line" $FILE_LOG
 		sudo reboot
 	else
 #		echo $cmd
@@ -187,6 +196,9 @@ else
 
 	if [ $min = 60 ]; then
 		sudo sed -i -e "/man_log/ c 0 $time * * * root /usr/local/dvs/man_log" $file
+		log_line="$time_now  stn busy, no REBOOT"
+		sudo sed -i "1 i\\$log_line" $FILE_LOG
+
 	else
 		sudo sed -i -e "/man_log/ c $min $time * * * root /usr/local/dvs/man_log" $file
 	fi
