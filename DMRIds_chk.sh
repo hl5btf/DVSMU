@@ -100,7 +100,7 @@ fi
 function callsign_chk() {
 
 for CALLSIGN in ${CHK_CALLSIGNS}; do
-        if [[ -z `grep $CALLSIGN $FILE_NEW` ]]; then
+        if [[ -z `grep $CALLSIGN $FILE_CHK` ]]; then
 		chk_result=no
 		break
 	else
