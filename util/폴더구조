@@ -1,0 +1,25 @@
+alias dv="cd /usr/local/dvs"
+alias data="cd /var/lib/dvswitch/dvs"
+alias adv="cd /var/lib/dvswitch/dvs/adv"
+alias lan="cd /var/lib/dvswitch/dvs/lan"
+alias tgdb="cd /var/lib/dvswitch/dvs/tgdb"
+alias ab="cd /opt/Analog_Bridge"
+alias ar="cd /opt/Analog_Reflector"
+alias mb="cd /opt/MMDVM_Bridge"
+
+
+/usr/local/dvs  DVS_MENU
+/opt/MMDVM_Bridge
+/opt/Analog_Bridge
+/var/lib/dvswitch/dvs  DATA
+/var/lib/dvswitch/dvs/adv ADV
+/var/lib/dvswitch/dvs/lan LANGUAGE
+/var/lib/dvswitch/dvs/tgdb TGDB
+
+
+/var/log/dvswitch/Analog_Bridge.log
+/var/log/dvswitch/dvsmu.log
+/var/log/mmdvm/MMDVM_Bridge.log
+
+
+/boot/
