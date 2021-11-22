@@ -3,7 +3,7 @@
 #source /var/lib/dvswitch/dvs/var.txt
 
 #===================================
-SCRIPT_VERSION="1.91"
+SCRIPT_VERSION="1.92"
 SCRIPT_AUTHOR="HL5KY"
 SCRIPT_DATE="2021-11-22"
 #===================================
@@ -1604,9 +1604,9 @@ fi
 
 file=test.txt
 
-if [ -e $file ] && [[ ! -z `grep "change" $file -a` ]]; then
+if [ -e $file ] && [[ ! -z `grep "ip change" $file -a` ]]; then
 
-line_no_ipchange=$(grep -n "change" $file -a | cut -d: -f1 | tail -1)
+line_no_ipchange=$(grep -n "ip change" $file -a | cut -d: -f1 | tail -1)
 line_no_connect=$(grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_connect" = "" ]; then line_no_connect=0; fi
 line_no_reset=$(grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
@@ -1679,9 +1679,9 @@ if [ -d $dir ]; then
 
         file=/var/log/dvswitch/user${user}/Analog_Bridge.log
 
-        if [[ ! -z `grep "change" $file -a` ]]; then
+        if [[ ! -z `grep "ip change" $file -a` ]]; then
 
-        line_no_ipchange=$(grep -n "change" $file -a | cut -d: -f1 | tail -1)
+        line_no_ipchange=$(grep -n "ip change" $file -a | cut -d: -f1 | tail -1)
         line_no_connect=$(grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
         if [ "$line_no_connect" = "" ]; then line_no_connect=0; fi
         line_no_reset=$(grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
@@ -1879,6 +1879,11 @@ dvswitch_upgrade ;;
 7)
 dvsmu_upgrade ;;
 8)
+if [ ! -e /var/log/dvswitch/dvsmu.log ]; then
+        echo "This is a Log file for dvsMU" | sudo tee /var/log/dvswitch/dvsmu.log > /dev/null 2>&1
+        log_line=--------------------------------------------------
+        sudo sed -i "1 i\\$log_line" /var/log/dvswitch/dvsmu.log
+fi
 sudo nano /var/log/dvswitch/dvsmu.log
 ${DVS}dvsmu A; exit 0 ;;
 9)
