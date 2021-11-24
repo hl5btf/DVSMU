@@ -25,9 +25,11 @@ function time_chk() {
 
 function main_user_connection_chk() {
 
+source /var/lib/dvswitch/dvs/var.txt
+
 file1=/var/log/dvswitch/Analog_Bridge.log
 
-echo "" | sudo tee test.txt > /dev/null 2>&1
+echo "" | sudo tee temp.txt > /dev/null 2>&1
 
 n=5
 until [ $n = 0 ]; do
@@ -36,16 +38,17 @@ log_date=$(date -d "$n day ago" '+%Y-%m-%d')
 file2=/var/log/dvswitch/Analog_Bridge-$log_date.log
 
 if [ -e $file2 ]; then
-        cat $file2 | sudo tee -a test.txt > /dev/null 2>&1
+        cat $file2 | sudo tee -a temp.txt > /dev/null 2>&1
 fi
 done
 
 
+
 if [ -s $file1 ]; then
-        cat $file1 | sudo tee -a test.txt > /dev/null 2>&1
+        cat $file1 | sudo tee -a temp.txt > /dev/null 2>&1
 fi
 
-file=test.txt
+file=temp.txt
 
 if [ -e $file ] && [[ ! -z `grep "ip change" $file -a` ]]; then
 line_no_ipchange=$(grep -n "ip change" $file -a | cut -d: -f1 | tail -1)
@@ -58,17 +61,17 @@ line_no_analog_start=$(grep -n "starting" $file -a | cut -d: -f1 | tail -1)
 
 
         if [ $line_no_connect -gt $line_no_reset ] && [ $line_no_connect -gt $line_no_analog_start ]; then
-                declare con_cl_M=ok
+                con_cl_M=ok; callsigns="$call_sign "
         elif [ $line_no_ipchange -gt $line_no_reset ] && [ $line_no_ipchange -gt $line_no_analog_start ]; then
-                declare con_cl_M=ok
+                con_cl_M=ok; callsigns="$call_sign "
         else
-                declare con_cl_M=NO
+                con_cl_M=NO
         fi
-else declare con_cl_M=NO
+else con_cl_M=NO
 fi
 
 sudo rm $file
-echo $con_cl_M
+#echo $con_cl_M
 
 }
 
@@ -89,6 +92,8 @@ dir=/opt/user${user}
 
 if [ -d $dir ]; then
 
+source /var/lib/dvswitch/dvs/var${user}.txt
+
 file=/var/log/dvswitch/user${user}/Analog_Bridge.log
 
 if [[ ! -z `grep "ip change" $file -a` ]]; then
@@ -108,22 +113,23 @@ if [[ ! -z `grep "ip change" $file -a` ]]; then
 
 
         if [ $line_no_connect -gt $line_no_reset ] && [ $line_no_connect -gt $line_no_analog_start ]; then
-                declare con_cl_user=ok; con_cl_one_of_sub_users=ok
+                con_cl_user=ok; con_cl_one_of_sub_users=ok; callsigns="$callsigns$call_sign "
         elif [ $line_no_ipchange -gt $line_no_reset ] && [ $line_no_ipchange -gt $line_no_analog_start ]; then
-                declare con_cl_user=ok; con_cl_one_of_sub_users=ok
+                con_cl_user=ok; con_cl_one_of_sub_users=ok; callsigns="$callsigns$call_sign "
         else
-                declare con_cl_user=NO
+                con_cl_user=NO
         fi
 
-else declare con_cl_user=NO
+else con_cl_user=NO
 
 fi
 
 #echo "$user $con_cl_user"
 
 if [ "$1" = and_shrink ] && [ $con_cl_user = "NO" ]; then
-	declare cmd_add=analog_bridge${user}
-	cmd="$cmd $cmd_add"
+        declare cmd_add=analog_bridge${user}
+        cmd="$cmd $cmd_add"
+
 
         file=/var/log/dvswitch/user${user}/Analog_Bridge.log
         date=$(date -d '4 day ago' '+%Y-%m-%d')
@@ -145,17 +151,20 @@ done
 ######################################################
 
 if [ ! -e $FILE_LOG ]; then
-	echo "$time_now  Start a new dvsMU Log" | sudo tee $FILE_LOG > /dev/null 2>&1
-	log_line=--------------------------------------------------
-	sudo sed -i "1 i\\$log_line" $FILE_LOG
+        echo "$time_now  Start a new dvsMU Log" | sudo tee $FILE_LOG > /dev/null 2>&1
+        log_line=--------------------------------------------------
+        sudo sed -i "1 i\\$log_line" $FILE_LOG
 fi
 
-con_cl_M=$(main_user_connection_chk)
+#con_cl_M=$(main_user_connection_chk)
 
+main_user_connection_chk
 sub_user_connection_chk
 
-#echo $con_cl_M
-#echo $con_cl_one_of_sub_users
+echo $con_cl_M
+echo $con_cl_one_of_sub_users
+
+echo $callsigns
 
 if [ $con_cl_M = "NO" ] && [ $con_cl_one_of_sub_users = "NO" ]; then
 
@@ -167,42 +176,48 @@ if [ $con_cl_M = "NO" ] && [ $con_cl_one_of_sub_users = "NO" ]; then
         sudo find $log_dir -name '*.log' -mtime +4 -delete
         #---------------------------------------------------
 
-	cmd="sudo systemctl restart"
-#	con_cl_M=$(main_user_connection_chk)
 
-	if [ $con_cl_M = "NO" ]; then
-	cmd="$cmd analog_bridge"
-	fi
+        cmd="sudo systemctl restart"
+#       con_cl_M=$(main_user_connection_chk)
 
-	sub_user_connection_chk and_shrink
+        if [ $con_cl_M = "NO" ]; then
+        cmd="$cmd analog_bridge"
+        fi
 
-	file=/etc/crontab
-	time_chk
-	sudo sed -i -e "/man_log/ c 0 $time * * * root /usr/local/dvs/man_log" $file
+        sub_user_connection_chk and_shrink
 
-	if [[ ! -z `sudo grep "reboot=yes" $file` ]]; then
-		log_line="$time_now  REBOOT"
-		sudo sed -i "1 i\\$log_line" $FILE_LOG
-		sudo reboot
-	else
-#		echo $cmd
-		$cmd
-	fi
+        file=/etc/crontab
+        time_chk
+        sudo sed -i -e "/man_log/ c 0 $time * * * root /usr/local/dvs/man_log" $file
+
+        if [[ ! -z `sudo grep "reboot=yes" $file` ]]; then
+                log_line="$time_now  REBOOT"
+                sudo sed -i "1 i\\$log_line" $FILE_LOG
+                sudo reboot
+        else
+#               echo $cmd
+                $cmd
+        fi
 else
-	time_chk
+        time_chk
 
-	min=$((min + 10))
+        min=$((min + 10))
 
-	file=/etc/crontab
+        file=/etc/crontab
 
-	if [ $min = 60 ]; then
-		sudo sed -i -e "/man_log/ c 0 $time * * * root /usr/local/dvs/man_log" $file
-		log_line="$time_now  stn busy, no REBOOT"
-		sudo sed -i "1 i\\$log_line" $FILE_LOG
+        if [ $min = 60 ]; then
+                sudo sed -i -e "/man_log/ c 0 $time * * * root /usr/local/dvs/man_log" $file
+                log_line="$time_now  ${callsigns}busy, no REBOOT"
+                sudo sed -i "1 i\\$log_line" $FILE_LOG
 
-	else
-		sudo sed -i -e "/man_log/ c $min $time * * * root /usr/local/dvs/man_log" $file
-	fi
+        else
+                sudo sed -i -e "/man_log/ c $min $time * * * root /usr/local/dvs/man_log" $file
+                log_line="$time_now  ${callsigns}busy, no REBOOT"
+                sudo sed -i "1 i\\$log_line" $FILE_LOG
+        fi
 fi
 
 #sudo nano $file
+
+
+
