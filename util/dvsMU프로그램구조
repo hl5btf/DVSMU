@@ -17,11 +17,13 @@ dvswitch_upgrade
 
 dvsmu_upgrade
 
-main_user_log
-main_user_config
+main_user_log : 주사용자 로그 (MB.lob와 AB.log의 내용을 multitail 로 보여줌)
 
-sub_user_log
-sub_user_config
+main_user_config : 주사용자 관리 메뉴
+
+sub_user_log : 추가사용자 로그 (MB.lob와 AB.log의 내용을 multitail 로 보여줌)
+
+sub_user_config : 추가사용자 관리 메뉴
 
 system_optimizer : 최적화
 
