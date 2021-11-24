@@ -6,7 +6,7 @@ DVSwitch 또는 dvsMU의 변경내용이 있을때 작업 방법 및 순서
       2. 새로운 dvs 이미지를 만드는 것
 
 =====================================================================================================
-공통작업
+## 공통작업
       1. Google_Drive에 있는 이미지를 받아서 SD카드에 설치(BalenaEtcher사용) https://drive.google.com/drive/u/0/folders/1ORv7ehiaA3olCU5YMU7j8d4y7i2xTj08
          (SD카드에 이미지 설치한후, /boot/dvsconfig.txt의 내용중, chg를 73으로 해 둔다)      
          또는 이미 사용하고 있는 SD카드를 사용한다.
