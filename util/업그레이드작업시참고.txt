@@ -37,7 +37,7 @@ dvsMU에서 업그레이할때를 고려한 작업
 dvsmu, DMRIds_chk.sh, upgrade.sh 다운로드
       sudo wget -O /usr/local/dvs/dvsmu https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu
       sudo wget -O /usr/local/dvs/DMRIds_chk.sh https://raw.githubusercontent.com/hl5btf/DVSMU/main/DMRIds_chk.sh
-      sudo wget -O /usr/local/dvs/man_log https://raw.githubusercontent.com/hl5btf/DVSMU/main/man_log      
+      sudo wget -O /usr/local/dvs/man_log https://raw.githubusercontent.com/hl5btf/DVSMU/main/man_log
       sudo wget -O /usr/local/dvs/upgrade.sh https://raw.githubusercontent.com/hl5btf/DVSMU/main/upgrade.sh
       
 
