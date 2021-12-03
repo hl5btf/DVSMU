@@ -32,3 +32,7 @@
 311|||TG 311 TAC 311
 312|||TG 312 TAC 312
 313|||TG 313 TAC 313
+
+
+
+/var/lib/dvswitch/dvs/tgdb/KR 로 복사해야 함
