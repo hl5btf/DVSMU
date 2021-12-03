@@ -17,11 +17,6 @@ alias mb="cd /opt/MMDVM_Bridge"
 /var/lib/dvswitch/dvs/lan LANGUAGE
 /var/lib/dvswitch/dvs/tgdb TGDB
 
-/var/lib/mmdvm/DMRIds.dat  DMRID
-    DMR ID로 정보 찾을때 : /opt/MMDVM_Bridge/dvswitch.sh lookup 4500052
-    DMRIds.dat update : /usr/local/sbin/DVSM_Update.sh
-
-
 /var/log/dvswitch/Analog_Bridge.log
 /var/log/dvswitch/dvsmu.log
 /var/log/mmdvm/MMDVM_Bridge.log
@@ -30,6 +25,13 @@ alias mb="cd /opt/MMDVM_Bridge"
 /boot/
 
 /etc/cron.daily
+
+
+====  참고할 명령어 ===============================================================
+
+/var/lib/mmdvm/DMRIds.dat  DMRID
+    DMR ID로 정보 찾을때 : /opt/MMDVM_Bridge/dvswitch.sh lookup 4500052
+    DMRIds.dat update : /usr/local/sbin/DVSM_Update.sh
 
 /lib/systemd/system/lighttpd.service
 /etc/lighttpd/lighttpd.conf (대시보드 포트 80 변경)
