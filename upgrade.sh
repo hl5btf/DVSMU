@@ -173,6 +173,9 @@ sudo chmod +x /usr/local/dvs/$file
 
 sleep 10
 
+# DMR 즐겨찾기 파일 변경 (45039까지 내용 추가)
+sudo wget -O /var/lib/dvswitch/dvs/tgdb/KR/DMR_fvrt_list.txt https://raw.githubusercontent.com/hl5btf/DVSMU/main/tgdb_KR/DMR_fvrt_list.txt
+
 set_crontab
 
 freq_0_to_430
