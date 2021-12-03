@@ -33,6 +33,5 @@
 312|||TG 312 TAC 312
 313|||TG 313 TAC 313
 
+sudo wget -O /var/lib/dvswitch/dvs/tgdb/KR/DMR_fvrt_list.txt https://raw.githubusercontent.com/hl5btf/DVSMU/main/tgdb_KR/DMR_fvrt_list.txt
 
-
-/var/lib/dvswitch/dvs/tgdb/KR 로 복사해야 함
