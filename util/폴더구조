@@ -8,6 +8,8 @@ alias ab="cd /opt/Analog_Bridge"
 alias ar="cd /opt/Analog_Reflector"
 alias mb="cd /opt/MMDVM_Bridge"
 
+/opt/userXX    추가사용자별 관련 파일
+/var/lib/dvswitch/dvs/tgdb/userXX  추가사용자별 tgdb 파일
 
 /usr/local/dvs  DVS_MENU
 /opt/MMDVM_Bridge
