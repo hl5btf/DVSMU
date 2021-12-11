@@ -43,9 +43,10 @@ else
 fi
 }
 
-#====== 주파수가 000000000으로 되어 있으면 430000000로 변경하는 루틴 =========================
-function freq_0_to_430() {
+#====== 여러가지 수정사항을 처리하는 루틴 =========================
+function do_change() {
 
+# 주파수가 00000 이면, 430으로 수정
 update_ini="sudo ${MB}dvswitch.sh updateINIFileValue"
 
 source /var/lib/dvswitch/dvs/var00.txt > /dev/null 2>&1
@@ -78,6 +79,12 @@ if [ $RXFrequency = "000000000" ]; then
 	$update_ini $file $section $tag $value
 fi
 
+# DMR_fvrt_list.txt 수정
+file=/var/lib/dvswitch/dvs/tgdb/KR/DMR_fvrt_list.txt
+if [[ -z `sudo grep "45039" $file` ]]; then
+	sudo wget -O /var/lib/dvswitch/dvs/tgdb/KR/DMR_fvrt_list.txt https://raw.githubusercontent.com/hl5btf/DVSMU/main/tgdb_KR/DMR_fvrt_list.txt
+fi
+
 user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
 for user in $user; do
 source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
@@ -97,6 +104,11 @@ if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
 		$update_ini $file $section $tag $value
 		section=Info; tag=TXFrequency; value=430000000
 		$update_ini $file $section $tag $value
+	fi
+
+	file=/var/lib/dvswitch/dvs/tgdb/user${user}/DMR_fvrt_list.txt
+	if [[ -z `sudo grep "45039" $file` ]]; then
+		sudo wget -O /var/lib/dvswitch/dvs/tgdb/user${user}/DMR_fvrt_list.txt https://raw.githubusercontent.com/hl5btf/DVSMU/main/tgdb_KR/DMR_fvrt_list.txt
 	fi
 fi
 done
@@ -173,12 +185,9 @@ sudo chmod +x /usr/local/dvs/$file
 
 sleep 10
 
-# DMR 즐겨찾기 파일 변경 (45039까지 내용 추가)
-sudo wget -O /var/lib/dvswitch/dvs/tgdb/KR/DMR_fvrt_list.txt https://raw.githubusercontent.com/hl5btf/DVSMU/main/tgdb_KR/DMR_fvrt_list.txt
-
 set_crontab
 
-freq_0_to_430
+do_change
 
 # var_added
 
