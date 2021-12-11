@@ -17,7 +17,12 @@ alias mb="cd /opt/MMDVM_Bridge"
 /var/lib/dvswitch/dvs  DATA
 /var/lib/dvswitch/dvs/adv ADV
 /var/lib/dvswitch/dvs/lan LANGUAGE
-/var/lib/dvswitch/dvs/tgdb TGDB
+
+TGDB
+/var/lib/dvswitch/dvs/tgdb
+/var/lib/dvswitch/dvs/tgdb/EN
+/var/lib/dvswitch/dvs/tgdb/KR
+/var/lib/dvswitch/dvs/tgdb/user01
 
 /var/log/dvswitch/Analog_Bridge.log
 /var/log/dvswitch/dvsmu.log
