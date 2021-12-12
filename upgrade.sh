@@ -82,7 +82,7 @@ fi
 # DMR_fvrt_list.txt 수정
 file=/var/lib/dvswitch/dvs/tgdb/DMR_fvrt_list.txt
 if [[ -z `sudo grep "45039" $file` ]]; then
-	sudo wget -O /var/lib/dvswitch/dvs/tgdb/KR/DMR_fvrt_list.txt https://raw.githubusercontent.com/hl5btf/DVSMU/main/tgdb_KR/DMR_fvrt_list.txt
+	sudo wget -O $file https://raw.githubusercontent.com/hl5btf/DVSMU/main/tgdb_KR/DMR_fvrt_list.txt
 fi
 
 user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
