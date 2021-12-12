@@ -80,7 +80,7 @@ if [ $RXFrequency = "000000000" ]; then
 fi
 
 # DMR_fvrt_list.txt 수정
-file=/var/lib/dvswitch/dvs/tgdb/KR/DMR_fvrt_list.txt
+file=/var/lib/dvswitch/dvs/tgdb/DMR_fvrt_list.txt
 if [[ -z `sudo grep "45039" $file` ]]; then
 	sudo wget -O /var/lib/dvswitch/dvs/tgdb/KR/DMR_fvrt_list.txt https://raw.githubusercontent.com/hl5btf/DVSMU/main/tgdb_KR/DMR_fvrt_list.txt
 fi
