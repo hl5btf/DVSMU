@@ -19,14 +19,18 @@ alias mb="cd /opt/MMDVM_Bridge"
 /var/lib/dvswitch/dvs/lan LANGUAGE
 
 TGDB
-/var/lib/dvswitch/dvs/tgdb
-/var/lib/dvswitch/dvs/tgdb/EN
-/var/lib/dvswitch/dvs/tgdb/KR
-/var/lib/dvswitch/dvs/tgdb/user01
+        /var/lib/dvswitch/dvs/tgdb
+        /var/lib/dvswitch/dvs/tgdb/EN
+        /var/lib/dvswitch/dvs/tgdb/KR
+        /var/lib/dvswitch/dvs/tgdb/user01
 
-/var/log/dvswitch/Analog_Bridge.log
-/var/log/dvswitch/dvsmu.log
-/var/log/mmdvm/MMDVM_Bridge.log
+LOG files
+        /var/log/dvswitch/Analog_Bridge.log
+        /var/log/dvswitch/dvsmu.log
+        /var/log/mmdvm/MMDVM_Bridge.log
+
+ASL         /usr/local/sbin/asl-menu
+ASL CONFIG files            /etc/asterisk
 
 
 /boot/
