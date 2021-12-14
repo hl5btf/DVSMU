@@ -30,6 +30,8 @@ DSTAR = ${DVSM} dstar
 NXDN  = ${DVSM} nxdn
 P25   = ${DVSM} p25
 YSF   = ${DVSM} ysf
+ASL   = ${DVSM} asl
+STFU  = ${DVSM} stfu
 
 # Main contents of Adhoc Macros
 0                = ${MACRO} adv_main.txt
