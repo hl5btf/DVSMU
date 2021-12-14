@@ -120,32 +120,39 @@ done
 }
 
 #====== 변수가 추가될때 처리하는 루틴 시작부분 =============================================
-function var_added() {
+function add_var_val() {
 #sudo wget -O /var/lib/dvswitch/dvs/var00.txt https://raw.githubusercontent.com/hl5btf/DVSMU/main/var00.txt > /dev/null 2>&1
 
 # When updating, the stanzas will be appended to varxx.txt, if not exist.
 # each item needs space in between. no qutation marks are needed
-new_var=""
+new_var="txgain_asl txgain_stfu"
 # default value will be applied once, at the first time
 # each item needs space in between. if the item is character, it needs quotation marks.
-new_val=()
+new_val=(0.35 0.35)
+
+function do_add() {
+for var in ${new_var}; do
+        if [[ -z `sudo grep "^$var" $file` ]]; then
+                echo "$var=" | sudo tee -a $file > /dev/null 2>&1
+                val=${new_val[$n]}
+                sudo sed -i -e "/^$var=/ c $var=$val" $file
+        fi
+        n=$(($n+1))
+done
+}
+
+file=/var/lib/dvswitch/dvs/var.txt
+	do_add; n=0
+
+file=/var/lib/dvswitch/dvs/var00.txt
+	do_add; n=0
 
 user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
 for user in $user; do
 source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
-
-file=/var/lib/dvswitch/dvs/var${user}.txt
-
-for var in ${new_var}; do
-        if [[ -z `sudo grep "^$var" $file` ]]; then
-                echo "$var=" | sudo tee -a $file > /dev/null 2>&1
-                val=${new_val[$n]}
-                update_var $var $val
-        fi
-        n=$(($n+1))
-done
-n=0
+	file=/var/lib/dvswitch/dvs/var${user}.txt
+	do_add; n=0
 
     sudo systemctl stop mmdvm_bridge${user} > /dev/null 2>&1
 #   sudo systemctl stop analog_bridge${user} > /dev/null 2>&1
@@ -194,5 +201,5 @@ set_crontab
 
 do_change
 
-# var_added
+add_var_val
 
