@@ -26,4 +26,9 @@ ANALOG REFLECTOR 설치 순서
             sudo ./Analog_Reflector user $callsign $dmrid $rptid $pswd $permission
 
 
-
+ASL 설치
+      cd ~
+      sudo wget http://dvswitch.org/buster
+      sudo chmod +x buster
+      sudo ./buster
+      apt install allstar
