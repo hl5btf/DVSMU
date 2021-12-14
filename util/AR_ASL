@@ -55,7 +55,7 @@ Allmon2 설치 및 설정
             menu=yes
 
       3. addmin 권한 설정
-            sudo apt-get install apache2-utils                       ; htpasswd 를 실행하기 위해 설치하는 utility 프로그램
+            sudo apt install apache2-utils                       ; htpasswd 를 실행하기 위해 설치하는 utility 프로그램
             sudo htpasswd -cB .htpasswd admin
 
       4. database download 프로그램 실행 권한 부여
