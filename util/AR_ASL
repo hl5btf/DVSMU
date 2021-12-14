@@ -43,7 +43,7 @@ Allmon2 설치 및 설정
             sudo mv controlpanel.ini.txt controlpanel.ini.php
 
       2. 기본 설정
-            sudo nano allmon.ini.php
+            sudo nano /var/www/html/allmon2/allmon.ini.php
 
             <?php
             [Off-site Link]
