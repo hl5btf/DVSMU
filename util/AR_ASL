@@ -59,8 +59,8 @@ Allmon2 설치 및 설정
             sudo htpasswd -cB .htpasswd admin
 
       4. database download 프로그램 실행 권한 부여
-            sudo chmod 777 astdb.php
-            sudo ./astdb.php                                ;  실행후 astdb.txt 파일이 생성된 것을 확인할 수 있습니다
+            sudo chmod 777 /var/www/html/allmon2/astdb.php
+            sudo /var/www/html/allmon2/astdb.php                                ;  실행후 astdb.txt 파일이 생성된 것을 확인할 수 있습니다
 
 
       5. Lightpd setting
