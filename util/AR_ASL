@@ -32,3 +32,46 @@ ASL 설치
       sudo chmod +x buster
       sudo ./buster
       apt install allstar
+
+
+Allmon2 설치 및 설정
+      1. 설치
+            sudo apt install git
+            sudo git clone https://github.com/AllStarLink/AllMon2.git /var/www/html/allmon2
+            cd /var/www/html/allmon2
+            sudo mv allmon.ini.txt allmon.ini.php
+            sudo mv controlpanel.ini.txt controlpanel.ini.php
+
+      2. 기본 설정
+            sudo nano allmon.ini.php
+
+            <?php
+            [Off-site Link]
+            url=https://www.allstarlink.org/
+            [54439]
+            host=127.0.0.1:5038
+            user=admin
+            passwd=llcgi
+            menu=yes
+
+      3. addmin 권한 설정
+            sudo apt-get install apache2-utils                       ; htpasswd 를 실행하기 위해 설치하는 utility 프로그램
+            sudo htpasswd -cB .htpasswd admin
+
+      4. database download 프로그램 실행 권한 부여
+            sudo chmod 777 astdb.php
+            sudo ./astdb.php                                ;  실행후 astdb.txt 파일이 생성된 것을 확인할 수 있습니다
+
+
+      5. Lightpd setting
+            sudo nano /etc/lighttpd/lighttpd.conf
+            맨아래에 다음의 내용 추가
+            server.stream-response-body = 2
+            서비스 재시작  sudo systemctl restart lighttpd
+
+      6. 자신의 Allstar Monitor II 에 접속
+            웹브라우즈 주소창에 AllStarLink IP/allmon2/ 를 입력하고 엔터
+            Login  - Username : admin  - Password  : llcgi
+
+
+
