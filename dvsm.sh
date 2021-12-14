@@ -161,7 +161,6 @@ elif [ "$1" = "nxdn" ]; then
 #        ${DVSWITCH} tlvAudio AUDIO_USE_GAIN ${txgain_nxdn}
 #        sudo systemctl stop ircddbgatewayd
 #        fi
-#        ${DVSWITCH} tlvAudio AUDIO_USE_GAIN ${txgain_nxdn}
 
 elif [ "$1" = "p25" ]; then
 #        if [ ${mode_now} = "P25" ]; then
@@ -178,6 +177,24 @@ elif [ "$1" = "ysf" ]; then
 #        else
 #        ${MODESET} YSF
 #        ${DVSWITCH} tlvAudio AUDIO_USE_GAIN ${txgain_ysf}
+#        sudo systemctl stop ircddbgatewayd
+#        fi
+
+elif [ "$1" = "asl" ]; then
+#        if [ ${mode_now} = "ASL" ]; then
+        ${MESSAGE} " only DMR is available "
+#        else
+#        ${MODESET} ASL
+#        ${DVSWITCH} tlvAudio AUDIO_USE_GAIN ${txgain_asl}
+#        sudo systemctl stop ircddbgatewayd
+#        fi
+
+elif [ "$1" = "stfu" ]; then
+#        if [ ${mode_now} = "STFU" ]; then
+        ${MESSAGE} " only DMR is available "
+#        else
+#        ${MODESET} STFU
+#        ${DVSWITCH} tlvAudio AUDIO_USE_GAIN ${txgain_stfu}
 #        sudo systemctl stop ircddbgatewayd
 #        fi
 fi
