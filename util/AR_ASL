@@ -1,0 +1,26 @@
+
+ANALOG REFLECTOR 설치 순서
+
+      System upgrade
+            sudo apt update
+            sudo apt upgrade
+      INSTALL Analog Reflector
+            sudo apt install analog-reflector
+      Check if you see <Analog_Reflector  Analog_Reflector.json  arRoot  ssl>
+            cd ssl
+            cd /opt/Analog_Reflector
+            ls -l
+      This is the script that will create a certificate for your server so you can run the HTML Client(hUC)
+            sudo chmod +x mkcerts.sh
+            ./mkcerts.sh
+      Check if you see <Your certificate is now ready for use>
+      check the version of AR
+            cd /opt/Analog_Reflector
+            ./Analog_Reflector -v
+      Finished installation
+      Now, Add user account
+      사용자 권한  송신가능(1), TG변경가능(2), SYSOP(8), 전체(11)
+            sudo ./Analog_Reflector user $callsign $dmrid $rptid $pswd $permission
+
+
+
