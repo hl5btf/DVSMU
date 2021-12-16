@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#source /var/lib/dvswitch/dvs/var.txt
+source /var/lib/dvswitch/dvs/var.txt
 
 #===================================
 SCRIPT_VERSION="1.93"
@@ -869,9 +869,9 @@ function misc_config() {
 #}
 
 #-------------------------------------
-# Function change_status
+# Function change_ar_status
 #-------------------------------------
-function change_status() {
+function change_ar_status() {
 sel=$(whiptail --title " 설정 변경 " --menu "\
 \n
 " 11 30 3 \
@@ -1075,7 +1075,7 @@ if [ $? != 0 ]; then ${DVS}dvsmu misc; exit 0; fi
 
 case $sel in
 1)
-change_status; ${DVS}dvsmu misc ar; exit 0 ;;
+change_ar_status; ${DVS}dvsmu misc ar; exit 0 ;;
 2)
 sudo nano /opt/Analog_Reflector/Analog_Reflector.json; ${DVS}dvsmu misc ar; exit 0 ;;
 3)
@@ -1332,7 +1332,7 @@ $sp05 MAIN_USER  $call_sign_M $dmr_id $ext $usrp_port_M
 "13" "dvswitch.sh" \
 "14" "crontab 왁인" \
 "15" "MAIN_user 서비스 재시작" \
-"16" "추가 프로그램" \
+"16" "추가 프로그램(AR, AllStar)" \
 "17" "Back to MAIN" \
 3>&1 1>&2 2>&3)
 
