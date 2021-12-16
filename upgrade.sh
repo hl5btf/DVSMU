@@ -125,10 +125,10 @@ function add_var_val() {
 
 # When updating, the stanzas will be appended to varxx.txt, if not exist.
 # each item needs space in between. no qutation marks are needed
-new_var="txgain_asl txgain_stfu"
+new_var="txgain_asl txgain_stfu txgain_intercom"
 # default value will be applied once, at the first time
 # each item needs space in between. if the item is character, it needs quotation marks.
-new_val=(0.35 0.35)
+new_val=(0.35 0.35 0.35)
 
 function do_add() {
 for var in ${new_var}; do
