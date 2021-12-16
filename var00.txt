@@ -75,6 +75,7 @@ txgain_p25=0.35
 txgain_ysf=0.35
 txgain_asl=0.35
 txgain_stfu=0.35
+txgain_intercom=0.35
 
 usrpGain=4.00
 txgain_dmr_default=0.35
