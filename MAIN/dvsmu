@@ -1151,7 +1151,7 @@ $sp02 sudo ./buster
 	then :
 	else ${DVS}dvsmu misc asl; exit 0
 fi
-sudo asl-menu
+sudo apt install allstar
 ${DVS}dvsmu misc asl; exit 0
 }
 
