@@ -98,4 +98,13 @@ Allmon2 설치 및 설정
             Login  - Username : admin  - Password  : llcgi
 
 
+ASL 사용법
+      iaxRpt 를 사용
+      컴퓨터의 Node는 HL5KY-pc로 되어 있음
+      라즈베리파이의 node로 연결하려면, 54439 로 연경해야 한다. *54439 + Connect
+      54439로부터 연결을 끊으려면, Disconnect를 누르거나, *154439 + Connect
+
+      54439로부터 다른 node로 연결하는 경우.
+      예를들어, JH1BLT로 연결하려면, *352984 + Connect
+      교신이 끝나고 JH1BLT로부터 연결을 끊으려면, *152984 + Connect
 
