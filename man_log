@@ -3,6 +3,8 @@
 time_now=$(date +%Y-%m-%d'  '%H:%M:%S)
 FILE_LOG=/var/log/dvswitch/dvsmu.log
 
+#echo $time_now
+
 #=====================================================
 # Function time_chk
 #=====================================================
@@ -25,54 +27,78 @@ function time_chk() {
 
 function main_user_connection_chk() {
 
-source /var/lib/dvswitch/dvs/var.txt
+ar_status=$(systemctl is-active analog_reflector)
+if [ $ar_status = "active" ]; then
 
-file1=/var/log/dvswitch/Analog_Bridge.log
+	file=/var/log/dvswitch/Analog_Reflector.log
 
-echo "" | sudo tee temp.txt > /dev/null 2>&1
+	if [ -e $file ] && [[ ! -z `grep "Connected WS" $file -a` ]]; then
 
-n=5
-until [ $n = 0 ]; do
-n=$(($n-1))
-log_date=$(date -d "$n day ago" '+%Y-%m-%d')
-file2=/var/log/dvswitch/Analog_Bridge-$log_date.log
+		line_no_connected_WS=$(grep -n "Connected WS" $file -a | cut -d: -f1 | tail -1)
+		line_no_disconnect=$(grep -n "disconnect" $file -a | cut -d: -f1 | tail -1)
 
-if [ -e $file2 ]; then
-        cat $file2 | sudo tee -a temp.txt > /dev/null 2>&1
+#echo $line_no_connected_WS
+#echo $line_no_disconnect
+
+		if [ "$line_no_connected_WS" -gt "$line_no_disconnect" ]; then
+        		line=$(cat $file | sed -n ${line_no_connected_WS}p)
+	        	con_cl_M=ok
+	        	else line=$(cat $file | sed -n ${line_no_disconnect}p)
+		        con_cl_M=NO
+		fi
+
+	else
+		con_cl_M=NO
+	fi
+else
+	source /var/lib/dvswitch/dvs/var.txt
+
+	file1=/var/log/dvswitch/Analog_Bridge.log
+
+	echo "" | sudo tee temp.txt > /dev/null 2>&1
+
+	n=5
+	until [ $n = 0 ]; do
+	n=$(($n-1))
+	log_date=$(date -d "$n day ago" '+%Y-%m-%d')
+	file2=/var/log/dvswitch/Analog_Bridge-$log_date.log
+
+	if [ -e $file2 ]; then
+        	cat $file2 | sudo tee -a temp.txt > /dev/null 2>&1
+	fi
+	done
+
+	if [ -s $file1 ]; then
+        	cat $file1 | sudo tee -a temp.txt > /dev/null 2>&1
+	fi
+
+	file=temp.txt
+
+	if [ -e $file ] && [[ ! -z `grep "ip change" $file -a` ]]; then
+		line_no_ipchange=$(grep -n "ip change" $file -a | cut -d: -f1 | tail -1)
+		line_no_connect=$(grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
+        		if [ "$line_no_connect" = "" ]; then line_no_connect=0; fi
+		line_no_reset=$(grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
+        		if [ "$line_no_reset" = "" ]; then line_no_reset=0; fi
+		line_no_analog_start=$(grep -n "starting" $file -a | cut -d: -f1 | tail -1)
+        		if [ "$line_no_analog_start" = "" ]; then line_no_analog_start=0; fi
+
+	        if [ $line_no_connect -gt $line_no_reset ] && [ $line_no_connect -gt $line_no_analog_start ]; then
+        	        con_cl_M=ok
+			#callsigns="$call_sign "
+	        elif [ $line_no_ipchange -gt $line_no_reset ] && [ $line_no_ipchange -gt $line_no_analog_start ]; then
+        	        con_cl_M=ok
+			#callsigns="$call_sign "
+	        else
+        	        con_cl_M=NO
+	        fi
+	else con_cl_M=NO
+	fi
+	sudo rm $file
 fi
-done
-
-
-
-if [ -s $file1 ]; then
-        cat $file1 | sudo tee -a temp.txt > /dev/null 2>&1
-fi
-
-file=temp.txt
-
-if [ -e $file ] && [[ ! -z `grep "ip change" $file -a` ]]; then
-line_no_ipchange=$(grep -n "ip change" $file -a | cut -d: -f1 | tail -1)
-line_no_connect=$(grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
-        if [ "$line_no_connect" = "" ]; then line_no_connect=0; fi
-line_no_reset=$(grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
-        if [ "$line_no_reset" = "" ]; then line_no_reset=0; fi
-line_no_analog_start=$(grep -n "starting" $file -a | cut -d: -f1 | tail -1)
-        if [ "$line_no_analog_start" = "" ]; then line_no_analog_start=0; fi
-
-
-        if [ $line_no_connect -gt $line_no_reset ] && [ $line_no_connect -gt $line_no_analog_start ]; then
-                con_cl_M=ok; callsigns="$call_sign "
-        elif [ $line_no_ipchange -gt $line_no_reset ] && [ $line_no_ipchange -gt $line_no_analog_start ]; then
-                con_cl_M=ok; callsigns="$call_sign "
-        else
-                con_cl_M=NO
-        fi
-else con_cl_M=NO
-fi
-
-sudo rm $file
+callsigns="main_USRP "
 #echo $con_cl_M
-
+#echo $callsigns
 }
 
 #=====================================================
@@ -161,10 +187,9 @@ fi
 main_user_connection_chk
 sub_user_connection_chk
 
-echo $con_cl_M
-echo $con_cl_one_of_sub_users
-
-echo $callsigns
+#echo $con_cl_M
+#echo $callsigns
+#echo $con_cl_one_of_sub_users
 
 if [ $con_cl_M = "NO" ] && [ $con_cl_one_of_sub_users = "NO" ]; then
 
