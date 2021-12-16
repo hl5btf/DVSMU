@@ -862,13 +862,6 @@ fi
 function misc_config() {
 
 #-------------------------------------
-# Function pse_wait
-#-------------------------------------
-#function pse_wait() {
-#TERM=ansi whiptail --title " Processing " --infobox " Pse wait ! " 8 50
-#}
-
-#-------------------------------------
 # Function change_ar_status
 #-------------------------------------
 function change_ar_status() {
@@ -1061,24 +1054,50 @@ if [ $ar_chk = "active" ]; then ar_sts="<< 활성상태 >>"; else ar_sts=" 비�
 sel=$(whiptail --title " Analog Reflector " --menu "\
 \n
 " 19 55 8 \
-"1" "Analog Reflector $ar_sts" \
-"2" "Edit Analog_Reflector.json" \
-"3" "callsign.json" \
-"4" "AR 서비스 재시작" \
-"5" "Analog Reflector 설치" \
-"6" "Analog Reflector 설정" \
-"7" "AR 사용자 추가" \
-"8" "Edit TG" \
+"1" "Analog Reflector 설치" \
+"2" "Analog Reflector 설정" \
+"3" "AR 사용자 추가" \
+"4" "Edit TG" \
+"5" "Analog Reflector $ar_sts" \
+"6" "Edit Analog_Reflector.json" \
+"7" "callsign.json" \
+"8" "AR 서비스 재시작" \
 3>&1 1>&2 2>&3)
 
 if [ $? != 0 ]; then ${DVS}dvsmu misc; exit 0; fi
 
 case $sel in
 1)
-change_ar_status; ${DVS}dvsmu misc ar; exit 0 ;;
+ar_install; ${DVS}dvsmu misc ar; exit 0 ;;
 2)
-sudo nano /opt/Analog_Reflector/Analog_Reflector.json; ${DVS}dvsmu misc ar; exit 0 ;;
+clear
+whiptail --msgbox "\
+$sp02 아래의 내용을 추가로 설정해야 함.
+
+$sp05 - var.txt 설정 - usrp Port (50000)
+
+$sp05 - Analog_Bridge.ini 설정 - usrp Port (50000)
+
+$sp05 - Analog_Reflector.json 설정 - usrp Port(50000), mobile Port(500xx)
+
+$sp05 - DMR_node_list.json의 public_id_value 변경 (HL5KY-S)
+
+
+$sp02 WebBrowser Address
+
+$sp02 https://192.168.0.x  or https://192.168.0.x/html/hUC-min.html
+
+" 20 80 1
+${DVS}dvsmu misc ar; exit 0 ;;
 3)
+ar_add_user; ${DVS}dvsmu misc ar; exit 0 ;;
+4)
+do_edit_tg; ${DVS}dvsmu misc ar; exit 0 ;;
+5)
+change_ar_status; ${DVS}dvsmu misc ar; exit 0 ;;
+6)
+sudo nano /opt/Analog_Reflector/Analog_Reflector.json; ${DVS}dvsmu misc ar; exit 0 ;;
+7)
 call_s=$(whiptail --title "INPUT" --inputbox "Callsign(LowerCase)" 10 60 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu misc ar; exit 0; fi
 
@@ -1091,35 +1110,9 @@ no such user exists
 " 8 50 1
 ${DVS}dvsmu misc ar; exit 0
 fi ;;
-4)
+8)
 pse_wait
 sudo systemctl restart analog_reflector; ${DVS}dvsmu misc ar; exit 0 ;;
-5)
-ar_install; ${DVS}dvsmu misc ar; exit 0 ;;
-6)
-clear
-whiptail --msgbox "\
-$sp02 추가로 설정할 내용
-
-$sp05 - var.txt 설정 - usrp Port
-
-$sp05 - Analog_Bridge.ini 설정 - usrp Port
-
-$sp05 - Analog_Reflector.json 설정 - usrp Port, mobile Port
-
-$sp05 - DMR_node_list.json의 public_id_value 변경 (HL5KY-S)
-
-
-$sp02 WebBrowser Address
-
-$sp02 https://192.168.0.x  or https://192.168.0.x/html/hUC-min.html
-
-" 20 70 1
-${DVS}dvsmu misc ar; exit 0 ;;
-7)
-ar_add_user; ${DVS}dvsmu misc ar; exit 0 ;;
-8)
-do_edit_tg; ${DVS}dvsmu misc ar; exit 0 ;;
 esac
 }
 #-------------------------------------
