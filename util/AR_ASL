@@ -33,6 +33,30 @@ ASL 설치
       sudo ./buster
       apt install allstar
 
+ASL 설정
+      node-setup의 password는 홈페이지에서 node를 개설할때 만든 pswd
+
+      설정방법
+      DVSM 사용을 위한 서버의 설정 방법
+
+      1. rpt.conf
+            ; Your Repeater  아래에 54439가 입력되어 있는지 확인
+
+      2. /etc/asterisk/iax.conf 파일을 수정. 아래와 같이 계정 추가
+            register의 내용이 아래와 같은지 확인
+            register =54439:yuni7388@register.allstarlink.org       ; This must be changed to your node number, password
+
+            [general]
+            bindport = 4569          ; DVSM 연결시 Port에 입력할 내용
+
+            아래와 같이 사용자는 계속 추가할 수 있음
+
+            [iax-client]                             ;  DVSM의 Username에 입력
+            type = friend                           ; user, friend 등 상관없음
+            context = iax-client                    ; extensions.conf 의 stanza 항목이름과 같아야 함
+            auth = md5
+            secret = 비밀번호 (DVSM에 설정시 사용)
+
 
 Allmon2 설치 및 설정
       1. 설치
