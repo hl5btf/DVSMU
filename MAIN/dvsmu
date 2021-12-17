@@ -1055,7 +1055,7 @@ sel=$(whiptail --title " Analog Reflector " --menu "\
 \n
 " 19 55 8 \
 "1" "Analog Reflector 설치" \
-"2" "Analog Reflector 설정" \
+"2" "Analog Reflector 설정 설명" \
 "3" "AR 사용자 추가" \
 "4" "Edit TG" \
 "5" "Analog Reflector $ar_sts" \
@@ -2617,5 +2617,4 @@ X)
 exit 0 ;;
 esac
 
-exit 0
 exit 0
