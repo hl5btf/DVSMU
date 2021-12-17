@@ -2059,13 +2059,13 @@ function chk_AR_log() {
 file=/var/log/dvswitch/Analog_Reflector.log
 
 
-if [ -e $file ] && [[ ! -z `grep "Connected WS" $file -a` ]]; then
+if [ -e $file ] && [[ ! -z `grep "Connected WS" $file -a` ]] && [[ ! -z `grep "disconnect" $file -a` ]]; then
 
 line_no_connected_WS=$(grep -n "Connected WS" $file -a | cut -d: -f1 | tail -1)
 line_no_disconnect=$(grep -n "disconnect" $file -a | cut -d: -f1 | tail -1)
 
-echo $line_no_connected_WS
-echo $line_no_disconnect
+#echo $line_no_connected_WS
+#echo $line_no_disconnect
 
 if [ $line_no_connected_WS -gt $line_no_disconnect ]; then
         line=$(cat $file | sed -n ${line_no_connected_WS}p)
