@@ -2071,8 +2071,10 @@ if [ $line_no_connected_WS -gt $line_no_disconnect ]; then
         line=$(cat $file | sed -n ${line_no_connected_WS}p)
         con_cl_M=ok; callsign_cl_M=USRP
         else line=$(cat $file | sed -n ${line_no_disconnect}p)
-        con_cl_M=NO; callsign_cl_M="------"
+        con_cl_M=NO; callsign_cl_M="USRP"
 fi
+
+#echo $con_cl_M
 
 #echo $line
 
