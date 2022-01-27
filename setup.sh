@@ -74,10 +74,8 @@ sudo chmod +x /usr/local/dvs/man_log
 
 file=/etc/crontab
 
-#cron_daily_time=$(sed -n -e '/cron.daily/p' $FILE_CRON | cut -f 2 -d' ')
 cron_daily_time=$(sed -n -e '/cron.daily/p' $file | cut -f 2 -d' ')
 cron_daily_time=$(echo $cron_daily_time | cut -f1 -d' ')
-#cron_daily_min=$(sed -n -e '/cron.daily/p' $FILE_CRON | cut -f 1 -d' ')
 cron_daily_min=$(sed -n -e '/cron.daily/p' $file | cut -f 1 -d' ')
 cron_daily_min_plus_3=$((cron_daily_min + 3))
 cron_daily_min_plus_4=$((cron_daily_min + 4))
