@@ -46,7 +46,7 @@ sudo chmod +x /usr/local/dvs/dvsmu
 echo "----------------------------------------------------"
 
 file=DMRIds_chk.sh
-sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
+sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file > /dev/null 2>&1
 sudo chmod +x /usr/local/dvs/$file
 
 sudo mkdir /var/lib/dvswitch/dvs/adv/user00 > /dev/null 2>&1
