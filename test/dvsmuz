@@ -1,0 +1,726 @@
+#!/bin/bash
+
+source /var/lib/dvswitch/dvs/var.txt
+
+
+###############################################################
+# Function misc_config
+###############################################################
+
+function misc_config() {
+
+#-------------------------------------
+# Function change_ar_status
+#-------------------------------------
+function change_ar_status() {
+sel=$(whiptail --title " 설정 변경 " --menu "\
+\n
+" 11 30 3 \
+"C" "취 소" \
+"A" "활성화" \
+"I" "비활성화" \
+3>&1 1>&2 2>&3)
+
+case $sel in
+C)
+${DVS}dvsmu misc ar; exit 0 ;;
+A)
+change=A ;;
+I)
+change=I ;;
+esac
+
+if [ $change = A ] && [ $ar_chk != "active" ]; then
+pse_wait
+sudo systemctl enable analog_reflector > /dev/null 2>&1
+sudo systemctl start analog_reflector > /dev/null 2>&1
+${DVS}88_restart.sh;
+
+elif [ $change = I ] && [ $ar_chk = "active" ]; then
+pse_wait
+sudo systemctl disable analog_reflector > /dev/null 2>&1
+sudo systemctl stop analog_reflector > /dev/null 2>&1
+${DVS}88_restart.sh;
+
+else
+clear
+whiptail --msgbox "\
+
+$sp09 상태를 변경하지 않았습니다.
+" 9 50 1
+
+fi
+
+${DVS}dvsmu misc ar; exit 0
+}
+
+#-------------------------------------
+# Function do_edit_tg
+#-------------------------------------
+function do_edit_tg() {
+sel=$(whiptail --title " EDIT TG " --menu "\
+\n
+" 16 45 8 \
+"1" "DMR_node_list_json" \
+"2" "DSTAR_node_list.json" \
+"3" "NXDN_node_list.json" \
+"4" "P25_node_list.json" \
+"5" "YSF_node_list.json" \
+"6" "ASL_node_list.json" \
+"7" "STFU_node_list.json" \
+"8" "Intercom_node_list.json" \
+3>&1 1>&2 2>&3)
+
+if [ $? != 0 ]; then ${DVS}dvsmu misc ar; exit 0; fi
+
+case $sel in
+1)
+sudo nano /opt/Analog_Reflector/arRoot/modes/DMR_node_list.json; ${DVS}dvsmu misc tg; exit 0 ;;
+2)
+sudo nano /opt/Analog_Reflector/arRoot/modes/DSTAR_node_list.json; ${DVS}dvsmu misc tg; exit 0 ;;
+3)
+sudo nano /opt/Analog_Reflector/arRoot/modes/NXDN_node_list.json; ${DVS}dvsmu misc tg; exit 0 ;;
+4)
+sudo nano /opt/Analog_Reflector/arRoot/modes/P25_node_list.json; ${DVS}dvsmu misc tg; exit 0 ;;
+5)
+sudo nano /opt/Analog_Reflector/arRoot/modes/YSF_node_list.json; ${DVS}dvsmu misc tg; exit 0 ;;
+6)
+sudo nano /opt/Analog_Reflector/arRoot/modes/ASL_node_list.json; ${DVS}dvsmu misc tg; exit 0 ;;
+7)
+sudo nano /opt/Analog_Reflector/arRoot/modes/STFU_node_list.json; ${DVS}dvsmu misc tg; exit 0 ;;
+8)
+sudo nano /opt/Analog_Reflector/arRoot/modes/Intercom_node_list.json; ${DVS}dvsmu misc tg; exit 0 ;;
+esac
+}
+
+#-------------------------------------
+# Function ar_install
+#-------------------------------------
+function ar_install() {
+
+if (whiptail --title " AR INSTALL " --yesno "\
+
+$sp10 Do you want to INSATLL Analog_Reflector ?
+
+$sp10 github.com/hl5btf에설명이 있음.
+
+" 14 70);
+        then :
+        else ${DVS}dvsmu misc ar; exit 0
+fi
+
+clear
+echo
+echo "You should have done   <sudo apt update>  <sudo apt upgrade>  before installation"
+echo
+echo "INSTALL Analog Reflector"
+echo
+echo "Hit ENTER to install   or   Ctrl-C to exit"
+echo
+read x
+sudo apt install analog-reflector
+cd /opt/Analog_Reflector
+ls -l
+echo
+echo
+echo "#######################################################################"
+echo
+echo "Check if you see <Analog_Reflector  Analog_Reflector.json  arRoot  ssl>"
+echo
+echo "Hit ENTER to create certificate for your server"
+echo
+read x
+cd ssl
+ls -l
+sudo chmod +x mkcerts.sh
+sudo ./mkcerts.sh
+echo
+echo
+echo "#######################################################################"
+echo
+echo "Check if you see <Your certificate is now ready for use>"
+echo
+echo "Hit ENTER to check the version of AR"
+echo
+read x
+clear
+echo
+cd /opt/Analog_Reflector
+./Analog_Reflector -v
+echo
+echo
+echo "#######################################################################"
+echo
+echo "Finished installation"
+echo
+echo "Now, Add user account"
+echo
+echo "Hit ENTER to the MENU"
+read x
+${DVS}dvsmu misc ar; exit 0
+}
+
+#-------------------------------------
+# Function ar_add_user
+#-------------------------------------
+function ar_add_user() {
+echo
+echo "Enter Callsign ?"
+read call_s
+echo
+echo "DMR ID ?"
+read dmrid
+echo
+echo "RPT ID ?"
+read rptid
+echo
+echo "USRP Password ?"
+read pswd
+echo
+echo "사용자 권한  송신가능(1), TG변경가능(2), SYSOP(8), 전체(11)"
+read permission
+echo
+echo $call_s $dmrid $rptid $pswd $permission
+echo
+read x
+cd /opt/Analog_Reflector
+sudo ./Analog_Reflector user $call_s $dmrid $rptid $pswd $permission
+echo
+echo "Finished, Hit ENTER to the MENU"
+read x
+${DVS}dvsmu misc ar; exit 0
+}
+
+#-------------------------------------
+# Function do_analog_reflector
+#-------------------------------------
+function do_analog_reflector() {
+
+ar_chk=$(systemctl is-active analog_reflector)
+if [ $ar_chk = "active" ]; then ar_sts="<< 활성상태 >>"; else ar_sts=" 비활성상태"; fi
+
+sel=$(whiptail --title " Analog Reflector " --menu "\
+\n
+" 19 55 8 \
+"1" "Analog Reflector 설치" \
+"2" "Analog Reflector 설정 설명" \
+"3" "AR 사용자 추가" \
+"4" "Edit TG" \
+"5" "Analog Reflector $ar_sts" \
+"6" "Edit Analog_Reflector.json" \
+"7" "callsign.json" \
+"8" "AR 서비스 재시작" \
+3>&1 1>&2 2>&3)
+
+if [ $? != 0 ]; then ${DVS}dvsmu misc; exit 0; fi
+
+case $sel in
+1)
+ar_install; ${DVS}dvsmu misc ar; exit 0 ;;
+2)
+clear
+whiptail --msgbox "\
+$sp02 아래의 내용을 추가로 설정해야 함.
+
+$sp05 - var.txt 설정 - usrp Port (50000)
+
+$sp05 - Analog_Bridge.ini 설정 - usrp Port (50000)
+
+$sp05 - Analog_Reflector.json 설정 - usrp Port(50000), mobile Port(500xx)
+
+$sp05 - DMR_node_list.json의 public_id_value 변경 (HL5KY-S)
+
+
+$sp02 WebBrowser Address
+
+$sp02 https://192.168.0.x  or https://192.168.0.x/html/hUC-min.html
+
+" 20 80 1
+${DVS}dvsmu misc ar; exit 0 ;;
+3)
+ar_add_user; ${DVS}dvsmu misc ar; exit 0 ;;
+4)
+do_edit_tg; ${DVS}dvsmu misc ar; exit 0 ;;
+5)
+change_ar_status; ${DVS}dvsmu misc ar; exit 0 ;;
+6)
+sudo nano /opt/Analog_Reflector/Analog_Reflector.json; ${DVS}dvsmu misc ar; exit 0 ;;
+7)
+call_s=$(whiptail --title "INPUT" --inputbox "Callsign(LowerCase)" 10 60 3>&1 1>&2 2>&3)
+if [ $? != 0 ]; then ${DVS}dvsmu misc ar; exit 0; fi
+
+file=/opt/Analog_Reflector/arRoot/users/${call_s}.json
+if [ -e $file ]; then
+sudo nano $file; ${DVS}dvsmu misc ar; exit 0
+else
+whiptail --msgbox "\
+no such user exists
+" 8 50 1
+${DVS}dvsmu misc ar; exit 0
+fi ;;
+8)
+pse_wait
+sudo systemctl restart analog_reflector; ${DVS}dvsmu misc ar; exit 0 ;;
+esac
+}
+#-------------------------------------
+# END of do_analog_reflector
+#-------------------------------------
+
+#-------------------------------------
+# Function asl_install
+#-------------------------------------
+function asl_install() {
+clear
+if (whiptail --title " AR INSTALL " --yesno "\
+
+$sp02 Do you want to INSTALL ASL ?
+
+
+
+$sp02 참고사항
+
+$sp02 buster 서비스가 없으면, ASL이 설치되지 않음.
+
+$sp02 buster 설치방법
+$sp02 cd ~
+$sp02 sudo wget http://dvswitch.org/buster
+$sp02 sudo chmod +x buster
+$sp02 sudo ./buster
+
+" 22 70);
+        then :
+        else ${DVS}dvsmu misc asl; exit 0
+fi
+sudo apt install allstar
+${DVS}dvsmu misc asl; exit 0
+}
+
+#-------------------------------------
+# Function asl_setup_2
+#-------------------------------------
+function asl_setup_2() {
+
+if (whiptail --title " ASL SETUP " --yesno "\
+
+$sp10 Continue to SETUP ?
+
+" 11 70);
+        then :
+        else ${DVS}dvsmu misc asl; exit 0
+fi
+
+clear
+echo
+echo "===== 권한 설정 (pswd : llcgi) ====="
+echo
+echo "Hit ENTER to SETUP   or   Ctrl-C to exit"
+echo
+read x
+cd /var/www/html/allmon2
+sudo apt install apache2-utils
+sudo htpasswd -cB .htpasswd admin
+echo
+echo "권한 설정 완료"
+echo
+echo "===== Lighttpd 설정 ====="
+echo
+echo "파일이 열리면. (server.port) 아래 라인에 다음의 내용을 추가한다. 일단 복사해 둠"
+echo
+echo "server.stream-response-body = 2"
+echo
+read x
+sudo nano /etc/lighttpd/lighttpd.conf
+echo
+echo "Lifhttpd 설정 완료"
+echo
+echo
+echo "===== lighttpd 서비스 재시작 ====="
+echo
+echo "ENTER를 누르면 재시작"
+read x
+echo
+echo "===== 추가 설정 완료 ====="
+echo
+echo "IP/allmon2 on your Web Browser"
+echo
+echo "ENTER를 누르시오"
+read x
+${DVS}dvsmu misc asl; exit 0
+}
+
+#-------------------------------------
+# MAIN of do_allstar
+#-------------------------------------
+function do_allstar() {
+
+sel=$(whiptail --title " Allstar Link " --menu "\
+참고 : https://ds5qdr-dv.tistory.com/238
+\n
+" 17 50 7 \
+"1" "Allstar 설치" \
+"2" "AllStar 설정" \
+"3" "asterisk 서비스 재시작" \
+"4" "Allmon2 설치" \
+"5" "Allmon2 기본설정" \
+"6" "Allmon2 추가설정(1회만실시)" \
+"7" "Allmon2 DB 다운로드" \
+3>&1 1>&2 2>&3)
+
+if [ $? != 0 ]; then dvsmu misc; exit 0; fi
+
+case $sel in
+1)
+asl_install; dvsmu misc asl; exit 0 ;;
+2)
+sudo asl-menu; dvsmu misc asl; exit 0 ;;
+3)
+sudo systemctl restart asterisk; dvsmu misc asl; exit 0 ;;
+4)
+sudo apt install git
+sudo git clone https://github.com/AllStarLink/AllMon2.git /var/www/html/allmon2
+cd /var/www/html/allmon2
+sudo mv allmon.ini.txt allmon.ini.php
+sudo mv controlpanel.ini.txt controlpanel.ini.php ;;
+5)
+sudo nano /var/www/html/allmon2/allmon.ini.php; dvsmu misc asl; exit 0 ;;
+6)
+asl_setup_2 ;;
+7)
+sudo chmod 777 /var/www/html/allmon2/astdb.php
+sudo /var/www/html/allmon2/astdb.php
+echo "Downloaded"
+echo
+echo "Hit ENTER to the MENU"
+read x
+dvsmu misc asl; exit 0 ;;
+esac
+}
+#-------------------------------------
+# END of do_allstar
+#-------------------------------------
+
+
+#-------------------------------------
+# MAIN of misc_config
+#-------------------------------------
+
+if [ "$opt2" = ar ]; then do_analog_reflector; fi
+if [ "$opt2" = tg ]; then do_edit_tg; fi
+if [ "$opt2" = asl ]; then do_allstar; fi
+
+sel=$(whiptail --title " 추가 프로그램 " --menu "\
+\n
+" 10 40 2 \
+"1" "Analog Reflector" \
+"2" "AllStar" \
+3>&1 1>&2 2>&3)
+
+if [ $? != 0 ]; then dvsmu M; exit 0; fi
+
+case $sel in
+1)
+do_analog_reflector; dvsmu M; exit 0 ;;
+2)
+do_allstar; dvsmu M; exit 0 ;;
+esac
+}
+#==============================================================
+# END of misc_config
+#==============================================================
+
+#--------------------------------------------------------------
+# Function main_user_log_menu_z
+#--------------------------------------------------------------
+function main_user_log_menu_z() {
+
+sel=$(whiptail --title " MAIN USER LOG 확인 " --menu "\
+\n
+" 13 45 5 \
+"1" "실시간 로그 확인" \
+"2" "MMDVM_Bridge.log" \
+"3" "Analog_Bridge.log" \
+"4" "Analog_Reflector.log" \
+"5" "Back" \
+3>&1 1>&2 2>&3)
+
+if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
+
+case $sel in
+1)
+log_start_msg; main_user_log; multitail $file1 $file2; ${DVS}dvsmu M main_log_z; exit 0 ;;
+2)
+main_user_log; sudo nano $file1; ${DVS}dvsmu M main_log_z; exit 0 ;;
+3)
+main_user_log; sudo nano $file2; ${DVS}dvsmu M main_log_z; exit 0 ;;
+4)
+file=/var/log/dvswitch/Analog_Reflector.log
+sudo nano $file; ${DVS}dvsmu M main_log_z; exit 0 ;;
+5)
+${DVS}dvsmu M; exit 0 ;;
+esac
+}
+
+#--------------------------------------------------------------
+# Function main_user_file_menu_z
+#--------------------------------------------------------------
+function main_user_file_menu_z() {
+
+sel=$(whiptail --title " MAIN USER FILE 확인 " --menu "\
+\n
+" 19 45 11 \
+"1" "var.txt" \
+"2" "func.txt" \
+"3" "MMDVM_Bridge.ini" \
+"4" "Analog_Bridge.ini" \
+"5" "DVSwitch.ini" \
+"6" "dvswitch.sh" \
+"7" "dvsm.macro" \
+"8" "dvsm.sh" \
+"9" "dvswitch.sh" \
+"10" "crontab" \
+"11" "Back" \
+3>&1 1>&2 2>&3)
+
+if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
+
+case $sel in
+1)
+sudo nano /var/lib/dvswitch/dvs/var.txt; ${DVS}dvsmu M main_file_z; exit 0 ;;
+2)
+sudo nano /var/lib/dvswitch/dvs/func.txt; ${DVS}dvsmu M main_file_z; exit 0 ;;
+3)
+sudo nano /opt/MMDVM_Bridge/MMDVM_Bridge.ini; ${DVS}dvsmu M main_file_z; exit 0 ;;
+4)
+sudo nano /opt/Analog_Bridge/Analog_Bridge.ini; ${DVS}dvsmu M main_file_z; exit 0 ;;
+5)
+sudo nano /opt/MMDVM_Bridge/DVSwitch.ini; ${DVS}dvsmu M main_file_z; exit 0 ;;
+6)
+sudo nano /opt/MMDVM_Bridge/dvswitch.sh; ${DVS}dvsmu M main_file_z; exit 0 ;;
+7)
+sudo nano /opt/Analog_Bridge/dvsm.macro; ${DVS}dvsmu M main_file_z; exit 0 ;;
+8)
+sudo nano /opt/Analog_Bridge/dvsm.sh; ${DVS}dvsmu M main_file_z; exit 0 ;;
+9)
+sudo nano /opt/MMDVM_Bridge/dvswitch.sh; ${DVS}dvsmu M main_file_z; exit 0 ;;
+10)
+sudo nano /etc/crontab; ${DVS}dvsmu M main_file_z; exit 0 ;;
+11)
+${DVS}dvsmu M; exit 0 ;;
+esac
+}
+
+
+###############################################################
+# Function main_user_config_z
+###############################################################
+
+function main_user_config_z() {
+sel3=$(whiptail --title " Main User Configuration " --menu "\
+\n
+$sp05 MAIN_USER  $call_sign_M $dmr_id $ext $usrp_port_M
+-------------------------------------------------------
+" 16 50 5 \
+"1" "로그 확인--->" \
+"2" "파일 관리--->" \
+"3" "서비스 재시작" \
+"4" "추가 프로그램(AR, AllStar)" \
+"5" "Back to MAIN" \
+3>&1 1>&2 2>&3)
+
+if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
+
+case $sel3 in
+1)
+main_user_log_menu_z; exit 0 ;;
+2)
+main_user_file_menu_z; exit 0 ;;
+3)
+pse_wait
+${DVS}88_restart.sh; ${DVS}dvsmu M; exit 0 ;;
+4)
+misc_config; ${DVS}dvsmu M ;;
+5)
+${DVS}dvsmu; exit 0 ;;
+esac
+}
+
+#--------------------------------------------------------------
+# Function sub_user_log_menu_z
+#--------------------------------------------------------------
+function sub_user_log_menu_z() {
+
+sel=$(whiptail --title " USER $USER_NO LOG 확인 " --menu "\
+\n
+" 12 45 4 \
+"1" "실시간 로그 확인" \
+"2" "MMDVM_Bridge.log 확인" \
+"3" "Analog_Bridge.log 확인" \
+"4" "Back" \
+3>&1 1>&2 2>&3)
+
+if [ $? != 0 ]; then ${DVS}dvsmu $USER_NO; exit 0; fi
+
+case $sel in
+1)
+log_start_msg; sub_user_log; multitail $file1 $file2; ${DVS}dvsmu $USER_NO sub_log_z; exit 0 ;;
+2)
+sub_user_log; sudo nano $file1; ${DVS}dvsmu $USER_NO sub_log_z; exit 0 ;;
+3)
+sub_user_log; sudo nano $file2; ${DVS}dvsmu $USER_NO sub_log_z; exit 0 ;;
+4)
+${DVS}dvsmu $USER_NO; exit 0 ;;
+esac
+}
+
+#--------------------------------------------------------------
+# Function sub_user_file_menu_z
+#--------------------------------------------------------------
+function sub_user_file_menu_z() {
+
+sel=$(whiptail --title " USER $USER_NO FILE 확인 " --menu "\
+\n
+" 15 45 7 \
+"1" "var${USER_NO}.txt" \
+"2" "MMDVM_Bridge.ini" \
+"3" "Analog_Bridge.ini" \
+"4" "DVSwitch.ini" \
+"5" "dvsm.macro" \
+"6" "dvsm.sh" \
+"7" "Back" \
+3>&1 1>&2 2>&3)
+
+if [ $? != 0 ]; then ${DVS}dvsmu $USER_NO; exit 0; fi
+
+case $sel in
+1)
+sudo nano /var/lib/dvswitch/dvs/var$USER_NO.txt; ${DVS}dvsmu $USER_NO sub_file_z; exit 0 ;;
+2)
+sudo nano /opt/user$USER_NO/MMDVM_Bridge.ini; ${DVS}dvsmu $USER_NO sub_file_z; exit 0 ;;
+3)
+sudo nano /opt/user$USER_NO/Analog_Bridge.ini; ${DVS}dvsmu $USER_NO sub_file_z; exit 0 ;;
+4)
+sudo nano /opt/user$USER_NO/DVSwitch.ini; ${DVS}dvsmu $USER_NO sub_file_z; exit 0 ;;
+5)
+sudo nano /opt/user$USER_NO/dvsm.macro; ${DVS}dvsmu $USER_NO sub_file_z; exit 0 ;;
+6)
+sudo nano /opt/user$USER_NO/dvsm.sh; ${DVS}dvsmu $USER_NO sub_file_z; exit 0 ;;
+7)
+${DVS}dvsmu $USER_NO; exit 0 ;;
+esac
+}
+
+###############################################################
+# Function sub_user_config_z
+###############################################################
+
+function sub_user_config_z() {
+
+sel2=$(whiptail --title " User Configuration " --menu "\
+\n
+$sp02 User$USER_NO  $call_sign $dmr_id $ext $usrp_port $macro_status
+-------------------------------------------------------
+" 20 55 9 \
+"1" "로그 확인 --->" \
+"2" "파일 관리 --->" \
+"3" "사용자 설정 변경" \
+"4" "사용자 삭제" \
+"5" "서비스 재시작" \
+"6" "기본매크로로 변경" \
+"7" "수정매크로로 변경" \
+"8" "talkerAlias ($TA)" \
+"9" "Back to MAIN" \
+3>&1 1>&2 2>&3)
+
+if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
+
+case $sel2 in
+1)
+sub_user_log_menu_z $USER_NO; exit 0 ;;
+2)
+sub_user_file_menu_z $USER_NO; exit 0 ;;
+3)
+user_input $USER_NO; exit 0 ;;
+4)
+user_delete $USER_NO; exit 0 ;;
+5)
+restart $USER_NO; exit 0 ;;
+6)
+sudo \cp -f /opt/user$USER_NO/dvsm.basic /opt/user$USER_NO/dvsm.macro; ${DVS}dvsmu $USER_NO; exit 0 ;;
+7)
+sudo \cp -f /opt/user$USER_NO/dvsm.adv /opt/user$USER_NO/dvsm.macro; ${DVS}dvsmu $USER_NO; exit 0 ;;
+8)
+TA_input $USER_NO; exit 0 ;;
+9)
+${DVS}dvsmu; exit 0 ;;
+esac
+}
+
+
+###############################################################
+# Function sys_admin_z
+###############################################################
+
+function sys_admin_z() {
+sel=$(whiptail --title " 시스템 관리=== " --menu "\
+\n
+" 18 50 10 \
+"1" "시스템 모니터링" \
+"2" "시스템 최적화" \
+"3" "시스템 리부팅" \
+"4" "1일1회 리부팅 설정" \
+"5" "BM 및 클라이언트 연결상태 확인" \
+"6" "추가사용자 DVSwitch 업그레이드" \
+"7" "dvsMU (Multi User) 업그레이드" \
+"8" "dvsmu.log 열기" \
+"9" "crontab 열기" \
+"10" "Back to Main" \
+3>&1 1>&2 2>&3)
+
+if [ $? != 0 ]; then ${DVS}dvsmu; exit 0
+fi
+
+case $sel in
+1)
+clear
+whiptail --msgbox "\
+
+$sp03 시스템 모니터의 종료 명령은 F10 또는 Ctrl-C
+" 9 57 1
+
+htop; ${DVS}dvsmu A ;;
+2)
+system_optimizer ;;
+3)
+clear
+source /var/lib/dvswitch/dvs/lan/korean.txt
+if (whiptail --title " 시스템 리부팅 " --yesno "\
+
+$sp10 지금 리부팅 하시겠습니까?
+" 9 50);
+then sudo reboot
+else ${DVS}dvsmu A; exit 0
+fi ;;
+4)
+set_reboot ;;
+5)
+connection_status ;;
+6)
+dvswitch_upgrade ;;
+7)
+dvsmu_upgrade ;;
+8)
+if [ ! -e /var/log/dvswitch/dvsmu.log ]; then
+        echo "This is a Log file for dvsMU" | sudo tee /var/log/dvswitch/dvsmu.log > /dev/null 2>&1
+        log_line=--------------------------------------------------
+        sudo sed -i "1 i\\$log_line" /var/log/dvswitch/dvsmu.log
+fi
+sudo nano /var/log/dvswitch/dvsmu.log
+${DVS}dvsmu A; exit 0 ;;
+9)
+sudo nano /etc/crontab; ${DVS}dvsmu A; exit 0 ;;
+10)
+${DVS}dvsmu; exit 0 ;;
+esac
+}
+
