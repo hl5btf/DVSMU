@@ -58,8 +58,11 @@ if [ $rx_freq = 000000000 ]; then
 	sudo sed -i -e "/^$tag=/ c $tag=$value" $file
 fi
 
-# 만약 password의 값이 있다면 지우도록 수정.
+# 아래의 항목들은 지운다.
 sudo sed -i -e "/^bm_password=/ c bm_password=" $file
+sudo sed -i "/^lat=/ c lat=" $file
+sudo sed -i "/^lon=/ c lon=" $file
+sudo sed -i "/^desc=/ c desc=dvsMU" $file
 
 source /var/lib/dvswitch/dvs/var.txt > /dev/null 2>&1
 if [ $rx_freq = 000000000 ]; then
