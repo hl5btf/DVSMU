@@ -5,6 +5,8 @@
 # 차후에 upgrade 할 내용이 있으면 여기에 계속 주가하면 됨.
 # 차후에 변수가 추가될때를 고려하여 변수가 추가되는 루틴을 미리 작성해 둠.
 
+user_array="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40"
+
 #====== crontab 설정 (man_log 및 DMRIds_chk.sh의 실행을 위한 설정) =============================================
 function set_crontab() {
 
@@ -93,7 +95,7 @@ if [[ -z `sudo grep "45039" $file` ]]; then
 	sudo wget -O $file https://raw.githubusercontent.com/hl5btf/DVSMU/main/tgdb_KR/DMR_fvrt_list.txt
 fi
 
-user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
+user_array
 for user in $user; do
 source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
@@ -150,7 +152,7 @@ file=/var/lib/dvswitch/dvs/var.txt
 file=/var/lib/dvswitch/dvs/var00.txt
 	do_add; n=0
 
-user="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20"
+user_array
 for user in $user; do
 source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
