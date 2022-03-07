@@ -261,7 +261,7 @@ user=$user_array
 
 for user in $user; do
 
-#file=/var/lib/dvswitch/dvs/var${user}.txt
+source /var/lib/dvswitch/dvs/var${user}.txt
 dir=/opt/user${user}
 
 #if [ -e $file ] && [ -d $dir ]; then
