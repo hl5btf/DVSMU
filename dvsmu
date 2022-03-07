@@ -785,11 +785,9 @@ ver_now=${ver_now%.*}
 file=/usr/local/dvs/dvsmu_dn
 sudo wget -O $file https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu > /dev/null 2>&1
 sudo chmod +x $file
-#ver_dn=$($file -v)
-source $file > /dev/null 2>&1
-ver_dn=$SCRIPT_VERSION
+ver_dn=$($file -v)
 new_ver_no=$ver_dn
-ver_dn=$( echo "$ver_dn * 100" | tr -d $'\r' | bc )
+ver_dn=$( echo "$ver_dn * 100" |bc )
 ver_dn=${ver_dn%.*}
 #echo $ver_dn
 sudo rm $file
