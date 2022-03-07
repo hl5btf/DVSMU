@@ -5,7 +5,7 @@ source /var/lib/dvswitch/dvs/var.txt
 #===================================
 SCRIPT_VERSION="2.0"
 SCRIPT_AUTHOR="HL5KY"
-SCRIPT_DATE="2022-03-1"
+SCRIPT_DATE="2022-03-07"
 #===================================
 
 if [ "$1" != "" ]; then
