@@ -118,9 +118,8 @@ dir=/opt/user${user}
 
 if [ -d $dir ]; then
 
-source /var/lib/dvswitch/dvs/var${user}.txt
-
-file=/var/log/dvswitch/user${user}/Analog_Bridge.log
+source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
+file=/var/log/dvswitch/user${user}/Analog_Bridge.log > /dev/null 2>&1
 
 if [[ ! -z `grep "ip change" $file -a` ]] && [ "$1" != and_shrink ]; then
 
@@ -261,13 +260,13 @@ user=$user_array
 
 for user in $user; do
 
-source /var/lib/dvswitch/dvs/var${user}.txt
 dir=/opt/user${user}
 
 #if [ -e $file ] && [ -d $dir ]; then
 if [ -d $dir ] && [ "$busy_user" != yes ]; then
 
-        file=/var/log/mmdvm/MMDVM_Bridge${user}.log;
+	source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
+        file=/var/log/mmdvm/MMDVM_Bridge${user}.log > /dev/null 2>&1
 
         n=0
 #        until [ -e $file ] && [ -s $file ]; do
