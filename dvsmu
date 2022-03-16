@@ -875,6 +875,16 @@ fi
 }
 
 #--------------------------------------------------------------
+# Function no_file_msg
+#--------------------------------------------------------------
+function no_file_msg() {
+clear
+whiptail --msgbox "\
+$sp08 파일이 없거나 빈 파일입니다.
+" 9 50 1
+}
+
+#--------------------------------------------------------------
 # Function main_user_log
 #--------------------------------------------------------------
 function main_user_log() {
@@ -888,6 +898,7 @@ file1=/var/log/mmdvm/MMDVM_Bridge.log
 
 n=0
 until [ -e $file1 ] && [ -s $file1 ]; do
+if [ $n = 6 ]; then break; fi
 if [ ! -e $file1 ] || [ ! -s $file1 ]; then
         log_date=$(date -d "$n day ago" '+%Y-%m-%d')
         file1=/var/log/mmdvm/MMDVM_Bridge-$log_date.log
@@ -907,6 +918,8 @@ file2=/var/log/dvswitch/Analog_Bridge.log
 
 n=0
 until [ -e $file2 ] && [ -s $file2 ]; do
+if [ $n = 6 ]; then break; fi
+
 if [ ! -e $file2 ] || [ ! -s $file2 ]; then
         log_date=$(date -d "$n day ago" '+%Y-%m-%d')
         file2=/var/log/dvswitch/Analog_Bridge-$log_date.log
@@ -931,23 +944,46 @@ function main_user_log_menu() {
 
 sel=$(whiptail --title " MAIN USER LOG 확인 " --menu "\
 \n
-" 12 45 4 \
+" 12 45 5 \
 "1" "실시간 로그 확인" \
 "2" "MMDVM_Bridge.log 확인" \
 "3" "Analog_Bridge.log 확인" \
-"4" "Back" \
+"4" "Analog_Reflector.log" \
+"5" "Back" \
 3>&1 1>&2 2>&3)
 
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 
 case $sel in
 1)
-log_start_msg; main_user_log; multitail $file1 $file2; ${DVS}dvsmu M main_log; exit 0 ;;
+main_user_log;
+if [ ! -e $file1 ] || [ ! -e $file2 ] || [ ! -s $file1 ] || [ ! -s $file2 ]; then
+        no_file_msg; ${DVS}dvsmu M main_log; exit 0
+else
+        log_start_msg; main_user_log; multitail $file1 $file2; ${DVS}dvsmu M main_log; exit 0
+fi ;;
 2)
-main_user_log; sudo nano $file1; ${DVS}dvsmu M main_log; exit 0 ;;
+main_user_log;
+if [ ! -e $file1 ] || [ ! -s $file1 ]; then
+        no_file_msg; ${DVS}dvsmu M main_log; exit 0
+else
+        sudo nano $file1; ${DVS}dvsmu M main_log; exit 0
+fi ;;
 3)
-main_user_log; sudo nano $file2; ${DVS}dvsmu M main_log; exit 0 ;;
+main_user_log;
+if [ ! -e $file2 ] || [ ! -s $file2 ]; then
+        no_file_msg; ${DVS}dvsmu M main_log; exit 0
+else
+        sudo nano $file2; ${DVS}dvsmu M main_log; exit 0
+fi ;;
 4)
+file=/var/log/dvswitch/Analog_Reflector.log
+if [ ! -e $file ] || [ ! -s $file ]; then
+        no_file_msg; ${DVS}dvsmu M main_log; exit 0
+else
+        sudo nano $file; ${DVS}dvsmu M main_log; exit 0
+fi ;;
+5)
 ${DVS}dvsmu M; exit 0 ;;
 esac
 }
@@ -1012,7 +1048,8 @@ else
         declare usrp_port_M=$usrp_port
 fi
 
-if [[ $T031 =~ $call_sign ]] && [ ${#call_sign} = 5 ]; then
+#if [[ $T031 =~ $call_sign ]] && [ ${#call_sign} = 5 ]; then
+if [ -e /usr/local/dvs/dvsmuz ]; then
 
 main_user_config_z
 
@@ -1081,6 +1118,7 @@ file1=/var/log/mmdvm/MMDVM_Bridge$USER_NO.log;
 
 n=0
 until [ -e $file1 ] && [ -s $file1 ]; do
+if [ $n = 6 ]; then break; fi
 if [ ! -e $file1 ] || [ ! -s $file1 ]; then
         log_date=$(date -d "$n day ago" '+%Y-%m-%d')
         file1=/var/log/mmdvm/MMDVM_Bridge$USER_NO-$log_date.log
@@ -1100,6 +1138,7 @@ file2=/var/log/dvswitch/user$USER_NO/Analog_Bridge.log;
 
 n=0
 until [ -e $file2 ] && [ -s $file2 ]; do
+if [ $n = 6 ]; then break; fi
 n=$(($n+1))
 if [ ! -e $file2 ] || [ ! -s $file2 ]; then
         log_date=$(date -d "$n day ago" '+%Y-%m-%d')
@@ -1268,7 +1307,8 @@ if [ -e $file ]; then
 fi
 
 #-------------------------------------------------------------
-if [[ $T031 =~ $call_sign_M ]] && [ ${#call_sign_M} = 5 ]; then
+#if [[ $T031 =~ $call_sign_M ]] && [ ${#call_sign_M} = 5 ]; then
+if [ -e /usr/local/dvs/dvsmuz ]; then
 
 sub_user_config_z
 
@@ -1626,6 +1666,7 @@ file1=/var/log/mmdvm/MMDVM_Bridge.log
 n=0
 #until [ -e $file1 ] && [ -s $file1 ]; do
 until [ -s $file1 ] || [ $n = 5 ]; do
+if [ $n = 6 ]; then break; fi
 if [ ! -e $file1 ] || [ ! -s $file1 ]; then
         log_date=$(date -d "$n day ago" '+%Y-%m-%d')
         file1=/var/log/mmdvm/MMDVM_Bridge-$log_date.log
@@ -1722,19 +1763,20 @@ function chk_AR_log() {
 
 file=/var/log/dvswitch/Analog_Reflector.log
 
+#if [ -e $file ] && [[ ! -z `grep "New Mobile client" $file -a` ]] && [[ ! -z `grep "Removing client" $file -a` ]]; then
+if [ -e $file ] && [[ ! -z `grep "New Mobile client" $file -a` ]]; then
 
-if [ -e $file ] && [[ ! -z `grep "Connected WS" $file -a` ]] && [[ ! -z `grep "disconnect" $file -a` ]]; then
+line_no_new_mobile=$(grep -n "New Mobile client" $file -a | cut -d: -f1 | tail -1)
+line_no_removing=$(grep -n "Removing client" $file -a | cut -d: -f1 | tail -1)
 
-line_no_connected_WS=$(grep -n "Connected WS" $file -a | cut -d: -f1 | tail -1)
-line_no_disconnect=$(grep -n "disconnect" $file -a | cut -d: -f1 | tail -1)
 
-#echo $line_no_connected_WS
-#echo $line_no_disconnect
+#echo $line_no_new_mobile
+#echo $line_no_removing
 
-if [ $line_no_connected_WS -gt $line_no_disconnect ]; then
-        line=$(cat $file | sed -n ${line_no_connected_WS}p)
+if [ $line_no_new_mobile -gt $line_no_removing ]; then
+        line=$(cat $file | sed -n ${line_no_new_mobile}p)
         con_cl_M=ok; callsign_cl_M=USRP
-        else line=$(cat $file | sed -n ${line_no_disconnect}p)
+        else line=$(cat $file | sed -n ${line_no_removing}p)
         con_cl_M=NO; callsign_cl_M=USRP
 fi
 
@@ -2071,7 +2113,8 @@ function sys_admin() {
 
 source /var/lib/dvswitch/dvs/var.txt
 
-if [[ $T031 =~ $call_sign ]] && [ ${#call_sign} = 5 ]; then
+#if [[ $T031 =~ $call_sign ]] && [ ${#call_sign} = 5 ]; then
+if [ -e /usr/local/dvs/dvsmuz ]; then
 
 sys_admin_z
 

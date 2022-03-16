@@ -34,18 +34,19 @@ if [ $ar_status = "active" ]; then
 
 	file=/var/log/dvswitch/Analog_Reflector.log
 
-	if [ -e $file ] && [[ ! -z `grep "Connected WS" $file -a` ]]; then
+	if [ -e $file ] && [[ ! -z `grep "New Mobile client" $file -a` ]]; then
 
-		line_no_connected_WS=$(grep -n "Connected WS" $file -a | cut -d: -f1 | tail -1)
-		line_no_disconnect=$(grep -n "disconnect" $file -a | cut -d: -f1 | tail -1)
+		line_no_new_mobile=$(grep -n "New Mobile client" $file -a | cut -d: -f1 | tail -1)
+		line_no_removing=$(grep -n "Removing client" $file -a | cut -d: -f1 | tail -1)
 
-#echo $line_no_connected_WS
-#echo $line_no_disconnect
+#echo $line_no_new_mobile
+#echo $line_no_removing
 
-		if [ "$line_no_connected_WS" -gt "$line_no_disconnect" ]; then
-        		line=$(cat $file | sed -n ${line_no_connected_WS}p)
+
+		if [ $line_no_new_mobile -gt $line_no_removing ]; then
+			line=$(cat $file | sed -n ${line_no_new_mobile}p)
 	        	con_cl_M=yes; cnted_callsigns="main_user "
-	        	else line=$(cat $file | sed -n ${line_no_disconnect}p)
+		else line=$(cat $file | sed -n ${line_no_removing}p)
 		        con_cl_M=NO
 		fi
 
@@ -195,7 +196,10 @@ if [ -e $file ]; then
         ddd=$(date -d "$dd" +"%Y%m%d%H%M%S")
 #echo $ddd
         if [ $ddd -gt $date_10min_ago ] && [[ $line =~ "TX state = ON" ]]; then
-#                echo "main user busy"
+#                echo "TX state = ON, main user busy"
+                busy_M=yes; busy_callsigns="main_user "; break
+        elif [ $ddd -gt $date_10min_ago ] && [[ $line =~ "txTg=" ]]; then
+#                echo "txTg=, main user busy "
                 busy_M=yes; busy_callsigns="main_user "; break
         else busy_M=NO
         fi
@@ -219,28 +223,21 @@ if [ $ar_status = "active" ]; then
 
 	file=/var/log/dvswitch/Analog_Reflector.log
 
-	#n=0
-	##until [ -e $file ] && [ -s $file ]; do
-	#until [ -s $file ] || [ $n = 5 ]; do
-	#if [ ! -e $file ] || [ ! -s $file ]; then
-	#        log_date=$(date -d "$n day ago" '+%Y-%m-%d')
-	#        file=/var/log/mmdvm/MMDVM_Bridge-$log_date.log
-	#fi
-	#n=$(($n+1))
-	#done
-
 	if [ -e $file ]; then
         	tail -30 $file | sudo tee test.txt > /dev/null 2>&1
 	        while read line
         	do
-	        date_10min_ago=$(date -d '9 hour ago 10 minute ago' '+%Y%m%d%H%M%S')
+	        date_10min_ago=$(date -d '9 hour ago 10 minute ago' '+%Y%m%d%H%M%S') > /dev/null 2>&1
 #echo $date_10min_ago
 	        dd=${line:3:18}
-        	ddd=$(date -d "$dd" +"%Y%m%d%H%M%S")
+        	ddd=$(date -d "$dd" +"%Y%m%d%H%M%S") > /dev/null 2>&1
 #echo $ddd
-	        if [ $ddd -gt $date_10min_ago ] && [[ $line =~ "Begin TX" ]]; then
+	        if [ $ddd -gt $date_10min_ago ] && [[ "$line" =~ "Begin TX" ]] && [[ "$line" =~ "dst=0" ]]; then
 #                echo "AR user busy"
         	        busy_AR=yes; busy_callsigns="main_user "; break
+                elif [ $ddd -gt $date_10min_ago ] && [[ "$line" =~ "Tune executed" ]]; then
+#                echo "AR user busy"
+                        busy_AR=yes; busy_callsigns="main_user "; break
 	        else busy_AR=NO
         	fi
 	        done < test.txt
@@ -261,12 +258,16 @@ user=$user_array
 for user in $user; do
 
 dir=/opt/user${user}
+source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
+file=/var/log/mmdvm/MMDVM_Bridge${user}.log > /dev/null 2>&1
+
+
 
 #if [ -e $file ] && [ -d $dir ]; then
 if [ -d $dir ] && [ "$busy_user" != yes ]; then
 
-	source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
-        file=/var/log/mmdvm/MMDVM_Bridge${user}.log > /dev/null 2>&1
+#	source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
+#        file=/var/log/mmdvm/MMDVM_Bridge${user}.log > /dev/null 2>&1
 
         n=0
 #        until [ -e $file ] && [ -s $file ]; do
@@ -334,7 +335,7 @@ function do_reboot() {
 
 #echo "REBOOT"; exit 0
 
-                sudo reboot
+                sudo reboot; exit 0
         else
 #               echo $cmd
                 $cmd
@@ -357,9 +358,9 @@ fi
 main_user_connection_chk
 sub_user_connection_chk
 
-#echo $con_cl_M
-#echo $cnted_callsigns
-#echo $con_cl_one_of_sub_users
+#echo "con_cl_M $con_cl_M"
+#echo "cnted_callsigns $cnted_callsigns"
+#echo "con_cl_one_of_sub_users $con_cl_one_of_sub_users"
 
 if [ $con_cl_M = "NO" ] && [ $con_cl_one_of_sub_users = "NO" ]; then
 	cnted_callsigns="Not "
@@ -371,9 +372,12 @@ else
 	sub_user_busy_check
 fi
 
-#echo $busy_M
-#echo $busy_AR
-#echo $busy_user
+#echo "busy_M $busy_M"
+#echo "busy_AR $busy_AR"
+#echo "busy_user $busy_user"
+#exit 0
+
+
 
 if [ "$busy_M" = "NO" ] && [ "$busy_AR" = "NO" ] && [ "$busy_user" = "NO" ]; then
        	busy_callsigns="Not "
