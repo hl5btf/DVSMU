@@ -287,9 +287,15 @@ if [ -d $dir ] && [ "$busy_user" != yes ]; then
                 date_10min_ago=$(date -d '9 hour ago 10 minute ago' '+%Y%m%d%H%M%S')
                 dd=${line:3:22}
                 ddd=$(date -d "$dd" +"%Y%m%d%H%M%S")
-                if [ $ddd -gt $date_10min_ago ] && [[ $line =~ "TX state = ON" ]]; then
+
+		if [ $ddd -gt $date_10min_ago ] && [[ $line =~ "TX state = ON" ]]; then
 #                        echo "user${user} busy"
                         busy_user=yes; busy_callsigns="${busy_callsigns}${call_sign} "; break
+			
+                elif [ $ddd -gt $date_10min_ago ] && [[ $line =~ "txTg=" ]]; then
+#                        echo "user${user} busy"
+                        busy_user=yes; busy_callsigns="${busy_callsigns}${call_sign} "; break
+
                 else busy_user=NO
                 fi
                 done < test.txt
