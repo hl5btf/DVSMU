@@ -288,11 +288,11 @@ if [ -d $dir ] && [ "$busy_user" != yes ]; then
                 dd=${line:3:22}
                 ddd=$(date -d "$dd" +"%Y%m%d%H%M%S")
 
-		if [ $ddd -gt $date_10min_ago ] && [[ $line =~ "TX state = ON" ]]; then
+                if [ $ddd -gt $date_10min_ago ] && [[ $line =~ "TX state = ON" ]]; then
 #                        echo "user${user} busy"
                         busy_user=yes; busy_callsigns="${busy_callsigns}${call_sign} "; break
-			
-                elif [ $ddd -gt $date_10min_ago ] && [[ $line =~ "txTg=" ]]; then
+
+		elif [ $ddd -gt $date_10min_ago ] && [[ $line =~ "txTg=" ]]; then
 #                        echo "user${user} busy"
                         busy_user=yes; busy_callsigns="${busy_callsigns}${call_sign} "; break
 
@@ -361,6 +361,11 @@ fi
 #con_cl_M=$(main_user_connection_chk)
 
 #-----------------------------------------------------------------
+# 사용자가 한 사람이라도 연결되어 있고, 한 사람이라도 busy이면, REBOOT하지 않음
+# 연결된 사람과 사용자가 동일하지 않아도 busy로 간주하고 REBOOT하지 않게 되어 있음.
+# 확인루틴에서의 일시적인 에러가 있더라도 busy인 경우를 최우선으로 고려함
+
+
 main_user_connection_chk
 sub_user_connection_chk
 
