@@ -1757,8 +1757,12 @@ file=/var/log/dvswitch/Analog_Reflector.log
 if [ -e $file ] && [[ ! -z `grep "New Mobile client" $file -a` ]]; then
 
 line_no_new_mobile=$(grep -n "New Mobile client" $file -a | cut -d: -f1 | tail -1)
-line_no_removing=$(grep -n "Removing client" $file -a | cut -d: -f1 | tail -1)
 
+if [[ ! -z `grep "Removing client" $file -a` ]]; then
+        line_no_removing=$(grep -n "Removing client" $file -a | cut -d: -f1 | tail -1)
+else
+        line_no_removing=0
+fi
 
 #echo $line_no_new_mobile
 #echo $line_no_removing
