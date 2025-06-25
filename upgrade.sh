@@ -163,7 +163,7 @@ if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
 #   sudo systemctl stop analog_bridge${user} > /dev/null 2>&1
 #   sudo systemctl stop md380-emu${user} > /dev/null 2>&1
 
-speep 1
+sleep 1
 
 file=/opt/user${user}/DVSwitch.ini
         if [ "${talkerAlias}" = "" ];
