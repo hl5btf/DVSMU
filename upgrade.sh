@@ -139,9 +139,9 @@ function do_add() {
 for var in ${new_var}; do
         if [[ -z `sudo grep "^$var" $file` ]]; then
                 echo "$var=" | sudo tee -a $file > /dev/null 2>&1
+	fi
                 val=${new_val[$n]}
                 sudo sed -i -e "/^$var=/ c $var=$val" $file
-        fi
         n=$(($n+1))
 done
 }
