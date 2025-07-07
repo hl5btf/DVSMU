@@ -131,11 +131,11 @@ function add_var_val() {
 
 # When updating, the stanzas will be appended to varxx.txt, if not exist.
 # each item needs space in between. no qutation marks are needed
-new_var="txgain_asl txgain_stfu txgain_intercom"
+new_var="txgain_asl txgain_stfu txgain_intercom original_bm_address"
 # 기존에 있는 변수는 값을 변경하지 않는다. (사용자가 변경한 값을 유지하도록)
 # 기존에 있는 변수의 값을 변경하려면 update_var 을 사용해야 한다.
 # each item needs space in between. if the item is character, it needs quotation marks.
-new_val=(0.35 0.35 0.35)
+new_val=(0.35 0.35 0.35 "")
 
 function do_add() {
 for var in ${new_var}; do
