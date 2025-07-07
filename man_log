@@ -335,7 +335,7 @@ function do_reboot() {
         time_chk
         sudo sed -i -e "/man_log/ c 0 $time * * * root /usr/local/dvs/man_log" $file
 
-        if [[ ! -z `sudo grep "reboot=yes" $file` ]]; then
+	if sudo grep -q "reboot=yes" "$file"; then
                 log_line="$time_now  ${cnted_callsigns}Connected, ${busy_callsigns}Busy, REBOOT"
                 sudo sed -i "1 i\\$log_line" $FILE_LOG
 
