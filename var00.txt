@@ -122,3 +122,4 @@ new_val=()
 # ETC
 cpu_temp=
 talkerAlias=
+original_bm_address=
