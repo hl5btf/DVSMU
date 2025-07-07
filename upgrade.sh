@@ -21,25 +21,25 @@ cron_daily_min=$(sed -n -e '/cron.daily/p' $FILE_CRON | cut -f 1 -d' ')
 cron_daily_min_plus_3=$((cron_daily_min + 3))
 cron_daily_min_plus_4=$((cron_daily_min + 4))
 
-if [[ ! -z `sudo grep "time" $FILE_CRON` ]]; then
-	sudo sed -i -e "/time/ c time=3" $FILE_CRON
+if sudo grep -q "time" "$FILE_CRON"; then
+	sudo sed -i -e "/time/ c #time=3" $FILE_CRON
 else
-	echo "time=3" | sudo tee -a $FILE_CRON
+	echo "#time=3" | sudo tee -a $FILE_CRON
 fi
 
-if [[ ! -z `sudo grep "man_log" $FILE_CRON` ]]; then
+if sudo grep -q "man_log" "$FILE_CRON"; then
 	sudo sed -i -e "/man_log/ c 0 3 * * * root /usr/local/dvs/man_log" $FILE_CRON
 else
 	echo "0 3 * * * root /usr/local/dvs/man_log" | sudo tee -a $FILE_CRON
 fi
 
-if [[ ! -z `sudo grep "reboot" $FILE_CRON` ]]; then
-	sudo sed -i -e "/reboot/ c reboot=yes" $FILE_CRON
+if sudo grep -q "reboot" "$FILE_CRON"; then
+	sudo sed -i -e "/reboot/ c #reboot=yes" $FILE_CRON
 else
-	echo "reboot=yes" | sudo tee -a $FILE_CRON
+	echo "#reboot=yes" | sudo tee -a $FILE_CRON
 fi
 
-if [[ ! -z `sudo grep "DMRIds" $FILE_CRON` ]]; then
+if sudo grep -q "DMRIds" "$FILE_CRON"; then
 	sudo sed -i -e "/DMRIds/ c $cron_daily_min_plus_3 $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh" $FILE_CRON
 else
 	echo "$cron_daily_min_plus_3 $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh" | sudo tee -a $FILE_CRON
