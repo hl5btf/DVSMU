@@ -395,6 +395,7 @@ if [ "$busy_M" = "NO" ] && [ "$busy_AR" = "NO" ] && [ "$busy_user" = "NO" ]; the
         do_reboot
 else
 	time_chk
+	min=$(echo "$min" | sed 's/[^0-9]//g')
 	min=$((min + 10))
 	file=/etc/crontab
 
