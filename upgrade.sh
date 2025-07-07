@@ -44,6 +44,12 @@ if sudo grep -q "DMRIds" "$FILE_CRON"; then
 else
 	echo "$cron_daily_min_plus_3 $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh" | sudo tee -a $FILE_CRON
 fi
+
+if sudo grep -q "bm_watchdog" "$FILE_CRON"; then
+	sudo sed -i -e "/bm_watchdog/ c */5 * * * * root /usr/local/dvs/bm_watchdog.sh" $FILE_CRON
+else
+	echo "*/5 * * * * root /usr/local/dvs/bm_watchdog.sh" | sudo tee -a $FILE_CRON
+fi
 }
 
 #====== 여러가지 수정사항을 처리하는 루틴 =========================
