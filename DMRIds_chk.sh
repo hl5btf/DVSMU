@@ -3,9 +3,9 @@
 source /var/lib/dvswitch/dvs/var.txt
 
 #===================================
-SCRIPT_VERSION="1.0"
+SCRIPT_VERSION="2.0"
 SCRIPT_AUTHOR="HL5KY"
-SCRIPT_DATE="2021-11-18"
+SCRIPT_DATE="2025-07-07"
 #===================================
 
 FILE_DAT=/var/lib/mmdvm/DMRIds.dat
