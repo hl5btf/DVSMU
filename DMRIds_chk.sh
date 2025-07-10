@@ -54,14 +54,14 @@ fi
 }
 #--------------------------------------------------------------
 function logging() {
+    sudo sed -i "1 i\\$log_line" "$FILE_LOG" > /dev/null 2>&1
 
-sudo sed -i "1 i\\$log_line" $FILE_LOG > /dev/null 2>&1
+    line=$(wc -l < "$FILE_LOG")
 
-line=`cat $FILE_LOG | wc -l`
-
-if [ $line -gt $MAX_LOG_LINE ]; then
-	sudo sed -i '$ d' $FILE_LOG
-fi
+    if [ "$line" -gt "$MAX_LOG_LINE" ]; then
+        # 상단 MAX_LOG_LINE줄만 유지
+        sudo head -n "$MAX_LOG_LINE" "$FILE_LOG" | sudo tee "$FILE_LOG" > /dev/null
+    fi
 }
 #--------------------------------------------------------------
 function cp_bak_to_dat() {
