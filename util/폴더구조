@@ -28,6 +28,7 @@ LOG files
         /var/log/dvswitch/Analog_Bridge.log
         /var/log/dvswitch/dvsmu.log
         /var/log/mmdvm/MMDVM_Bridge.log
+        /var/log/dvswitch/bm_watchdog.log
 
 ASL         /usr/local/sbin/asl-menu
 ASL CONFIG files            /etc/asterisk
