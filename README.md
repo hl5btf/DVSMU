@@ -8,6 +8,10 @@
 
 - util : upgrade 등 작업시 참고
 
+- bm_watchdog.sh : dvsmu의 일부로 작동함. 각 사용자의 bm 마스트서버를 검사(ping)하여 필요시 대체 마스터서버 적용 등의 기능.
+
+- config_main_user.sh : dvsmu의 일부로 작동함. 주사용자의 설정 및 변경.
+
             예를 들어, 추가모드(STFU, ASL)의 사용을 위해서 dvsm.sh, dvsm.macro, var.txt 등에 내용을 추가해야 한다.
             이런 파일은 주 사용자에게만 해당되고, 이미지파일에는 수정되지만, 기존 사용자에게는 전달할 방법이 없으므로,
             dvsmu의 upgrade시 적용이 되도록 한다.
