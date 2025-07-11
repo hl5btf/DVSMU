@@ -8,6 +8,34 @@
 
 user_array=(01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40)
 
+function dn_program() {
+
+file=dvsmu
+sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
+sudo chmod +x /usr/local/dvs/$file
+
+file=man_log
+sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
+sudo chmod +x /usr/local/dvs/$file
+
+file=DMRIds_chk.sh
+sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
+sudo chmod +x /usr/local/dvs/$file
+
+file=bm_watchdog.sh
+sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
+sudo chmod +x /usr/local/dvs/$file
+
+file=config_main_user.sh
+sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
+sudo chmod +x /usr/local/dvs/$file
+}
+# 필요시 아래와 같이 다운로드 가능
+# sudo wget -O /usr/local/dvs/dvsmu https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu
+# sudo wget -O /usr/local/dvs/man_log https://raw.githubusercontent.com/hl5btf/DVSMU/main/man_log
+# sudo wget -O /usr/local/dvs/DMRIds_chk.sh https://raw.githubusercontent.com/hl5btf/DVSMU/main/DMRIds_chk.sh
+
+
 #====== crontab 설정 (man_log 및 DMRIds_chk.sh의 실행을 위한 설정) =============================================
 function set_crontab() {
 
@@ -189,23 +217,8 @@ done
 ################################################
 # MAIN PROGRAM
 ################################################
-file=dvsmu
-sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
-sudo chmod +x /usr/local/dvs/$file
 
-file=man_log
-sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
-sudo chmod +x /usr/local/dvs/$file
-
-file=DMRIds_chk.sh
-sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
-sudo chmod +x /usr/local/dvs/$file
-
-
-# 필요시 아래와 같이 다운로드 가능
-# sudo wget -O /usr/local/dvs/dvsmu https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu
-# sudo wget -O /usr/local/dvs/man_log https://raw.githubusercontent.com/hl5btf/DVSMU/main/man_log
-# sudo wget -O /usr/local/dvs/DMRIds_chk.sh https://raw.githubusercontent.com/hl5btf/DVSMU/main/DMRIds_chk.sh
+dn_program
 
 sleep 10
 
