@@ -10,25 +10,13 @@ user_array=(01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23
 
 function dn_program() {
 
-file=dvsmu
-sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
-sudo chmod +x /usr/local/dvs/$file
 
-file=man_log
-sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
-sudo chmod +x /usr/local/dvs/$file
+files="dvsmu man_log DMRIds_chk.sh bm_watchdog.sh config_main_user.sh"
 
-file=DMRIds_chk.sh
-sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
-sudo chmod +x /usr/local/dvs/$file
-
-file=bm_watchdog.sh
-sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
-sudo chmod +x /usr/local/dvs/$file
-
-file=config_main_user.sh
-sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
-sudo chmod +x /usr/local/dvs/$file
+for file in $files; do
+sudo wget -O /var/lib/dvswitch/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file > /dev/null 2>&1
+sudo chmod +x /var/lib/dvswitch/dvs/$file
+done
 }
 # 필요시 아래와 같이 다운로드 가능
 # sudo wget -O /usr/local/dvs/dvsmu https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu
