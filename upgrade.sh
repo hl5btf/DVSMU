@@ -14,8 +14,8 @@ function dn_program() {
 files="dvsmu man_log DMRIds_chk.sh bm_watchdog.sh config_main_user.sh"
 
 for file in $files; do
-sudo wget -O /var/lib/dvswitch/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file > /dev/null 2>&1
-sudo chmod +x /var/lib/dvswitch/dvs/$file
+sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
+sudo chmod +x /usr/local/dvs/$file
 done
 }
 # 필요시 아래와 같이 다운로드 가능
