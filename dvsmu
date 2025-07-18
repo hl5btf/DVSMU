@@ -3,9 +3,9 @@
 source /var/lib/dvswitch/dvs/var.txt
 
 #===================================
-SCRIPT_VERSION="2.01"
+SCRIPT_VERSION="3.0"
 SCRIPT_AUTHOR="HL5KY"
-SCRIPT_DATE="2022-03-18"
+SCRIPT_DATE="2025-07-08"
 #===================================
 
 if [ "$1" != "" ]; then
@@ -375,8 +375,8 @@ done
 
 #----------- USRP PORT 입력 중복 확인 끝 부분-----------------------
 
-source /var/lib/dvswitch/dvs/var.txt
-bm_address_M=$bm_address
+# source /var/lib/dvswitch/dvs/var.txt
+# bm_address_M=$bm_address
 
 source /var/lib/dvswitch/dvs/var$1.txt
 USER_NO=$1
@@ -429,6 +429,47 @@ tx_freq=${rx_MHz:0:3}${rx_MHz:4:4}"00"
 #tx_freq=${tx_MHz:0:3}${tx_MHz:4:4}"00"
 
 # if [ x${bm_password} = x ]; then bm_password=passw0rd; fi
+
+#------- Create bm.list from DMR_Hotsts.txt ----------------------------------------------
+
+sudo \cp -f ${DATA}bm.list ${DATA}bm.list_old > /dev/null 2>&1
+
+# get the records starting "BM_" from DMR_Hosts.txt and create bm.list_1
+sudo grep -i -e "^BM_" ${dir_host}DMR_Hosts.txt | sudo tee ${DATA}bm.list_1 > /dev/null 2>&1
+
+# cut the first column from bm.list_1
+sudo cut -f1 ${DATA}bm.list_1 | sudo tee ${DATA}bm.list_2 > /dev/null 2>&1
+
+# add a new line "===Type_in===" in the last line of bm.list
+#sudo bash -c 'echo ===Type_in=== >> /var/lib/dvswitch/dvs/bm.list' > /dev/null 2>&1
+
+# number all the lines
+sudo nl ${DATA}bm.list_2 | sudo tee ${DATA}bm.list > /dev/null 2>&1
+
+# verify bm.list is valid
+file=${DATA}bm.list
+if [[ -z `sudo grep "BM_" $file` ]]; then
+sudo \cp -f ${DATA}bm.list_old ${DATA}bm.list > /dev/null 2>&1
+fi
+
+sudo rm ${DATA}bm.list_* > /dev/null 2>&1
+
+#------- Create bm.list from DMR_Hotsts.txt ----------------------------------------------
+
+value=$(cat ${DATA}bm.list)
+num=$(whiptail --title "Local Brandmeister Master Server" --menu "\
+\n
+      $T163
+" 30 42 20 ${value} 3>&1 1>&2 2>&3)
+if [ $? != 0 ]; then ${DVS}dvsmu $USER_NO; exit 0; fi
+
+sel_line=$(sudo awk '$1 == '"$num"' { print $2 }' ${DATA}bm.list)
+
+bm_master=
+bm_address=$(awk '$1 == "'${sel_line}'" { print $3 }' ${dir_host}DMR_Hosts.txt)
+# bm_password=$(awk '$1 == "'${sel_line}'" { print $4 }' ${dir_host}DMR_Hosts.txt)
+bm_port=$(awk '$1 == "'${sel_line}'" { print $5 }' ${dir_host}DMR_Hosts.txt)
+
 
 bm_password=$(whiptail --title "$T009" --inputbox "브랜드마이스터 비밀번호" 10 60 ${bm_password} 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu $USER_NO; exit 0; fi
@@ -650,74 +691,20 @@ ${DVS}dvsmu; exit 0
 # END of user_delete
 #==============================================================
 
+###############################################################
+# Function user_dvswitch_upgrade
+###############################################################
+function user_dvswitch_upgrade() {
 
-###############################################################
-# Function dvswitch_upgrade
-###############################################################
-function dvswitch_upgrade() {
+source /var/lib/dvswitch/dvs/lan/korean.txt
+
 clear
-source /var/lib/dvswitch/dvs/lan/korean.txt
+whiptail --msgbox "\
 
-if (whiptail --title " DVSwitch 업그레이드 " --yesno "\
-$sp02(dvs에서 주사용자의 DVSwitch를 업그레이드 한 후, 본 작업을 진행하는것이 좋습니다)
+$sp04 추가사용자의 DVSwitch 업그레이드 및 재설정.
 
-$sp03 주사용자와 추가사용자의 DVSwitch 프로그램을 비교한 후 업그레이드합니다.
-
-$sp03 비교작업을 진행하시겠습니까?  $T005
-" 12 90);
-        then :
-        else ${DVS}dvsmu A; exit 0
-fi
-
-#-----------------------------------------------------------
-
-pse_wait
-
-user=$user_array
-
-for user in $user; do
-if [ -d /opt/user${user} ]; then
-        mmdvm=$(diff -s /opt/MMDVM_Bridge/MMDVM_Bridge /opt/user${user}/MMDVM_Bridge)
-        mmdvm=$(echo "$mmdvm" | rev | cut -d' ' -f1 | rev)
-
-        analog=$(diff -s /opt/Analog_Bridge/Analog_Bridge /opt/user${user}/Analog_Bridge)
-        analog=$(echo "$analog" | rev | cut -d' ' -f1 | rev)
-
-        dvs_M=$(/opt/MMDVM_Bridge/dvswitch.sh version)
-        dvs_u=$(/opt/user${user}/dvswitch.sh version)
-
-        if [ $mmdvm != "identical" ] || [ $analog != "identical" ] || [ "$dvs_M" != "$dvs_u" ]; then
-                upgrade=yes; break
-        fi
-fi
-done
-
-#-----------------------------------------------------------
-if [ "$upgrade" = yes ]; then :
-
-else
-        clear
-        whiptail --msgbox "\
-
-$sp06 주사용자와 동일한 버전을 사용중입니다.
-        " 9 60 1
-
-        ${DVS}dvsmu A; exit 0
-fi
-
-source /var/lib/dvswitch/dvs/lan/korean.txt
-
-if (whiptail --title " DVSwitch 업그레이드 " --yesno "\
-$sp03 주사용자의 DVSwitch 프로그램 중 일부가 업그레이드되었습니다.
-
-$sp03 추가사용자 DVSwitch를 업그레이드/재설정 하시겠습니까? (사용자당 약 20초)
-
-$sp03 $T005
-" 12 85);
-        then :
-        else ${DVS}dvsmu A; exit 0
-fi
-if [ $? != 0 ]; then ${DVS}dvsmu A; exit 0; fi
+$sp04 사용자당 약 20초 소요.
+" 10 60 2
 
 #-----------------------------------------------------------
 user=$user_array
@@ -731,12 +718,12 @@ if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
 let "complete=complete+15"
 echo -e "$complete"
 
-	sudo systemctl stop mmdvm_bridge${user} analog_bridge${user} md380-emu${user} > /dev/null 2>&1
+    sudo systemctl stop mmdvm_bridge${user} analog_bridge${user} md380-emu${user} > /dev/null 2>&1
 
-	# Function
-	file_copy_and_initialize ${user}
+    # Function
+    file_copy_and_initialize ${user}
 
-	var_to_ini ${user} upgrade
+    var_to_ini ${user} upgrade
 
 } |whiptail --title "$T029" --gauge "User${user} 업그레이드 및 설정중..." 6 60 0
 
@@ -746,15 +733,111 @@ done
 clear
 whiptail --msgbox "\
 
-$sp04 업그레이드 및 설정이 완료되었습니다.
-" 9 50 1
+$sp04 추가사용자의 DVSwitch 업그레이드 및 재설정 완료.
+" 9 60 1
 
-${DVS}dvsmu A; exit 0
+${DVS}dvsmu U; exit 0
+}
+#==============================================================
+# END of user_dvswitch_upgrade
+#==============================================================
+
+###############################################################
+# Function dvswitch_upgrade_excution
+###############################################################
+function dvswitch_upgrade_excution() {
+
+source /var/lib/dvswitch/dvs/var.txt
+
+sudo \mv -f ${DATA}var.txt ${DATA}var.old > /dev/null 2>&1
+
+sudo apt-get install dvswitch-server -y > /dev/null 2>&1
+
+sudo \mv -f /var/lib/dvswitch/dvs/var.old /var/lib/dvswitch/dvs/var.txt > /dev/null 2>&1
+
+# After upgrading, if [there is dvsm.basic] -> meaning setting is Advanced Macro Configuration
+if [ -e ${AB}dvsm.basic ]; then
+#    if there is not character "Advanced" in dvsm.macro -> updated & upgraded and dvsm.macro is brand new
+        if [[ -z `grep "Advanced" ${AB}dvsm.macro` ]]; then
+                sudo \cp -f ${adv}dvsm.macro ${AB}dvsm.macro
+        fi
+fi
+
+language=`echo ${language} | tr '[A-Z]' '[a-z]'`
+sudo \cp -f ${lan}${language}.txt ${lan}language.txt
+
+
+if [[ -z `sudo grep ${dmr_id} ${AB}Analog_Bridge.ini` ]] || \
+[[ -z `sudo grep ${call_sign} ${MB}MMDVM_Bridge.ini` ]] || \
+[[ -z `sudo grep ${call_sign} /opt/NXDNGateway/NXDNGateway.ini` ]] || \
+[[ -z `sudo grep ${call_sign} /opt/P25Gateway/P25Gateway.ini` ]] || \
+[[ -z `sudo grep ${call_sign} /opt/YSFGateway/YSFGateway.ini` ]] || \
+[[ -z `sudo grep ${call_sign} /etc/ircddbgateway` ]];
+then
+
+sudo ${DVS}init_config.sh return > /dev/null 2>&1
+
+sudo systemctl restart $services > /dev/null 2>&1
+
+fi
+}
+#==============================================================
+# END of dvswitch_upgrade_excution
+#==============================================================
+
+###############################################################
+# Function dvswitch_upgrade
+###############################################################
+function dvswitch_upgrade() {
+
+TERM=ansi whiptail --title "$T029" --infobox "\
+$sp04 업그레이드 확인 중.
+
+$sp04 다소 시간이 걸립니다............
+" 10 60
+
+sudo apt-get update > /dev/null 2>&1
+
+if ! apt-get -s upgrade | grep -q "^Inst dvswitch-server "; then
+
+clear
+whiptail --msgbox "\
+$sp04 현재 DVSwitch 는 최신버전입니다.
+
+$sp04 작업을 완료합니다.
+" 10 60
+
+${DVS}dvsmu U; exit 0
+
+else
+
+
+clear
+whiptail --msgbox "\
+$sp04 DVSwitch 의 최신 팩케지가 있습니다.
+
+$sp04 설치를 시작합니다.
+" 10 60 3
+
+TERM=ansi whiptail --title "업그레이드" --infobox "\
+$sp04 주사용자의 DVSwitch 최신 팩케지 설치 중........
+" 9 60
+
+	dvswitch_upgrade_excution
+
+clear
+whiptail --msgbox "\
+
+$sp04 주사용자의 DVSwitch 최신 팩케지 설치 완료.
+" 9 60 2
+
+user_dvswitch_upgrade
+
+fi
 }
 #==============================================================
 # END of dvswitch_upgrade
 #==============================================================
-
 
 ###############################################################
 # Function dvsmu_upgrade
@@ -791,7 +874,7 @@ if [ $ver_dn -le $ver_now ]; then
 $sp04 현재 v.${ver_now_no}  최신 버전을 사용중입니다.
         " 9 50 1
 
-        ${DVS}dvsmu A; exit 0
+        ${DVS}dvsmu U; exit 0
 
 elif [ "$ver_dn" = "" ]; then
         clear
@@ -802,7 +885,7 @@ $sp08 버전 확인이 되지 않습니다.
 $sp08 다시 확인하시기 바랍니다.
         " 11 50 1
 
-        ${DVS}dvsmu A; exit 0
+        ${DVS}dvsmu U; exit 0
 
 elif [ $ver_dn -gt $ver_now ]; then
 	clear
@@ -815,11 +898,13 @@ $sp10 $T005
         " 12 70);
         then
 	pse_wait
-        random_char=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 12 | sed 1q)
-        sudo wget -O ${DVS}${random_char}.sh https://raw.githubusercontent.com/hl5btf/DVSMU/main/upgrade.sh > /dev/null 2>&1
-        sudo chmod +x ${DVS}${random_char}.sh > /dev/null 2>&1;
-        ${DVS}${random_char}.sh > /dev/null 2>&1;
-        sudo rm ${DVS}${random_char}.sh > /dev/null 2>&1;
+
+	file=/usr/local/dvs/dvsmu_upgrade.sh
+        sudo wget -O $file https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu_upgrade.sh > /dev/null 2>&1
+	sudo chmod +x $file
+	sudo ./$file
+
+	sudo rm $file
 
 	clear
 	whiptail --msgbox "\
@@ -827,14 +912,40 @@ $sp10 $T005
 $sp08 업그레이드가 완료되었습니다.
 	" 9 50 1
 
-	${DVS}dvsmu A; exit 0
+	${DVS}dvsmu U; exit 0
 
-        else ${DVS}dvsmu A; exit 0
+        else ${DVS}dvsmu U; exit 0
 	fi
 fi
 }
 #==============================================================
 # END of dvsmu_upgrade
+#==============================================================
+
+###############################################################
+# Function _upgrade
+###############################################################
+function _upgrade() {
+sel=$(whiptail --title " 업그레이드 " --menu "\
+\n
+" 10 40 3 \
+"1" "DVSwitch 업그레이드" \
+"2" "dvsmu 업그레이드" \
+"3" "Back" \
+3>&1 1>&2 2>&3)
+if [ $? != 0 ]; then
+ ${DVS}dvsmu A; exit 0; fi
+case $sel in
+1)
+dvswitch_upgrade ;;
+2)
+dvsmu_upgrade ;;
+3)
+${DVS}dvsmu A; exit 0 ;;
+esac
+}
+#==============================================================
+# END of _upgrade
 #==============================================================
 
 #--------------------------------------------------------------
@@ -1049,24 +1160,27 @@ sel3=$(whiptail --title " Main User Configuration " --menu "\
 \n
 $sp05 MAIN_USER  $call_sign_M $dmr_id $ext $usrp_port_M
 -------------------------------------------------------
-" 15 50 4 \
-"1" "로그 확인--->" \
-"2" "파일 관리--->" \
-"3" "서비스 재시작" \
-"4" "Back to MAIN" \
+" 16 55 5 \
+"1" "주사용자 설정및변경" \
+"2" "로그 확인--->" \
+"3" "파일 관리--->" \
+"4" "서비스 재시작" \
+"5" "Back to MAIN" \
 3>&1 1>&2 2>&3)
 
 if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
 
 case $sel3 in
 1)
-main_user_log_menu; exit 0 ;;
+config_main_user.sh; exit 0 ;;
 2)
-main_user_file_menu; exit 0 ;;
+main_user_log_menu; exit 0 ;;
 3)
+main_user_file_menu; exit 0 ;;
+4)
 pse_wait
 ${DVS}88_restart.sh; ${DVS}dvsmu M; exit 0 ;;
-4)
+5)
 ${DVS}dvsmu; exit 0 ;;
 esac
 
@@ -2115,16 +2229,14 @@ sys_admin_z
 else
 sel=$(whiptail --title " 시스템 관리 " --menu "\
 \n
-" 17 50 9 \
+" 15 50 7 \
 "1" "시스템 모니터링" \
 "2" "시스템 최적화" \
 "3" "시스템 리부팅" \
 "4" "1일1회 리부팅 설정" \
 "5" "BM 및 클라이언트 연결상태 확인" \
-"6" "추가사용자 DVSwitch 업그레이드" \
-"7" "dvsMU (Multi User) 업그레이드" \
-"8" "dvsmu.log 열기" \
-"9" "Back to Main" \
+"6" "업그레이드" \
+"7" "Back to Main" \
 3>&1 1>&2 2>&3)
 
 if [ $? != 0 ]; then ${DVS}dvsmu; exit 0
@@ -2156,18 +2268,8 @@ set_reboot ;;
 5)
 connection_status ;;
 6)
-dvswitch_upgrade ;;
+_upgrade ;;
 7)
-dvsmu_upgrade ;;
-8)
-if [ ! -e /var/log/dvswitch/dvsmu.log ]; then
-        echo "This is a Log file for dvsMU" | sudo tee /var/log/dvswitch/dvsmu.log > /dev/null 2>&1
-        log_line=--------------------------------------------------
-        sudo sed -i "1 i\\$log_line" /var/log/dvswitch/dvsmu.log
-fi
-sudo nano /var/log/dvswitch/dvsmu.log
-${DVS}dvsmu A; exit 0 ;;
-9)
 ${DVS}dvsmu; exit 0 ;;
 esac
 fi
@@ -2194,6 +2296,8 @@ if [ "$opt" = A ]; then sys_admin; fi
 if [ "$opt" = M ]; then main_user_config; fi
 if [ "$opt" = O ]; then system_optimizer; fi
 if [ "$opt" = R ]; then set_reboot; fi
+if [ "$opt" = U ]; then _upgrade; fi
+if [ "$opt" = sl ]; then sys_log; fi
 if [ "$opt" = misc ]; then misc_config; fi
 
 USER_NO=$1
