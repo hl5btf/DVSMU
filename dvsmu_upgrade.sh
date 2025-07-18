@@ -105,6 +105,20 @@ done
 
 #====== add_talkeralias =============================================
 function add_talkeralias() {
+
+if [ -e /var/lib/dvswitch/dvs/var.txt ] && [ x${call_sign} != x ]; then
+
+    sudo systemctl stop mmdvm_bridge > /dev/null 2>&1
+
+    file=/opt/MMDVM_Bridge/DVSwitch.ini
+        if [ "${talkerAlias}" = "" ];
+        then    sudo sed -i -e "/talkerAlias/ c talkerAlias = " $file
+        else    $update_ini $file DMR talkerAlias "${talkerAlias}"
+        fi
+#    $update_ini $file Info Description "${desc}"
+    sudo systemctl start mmdvm_bridge > /dev/null 2>&1
+fi
+
 for user in "${user_array[@]}"; do
 source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
@@ -117,7 +131,6 @@ if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
         else    $update_ini $file DMR talkerAlias "${talkerAlias}"
         fi
 #    $update_ini $file Info Description "${desc}"
-
     sudo systemctl start mmdvm_bridge${user} > /dev/null 2>&1
 fi
 done
