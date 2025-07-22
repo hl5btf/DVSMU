@@ -207,8 +207,8 @@ file=/var/lib/dvswitch/dvs/var00.txt
     do_add; n=0
 
 for user in "${user_array[@]}"; do
-source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
+    source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
     file=/var/lib/dvswitch/dvs/var${user}.txt
     do_add; n=0
 fi
