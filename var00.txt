@@ -1,12 +1,16 @@
 #!/bin/bash
 
 DVS=/usr/local/dvs/
+AB=/opt/userUSER_NO/
+MB=/opt/userUSER_NO/
 DATA=/var/lib/dvswitch/dvs/
 adv=${DATA}adv/
 lan=${DATA}lan/
 tgdb=${DATA}tgdb/
+tgdb_user=${DATA}tgdb/userUSER_NO/
 dir_host=/var/lib/mmdvm/
 
+DVSWITCH=/opt/userUSER_NO/dvswitch.sh
 MACRO="${DVSWITCH} macro"
 MESSAGE="${DVSWITCH} message"
 TUNE="${DVSWITCH} tune"
