@@ -10,9 +10,6 @@ source /var/lib/dvswitch/dvs/var.txt > /dev/null 2>&1
 
 user_array=(01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40)
 
-update_ini="sudo ${MB}dvswitch.sh updateINIFileValue"
-
-
 #====== replace_freq_of_all_users =============================================
 function replace_freq_of_all_users() {
 
@@ -37,6 +34,7 @@ if [ "$rx_freq" = "000000000" ]; then
 fi
 
 source /opt/MMDVM_Bridge/MMDVM_Bridge.ini > /dev/null 2>&1
+update_ini="sudo /opt/MMDVM_Bridge/dvswitch.sh updateINIFileValue"
 if [ "$RXFrequency" = "000000000" ]; then
     file=/opt/MMDVM_Bridge/MMDVM_Bridge.ini
     section=Info; tag=RXFrequency; value=430000000
@@ -48,6 +46,7 @@ fi
 for user in "${user_array[@]}"; do
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
     source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
+    update_ini="sudo /opt/user${user}/dvswitch.sh updateINIFileValue"
     if [ "$rx_freq" = "000000000" ]; then
         file=/var/lib/dvswitch/dvs/var${user}.txt
         tag=rx_freq; value=430000000
@@ -111,6 +110,7 @@ if [ -e /var/lib/dvswitch/dvs/var.txt ] && [ x${call_sign} != x ]; then
     sudo systemctl stop mmdvm_bridge > /dev/null 2>&1
 
     file=/opt/MMDVM_Bridge/DVSwitch.ini
+        update_ini="sudo /opt/MMDVM_Bridge/dvswitch.sh updateINIFileValue"
         if [ "${talkerAlias}" = "" ];
         then    sudo sed -i -e "/talkerAlias/ c talkerAlias = " $file
         else    $update_ini $file DMR talkerAlias "${talkerAlias}"
@@ -126,6 +126,7 @@ if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
     sudo systemctl stop mmdvm_bridge${user} > /dev/null 2>&1
 
     file=/opt/user${user}/DVSwitch.ini
+        update_ini="sudo /opt/user${user}/dvswitch.sh updateINIFileValue"
         if [ "${talkerAlias}" = "" ];
         then    sudo sed -i -e "/talkerAlias/ c talkerAlias = " $file
         else    $update_ini $file DMR talkerAlias "${talkerAlias}"
