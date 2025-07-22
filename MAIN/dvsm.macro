@@ -16,7 +16,7 @@ var MMDVM_DIR=/var/lib/mmdvm
 var NODE_DIR=/tmp
 var DVS_DIR=/usr/local/dvs
 
-var DVSWITCH=/opt/userUSER_NO/dvswitch.sh
+var DVSWITCH=/opt/MMDVM_Bridge/dvswitch.sh
 var DVSM=./dvsm.sh
 var MACRO=${DVSWITCH} macro
 var MESSAGE=${DVSWITCH} message
@@ -30,14 +30,13 @@ DSTAR = ${DVSM} dstar
 NXDN  = ${DVSM} nxdn
 P25   = ${DVSM} p25
 YSF   = ${DVSM} ysf
-ASL   = ${DVSM} asl
-STFU  = ${DVSM} stfu
 
 # Main contents of Adhoc Macros
 0                = ${MACRO} adv_main.txt
 mainmenu  = ${MACRO} adv_main.txt
 audio     = ${MACRO} adv_audio.txt
 dmr       = ${MACRO} adv_dmr.txt
+temp      = ${MACRO} adv_temp.txt
 sys       = ${MACRO} adv_sys.txt
 txgain    = ${DVSM} tx_gain
 rxgain    = ${DVSM} rx_gain
@@ -50,7 +49,7 @@ resetyes  = ${DVSM} reset_fvrt_db
 managetg  = ${MACRO} adv_managetg.txt
 ver = ${MESSAGE} "$(${DVSWITCH} version)"
 ver_ab = ${MESSAGE} "AB Version   $(${DVSWITCH} version AB)"
-chk_temp = sudo ${DVS_DIR}/temp.sh
+temp = sudo ${DVS_DIR}/temp.sh
 temp_on = sudo ${DVS_DIR}/temp_msg.sh -y
 temp_off = sudo ${DVS_DIR}/temp_msg.sh -n
 extra_1   = ${MACRO} extra_1.txt
@@ -62,9 +61,9 @@ extra_5   = ${MACRO} extra_5.txt
 
 
 # Hotspots
-# 11 = ${DVSM} hotspot_1
-# 12 = ${DVSM} hotspot_2
-# 13 = ${DVSM} hotspot_3
+11 = ${DVSM} hotspot_1
+12 = ${DVSM} hotspot_2
+13 = ${DVSM} hotspot_3
 
 
 # Restart DVSwitch services and Reboot the system
