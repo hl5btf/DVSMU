@@ -19,7 +19,7 @@ function replace_freq_of_all_users() {
 # 주파수가 00000 일 경우에만, 430으로 수정
 
 source /var/lib/dvswitch/dvs/var.txt > /dev/null 2>&1
-if [ $rx_freq = "000000000" ]; then
+if [ "$rx_freq" = "000000000" ]; then
     file=/var/lib/dvswitch/dvs/var.txt
     tag=rx_freq; value=430000000
     sudo sed -i -e "/^$tag=/ c $tag=$value" $file
@@ -28,7 +28,7 @@ if [ $rx_freq = "000000000" ]; then
 fi
 
 source /var/lib/dvswitch/dvs/var00.txt > /dev/null 2>&1
-if [ $rx_freq = "000000000" ]; then
+if [ "$rx_freq" = "000000000" ]; then
     file=/var/lib/dvswitch/dvs/var00.txt
     tag=rx_freq; value=430000000
     sudo sed -i -e "/^$tag=/ c $tag=$value" $file
@@ -37,7 +37,7 @@ if [ $rx_freq = "000000000" ]; then
 fi
 
 source /opt/MMDVM_Bridge/MMDVM_Bridge.ini > /dev/null 2>&1
-if [ $RXFrequency = "000000000" ]; then
+if [ "$RXFrequency" = "000000000" ]; then
     file=/opt/MMDVM_Bridge/MMDVM_Bridge.ini
     section=Info; tag=RXFrequency; value=430000000
     $update_ini $file $section $tag $value
@@ -48,7 +48,7 @@ fi
 for user in "${user_array[@]}"; do
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
     source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
-    if [ $rx_freq = "000000000" ]; then
+    if [ "$rx_freq" = "000000000" ]; then
         file=/var/lib/dvswitch/dvs/var${user}.txt
         tag=rx_freq; value=430000000
         sudo sed -i -e "/^$tag=/ c $tag=$value" $file
@@ -57,7 +57,7 @@ if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
     fi
 
     source /opt/user${user}/MMDVM_Bridge.ini > /dev/null 2>&1
-    if [ $RXFrequency = "000000000" ]; then
+    if [ "$RXFrequency" = "000000000" ]; then
         file=/opt/user${user}/MMDVM_Bridge.ini
         section=Info; tag=RXFrequency; value=430000000
         $update_ini $file $section $tag $value
