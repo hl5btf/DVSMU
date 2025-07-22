@@ -1,8 +1,6 @@
-- config.sh : setup.sh의 주요 내용을 정리한 프로그램. 현재 특별한 용도는 없음.
-
 - dvsmu_ver : dvsMU의 ver만 표시한 파일.(ver2.0 이전을 사용하는 사람들에게는 꼭 필요함) dvsMU를 upgrade하면, 필히 이 파일의 내용을 변경하여야 한다.
 
-- upgrade.sh : dvsMU 프로그램내의 메뉴에서 upgrade하면 이 파일이 실행된다.
+- dvsmu_upgrade.sh : dvsMU 프로그램내의 메뉴에서 upgrade하면 이 파일이 실행된다.
 
 - MAIN 폴더 : 국내배포용 이미지파일에 변경되는 내용 중 주사용자에게만 관련되는 내용.
 
