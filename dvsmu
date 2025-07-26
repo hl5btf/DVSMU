@@ -319,9 +319,8 @@ if [ $ar_status = "active" ]; then
         fi
 fi
 
-user=$user_array
 
-for user in $user; do
+for user in $user_array; do
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ $user != $USER_NO ]; then
         source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
         declare usrp_port_chk=$usrp_port
@@ -358,9 +357,8 @@ if [ $ar_status = "active" ]; then
         fi
 fi
 
-user=$user_array
 
-for user in $user; do
+for user in $user_array; do
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ $user != $USER_NO ]; then
         source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
         declare usrp_port_chk=$usrp_port
@@ -707,9 +705,8 @@ $sp04 사용자당 약 20초 소요.
 " 10 60 2
 
 #-----------------------------------------------------------
-user=$user_array
 
-for user in $user; do
+for user in $user_array; do
 
 source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 
@@ -1748,9 +1745,8 @@ source /var/lib/dvswitch/dvs/var.txt
         if [ ${#call_sign} = 5 ]; then declare call_sign_M="$call_sign$sp01"; fi
 
 
-user=$user_array
 
-for user in $user; do
+for user in $user_array; do
 source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
         declare call_sign${user}=$call_sign
@@ -1799,9 +1795,7 @@ fi
 #echo $con_BM_M
 
 #------------ sub_user의 BM 연결상태 확인 --------------------------------
-user=$user_array
-
-for user in $user; do
+for user in $user_array; do
 
 #file=/var/lib/dvswitch/dvs/var${user}.txt
 dir=/opt/user${user}
@@ -2017,9 +2011,7 @@ if [ $ar_status = "active" ]; then
 fi
 
 #-------------- sub_user의 클라이언트 연결시간 및 연결상태 확인 --------------------
-user=$user_array
-
-for user in $user; do
+for user in $user_array; do
 
 #file=/var/lib/dvswitch/dvs/var${user}.txt
 dir=/opt/user${user}
@@ -2326,9 +2318,8 @@ else
 	declare usrp_port_M=$usrp_port
 fi
 
-user=$user_array
 
-for user in $user; do
+for user in $user_array; do
 source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
 	declare call_sign${user}=$call_sign
