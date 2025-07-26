@@ -13,7 +13,11 @@ user_input :  호출부호, ID 등의 입력
 
 user_delete : 사용자 삭제
 
-dvswitch_upgrade
+user_dvswitch_upgrade : 추가사용자 DVSwitch upgrade
+
+dvswitch_upgrade_excution : 주사용자의 DVSwitch upgrade
+
+dvswitch_upgrade : DVSwitch의 최신버전이 있는지 확인
 
 dvsmu_upgrade
 
