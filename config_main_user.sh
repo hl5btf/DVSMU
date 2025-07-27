@@ -3,7 +3,7 @@
 #===================================
 SCRIPT_VERSION="1.0"
 SCRIPT_AUTHOR="HL5KY"
-SCRIPT_DATE="2025/07/12"
+SCRIPT_DATE="2025/07/22"
 #===================================
 
 source /var/lib/dvswitch/dvs/var.txt
@@ -618,6 +618,12 @@ fi
 ############################################
 #  MAIN SCRIPT
 ############################################
+
+
+if [ "$1" = "return" ]; then
+        clear
+        do_config return
+fi
 
 main_user_input
 
