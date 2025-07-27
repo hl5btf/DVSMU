@@ -1,0 +1,80 @@
+#!/bin/bash
+
+# dvsmu에서 필요한 함수만 불러오기
+eval "$(
+  awk '
+    /^main_user_dvswitch_upgrade *\(\)/,/^}/
+    /^file_copy_and_initialize *\(\)/,/^}/
+    /^var_to_ini *\(\)/,/^}/
+  ' /usr/local/dvs/dvsmu
+)"
+
+LOG_FILE="/var/log/dvswitch/auto_upgrade.log"
+
+# 로그 없으면 생성
+[ -f "$LOG_FILE" ] || sudo touch "$LOG_FILE"
+
+# 로그 줄 수가 100줄 넘으면 최근 100줄만 유지
+MAX_LINES=100
+TOTAL_LINES=$(wc -l < "$LOG_FILE")
+
+if [ "$TOTAL_LINES" -gt "$MAX_LINES" ]; then
+    tail -n $MAX_LINES "$LOG_FILE" > "${LOG_FILE}.tmp"
+    mv "${LOG_FILE}.tmp" "$LOG_FILE"
+fi
+
+echo "AutoUpgrade check started at $(date)" >> "$LOG_FILE"
+
+# check DVSwitch -----------------------------------
+
+sudo apt-get update
+
+echo "Check DVSwitch" >> "$LOG_FILE"
+
+if apt-get -s upgrade | grep -q "^Inst dvswitch-server "; then
+	# call Function
+	main_user_dvswitch_upgrade
+	echo "Found upgrade of DVSwitch" >> "$LOG_FILE"
+
+	for user in $user_array; do
+		if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
+			source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
+    		sudo systemctl stop mmdvm_bridge${user} analog_bridge${user} md380-emu${user} > /dev/null 2>&1
+
+    		# call Function
+    		file_copy_and_initialize ${user}
+    		var_to_ini ${user} upgrade
+		fi
+	done
+	echo "DVSwitch upgrade done" >> "$LOG_FILE"
+else
+	echo "Current DVSwitch is the latest" >> "$LOG_FILE"
+fi
+
+# check dvsmu --------------------------
+
+LOCAL_FILE="/usr/local/dvs/dvsmu"
+REMOTE_URL="https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu"
+
+LOCAL_VERSION=$(grep '^SCRIPT_VERSION=' "$LOCAL_FILE" | cut -d'"' -f2)
+REMOTE_VERSION=$(curl -s --max-time 5 "$REMOTE_URL" | grep '^SCRIPT_VERSION=' | head -n 1 | cut -d'"' -f2)
+
+# 두 버전 중 더 낮은(작은) 버전을 구함
+LOWEST=$(printf '%s\n%s\n' "$LOCAL_VERSION" "$REMOTE_VERSION" | sort -V | head -n 1)
+
+echo "Check dvsmu" >> "$LOG_FILE"
+if [ "$LOCAL_VERSION" = "$REMOTE_VERSION" ]; then
+    echo "Current dvsmu is the latest" >> "$LOG_FILE"
+elif [ "$LOWEST" = "$LOCAL_VERSION" ]; then
+	echo "Found upgrade of dvsmu" >> "$LOG_FILE"
+        file=/usr/local/dvs/dvsmu_upgrade.sh
+        sudo wget -O $file https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu_upgrade.sh > /dev/null 2>&1
+        sudo chmod +x $file
+        sudo $file
+        sudo rm $file
+	echo "dvsmu upgrade done" >> "$LOG_FILE"
+else
+	echo "can't check the version" >> "$LOG_FILE"
+fi
+
+echo "------------------------------------------------------------" >> "$LOG_FILE"
