@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# dvsmu v2.01 이전 사용자를 위해서 필요함
+# dvsmu v2.01 또는 이전 사용자를 위해서 필요함
 
 file=/usr/local/dvs/dvsmu_upgrade.sh
 sudo wget -O $file https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu_upgrade.sh > /dev/null 2>&1
@@ -11,7 +11,7 @@ sudo rm $file
 exit 0
 
 
-# dvsmu v2.01 이전 사용자를 위해서 필요함
+# dvsmu v2.01 또는 이전 사용자를 위해서 필요함
 
 # dvsmu v2.01까지는 function dvsmu_upgrade() 에서 아래의 파일을 다운로드해서 업그레이드하도록 되어 있기 때문에
 # https://raw.githubusercontent.com/hl5btf/DVSMU/main/upgrade.sh
