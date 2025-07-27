@@ -6,4 +6,4 @@ sudo chmod +x $file
 sudo $file
 sudo rm $file
 
-exit 1
+exit 0
