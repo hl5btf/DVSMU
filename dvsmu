@@ -3,9 +3,9 @@
 source /var/lib/dvswitch/dvs/var.txt
 
 #===================================
-SCRIPT_VERSION="2.01"
+SCRIPT_VERSION="3.0"
 SCRIPT_AUTHOR="HL5KY"
-SCRIPT_DATE="2025-07-08"
+SCRIPT_DATE="2025-07-27"
 #===================================
 
 if [ "$1" != "" ]; then
@@ -42,7 +42,7 @@ source /var/lib/dvswitch/dvs/var$5.txt
 
 USER_NO=$5
 
-file=${AB}Analog_Bridge.ini
+file=/opt/user$USER_NO/Analog_Bridge.ini
 sec=DV3000
 
 line_contents=$(sed  -n "/^\[$sec\]/,/^\[/ p" "$file" | sed -n "/$1/p" | sed -n "/$2/p")
@@ -705,12 +705,10 @@ $sp04 사용자당 약 20초 소요.
 " 10 60 2
 
 #-----------------------------------------------------------
-
 for user in $user_array; do
 
-source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
-
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
+source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 {
 let "complete=complete+15"
 echo -e "$complete"
@@ -740,9 +738,9 @@ ${DVS}dvsmu U; exit 0
 #==============================================================
 
 ###############################################################
-# Function dvswitch_upgrade_excution
+# Function main_user_dvswitch_upgrade
 ###############################################################
-function dvswitch_upgrade_excution() {
+function main_user_dvswitch_upgrade() {
 
 source /var/lib/dvswitch/dvs/var.txt
 
@@ -772,14 +770,15 @@ if [[ -z `sudo grep ${dmr_id} ${AB}Analog_Bridge.ini` ]] || \
 [[ -z `sudo grep ${call_sign} /etc/ircddbgateway` ]];
 then
 
-sudo ${DVS}init_config.sh return > /dev/null 2>&1
+
+sudo ${DVS}config_main_user.sh return
 
 sudo systemctl restart $services > /dev/null 2>&1
 
 fi
 }
 #==============================================================
-# END of dvswitch_upgrade_excution
+# END of main_user_dvswitch_upgrade
 #==============================================================
 
 ###############################################################
@@ -820,7 +819,7 @@ TERM=ansi whiptail --title "업그레이드" --infobox "\
 $sp04 주사용자의 DVSwitch 최신 팩케지 설치 중........
 " 9 60
 
-	dvswitch_upgrade_excution
+	main_user_dvswitch_upgrade
 
 clear
 whiptail --msgbox "\
@@ -845,35 +844,14 @@ clear
 source /var/lib/dvswitch/dvs/lan/korean.txt
 TERM=ansi whiptail --title "확인중" --infobox "$T006" 8 60
 
-file=/usr/local/dvs/dvsmu
-ver_now=$($file -v)
-ver_now_no=$ver_now
-ver_now=$( echo "$ver_now * 100" |bc )
-ver_now=${ver_now%.*}
-#echo $ver_now
+LOCAL_FILE="$(realpath "$0")"
+REMOTE_URL="https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu"
 
-file=/usr/local/dvs/dvsmu_dn
-sudo wget -O $file https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu > /dev/null 2>&1
-sudo chmod +x $file
-ver_dn=$($file -v)
-new_ver_no=$ver_dn
-ver_dn=$( echo "$ver_dn * 100" |bc )
-ver_dn=${ver_dn%.*}
-#echo $ver_dn
-sudo rm $file
+LOCAL_VERSION=$(grep '^SCRIPT_VERSION=' "$LOCAL_FILE" | cut -d'"' -f2)
+REMOTE_VERSION=$(curl -s --max-time 5 "$REMOTE_URL" | grep '^SCRIPT_VERSION=' | head -n 1 | cut -d'"' -f2)
 
-#-----------------------------------------------------------
-if [ $ver_dn -le $ver_now ]; then
-
-        clear
-        whiptail --msgbox "\
-
-$sp04 현재 v.${ver_now_no}  최신 버전을 사용중입니다.
-        " 9 50 1
-
-        ${DVS}dvsmu U; exit 0
-
-elif [ "$ver_dn" = "" ]; then
+# curl 실패 대비
+if [ -z "$REMOTE_VERSION" ]; then
         clear
         whiptail --msgbox "\
 
@@ -883,36 +861,58 @@ $sp08 다시 확인하시기 바랍니다.
         " 11 50 1
 
         ${DVS}dvsmu U; exit 0
+fi
 
-elif [ $ver_dn -gt $ver_now ]; then
-	clear
+# 두 버전 중 더 낮은(작은) 버전을 구함
+LOWEST=$(printf '%s\n%s\n' "$LOCAL_VERSION" "$REMOTE_VERSION" | sort -V | head -n 1)
+
+if [ "$LOCAL_VERSION" = "$REMOTE_VERSION" ]; then
+        clear
+        whiptail --msgbox "\
+
+$sp04 현재 v.$REMOTE_VERSION  최신 버전을 사용중입니다.
+        " 9 50 1
+
+        ${DVS}dvsmu U; exit 0
+elif [ "$LOWEST" = "$LOCAL_VERSION" ]; then
+        clear
         if (whiptail --title " dvsMU 업그레이드 " --yesno "\
-$sp10 최신버전(v.$new_ver_no)으로 업그레이드가 가능합니다.
+$sp10 최신버전(v.$REMOTE_VERSION)으로 업그레이드가 가능합니다.
 
 $sp10 업그레이드 하시겠습니까?
 
 $sp10 $T005
         " 12 70);
         then
-	pse_wait
+        pse_wait
 
-	file=/usr/local/dvs/dvsmu_upgrade.sh
+        file=/usr/local/dvs/dvsmu_upgrade.sh
         sudo wget -O $file https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu_upgrade.sh > /dev/null 2>&1
-	sudo chmod +x $file
-	sudo ./$file
+        sudo chmod +x $file
+        sudo $file
 
-	sudo rm $file
+        sudo rm $file
 
-	clear
-	whiptail --msgbox "\
+        clear
+        whiptail --msgbox "\
 
 $sp08 업그레이드가 완료되었습니다.
-	" 9 50 1
+        " 9 50 1
 
-	${DVS}dvsmu U; exit 0
+        ${DVS}dvsmu U; exit 0
 
         else ${DVS}dvsmu U; exit 0
-	fi
+        fi
+else
+        clear
+        whiptail --msgbox "\
+
+$sp08 버전 확인이 되지 않습니다.
+
+$sp08 다시 확인하시기 바랍니다.
+        " 11 50 1
+
+        ${DVS}dvsmu U; exit 0
 fi
 }
 #==============================================================
@@ -1169,14 +1169,14 @@ if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
 
 case $sel3 in
 1)
-config_main_user.sh; exit 0 ;;
+sudo ${DVS}config_main_user.sh; exit 0 ;;
 2)
 main_user_log_menu; exit 0 ;;
 3)
 main_user_file_menu; exit 0 ;;
 4)
 pse_wait
-${DVS}88_restart.sh; ${DVS}dvsmu M; exit 0 ;;
+sudo ${DVS}88_restart.sh; ${DVS}dvsmu M; exit 0 ;;
 5)
 ${DVS}dvsmu; exit 0 ;;
 esac
@@ -1487,49 +1487,49 @@ esac
 pse_wait
 sudo systemctl enable ircddbgatewayd > /dev/null 2>&1
 sudo systemctl start ircddbgatewayd > /dev/null 2>&1
-${DVS}88_restart.sh;
+sudo ${DVS}88_restart.sh;
 
 elif [ $1 = dstar ] && [ $change = I ] && [ $dstar_chk = "active" ]; then
 pse_wait
 sudo systemctl disable ircddbgatewayd quantar_bridge > /dev/null 2>&1
 sudo systemctl stop ircddbgatewayd quantar_bridge > /dev/null 2>&1
-${DVS}88_restart.sh;
+sudo ${DVS}88_restart.sh;
 
 elif [ $1 = ysf ] && [ $change = A ] && [ $ysf_chk != "active" ]; then
 pse_wait
 sudo systemctl enable ysfgateway ysfparrot > /dev/null 2>&1
 sudo systemctl start ysfgateway ysfparrot > /dev/null 2>&1
-${DVS}88_restart.sh;
+sudo ${DVS}88_restart.sh;
 
 elif [ $1 = ysf ] && [ $change = I ] && [ $ysf_chk = "active" ]; then
 pse_wait
 sudo systemctl disable ysfgateway ysfparrot quantar_bridge > /dev/null 2>&1
 sudo systemctl stop ysfgateway ysfparrot quantar_bridge > /dev/null 2>&1
-${DVS}88_restart.sh;
+sudo ${DVS}88_restart.sh;
 
 elif [ $1 = nxdn ] && [ $change = A ] && [ $nxdn_chk != "active" ]; then
 pse_wait
 sudo systemctl enable nxdngateway nxdnparrot > /dev/null 2>&1
 sudo systemctl start nxdngateway nxdnparrot > /dev/null 2>&1
-${DVS}88_restart.sh;
+sudo ${DVS}88_restart.sh;
 
 elif [ $1 = nxdn ] && [ $change = I ] && [ $nxdn_chk = "active" ]; then
 pse_wait
 sudo systemctl disable nxdngateway nxdnparrot quantar_bridge > /dev/null 2>&1
 sudo systemctl stop nxdngateway nxdnparrot quantar_bridge > /dev/null 2>&1
-${DVS}88_restart.sh;
+sudo ${DVS}88_restart.sh;
 
 elif [ $1 = p25 ] && [ $change = A ] && [ $p25_chk != "active" ]; then
 pse_wait
 sudo systemctl enable p25gateway p25parrot > /dev/null 2>&1
 sudo systemctl start p25gateway p25parrot > /dev/null 2>&1
-${DVS}88_restart.sh;
+sudo ${DVS}88_restart.sh;
 
 elif [ $1 = p25 ] && [ $change = I ] && [ $p25_chk = "active" ]; then
 pse_wait
 sudo systemctl disable p25gateway p25parrot quantar_bridge > /dev/null 2>&1
 sudo systemctl stop p25gateway p25parrot quantar_bridge > /dev/null 2>&1
-${DVS}88_restart.sh;
+sudo ${DVS}88_restart.sh;
 
 elif [ $1 = lighttpd ] && [ $change = A ] && [ $lighttpd_chk != "active" ]; then
 pse_wait
@@ -1745,10 +1745,9 @@ source /var/lib/dvswitch/dvs/var.txt
         if [ ${#call_sign} = 5 ]; then declare call_sign_M="$call_sign$sp01"; fi
 
 
-
 for user in $user_array; do
-source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
+	source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
         declare call_sign${user}=$call_sign
         if [ ${#call_sign} = 4 ]; then declare call_sign${user}="$call_sign$sp02"; fi
         if [ ${#call_sign} = 5 ]; then declare call_sign${user}="$call_sign$sp01"; fi
@@ -2224,11 +2223,10 @@ sel=$(whiptail --title " 시스템 관리 " --menu "\
 " 15 50 7 \
 "1" "시스템 모니터링" \
 "2" "시스템 최적화" \
-"3" "시스템 리부팅" \
-"4" "1일1회 리부팅 설정" \
-"5" "BM 및 클라이언트 연결상태 확인" \
-"6" "업그레이드" \
-"7" "Back to Main" \
+"3" "1일1회 리부팅 설정" \
+"4" "BM 및 클라이언트 연결상태 확인" \
+"5" "업그레이드" \
+"6" "Back to Main" \
 3>&1 1>&2 2>&3)
 
 if [ $? != 0 ]; then ${DVS}dvsmu; exit 0
@@ -2246,22 +2244,12 @@ htop; ${DVS}dvsmu A ;;
 2)
 system_optimizer ;;
 3)
-clear
-source /var/lib/dvswitch/dvs/lan/korean.txt
-if (whiptail --title " 시스템 리부팅 " --yesno "\
-
-$sp10 지금 리부팅 하시겠습니까?
-" 9 50);
-then sudo reboot
-else ${DVS}dvsmu A; exit 0
-fi ;;
-4)
 set_reboot ;;
-5)
+4)
 connection_status ;;
-6)
+5)
 _upgrade ;;
-7)
+6)
 ${DVS}dvsmu; exit 0 ;;
 esac
 fi
@@ -2320,8 +2308,8 @@ fi
 
 
 for user in $user_array; do
-source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
+	source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 	declare call_sign${user}=$call_sign
 	if [ ${#call_sign} = 4 ]; then declare call_sign${user}="$call_sign$sp02"; fi
 	if [ ${#call_sign} = 5 ]; then declare call_sign${user}="$call_sign$sp01"; fi
