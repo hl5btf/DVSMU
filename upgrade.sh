@@ -19,7 +19,7 @@ exit 0
 # 현재의 파일에서 dvsmu_upgrade.sh를 실행하도록 함
 
 # 참고로 /usr/local/dvs 폴더에는 기존에 dvs용의 upgrade.sh 파일 있음
-# 다운로드시 기존의 파일을 덮어쓸 우려가 있기 때문에 아래와 같이 처리함
+# dvsmu v2.01에서 다운로드시 기존의 파일을 덮어쓸 우려가 있기 때문에 아래와 같이 처리함
 # 다운로드한 파일의 이름을 임의의 이름으로 저장하여 사용함
 
 # random_char=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 12 | sed 1q)
