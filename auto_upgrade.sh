@@ -70,17 +70,18 @@ LOWEST=$(printf '%s\n%s\n' "$LOCAL_VERSION" "$REMOTE_VERSION" | sort -V | head -
 
 echo "Check dvsmu" >> "$LOG_FILE"
 if [ "$LOCAL_VERSION" = "$REMOTE_VERSION" ]; then
-    echo "Current dvsmu is the latest" >> "$LOG_FILE"
+    echo "Current dvsmu v$LOCAL_VERSION is the latest" >> "$LOG_FILE"
 elif [ "$LOWEST" = "$LOCAL_VERSION" ]; then
-	echo "Found upgrade of dvsmu" >> "$LOG_FILE"
+        echo "Found upgrade v$REMOTE_VERSION of dvsmu" >> "$LOG_FILE"
         file=/usr/local/dvs/dvsmu_upgrade.sh
         sudo wget -O $file https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu_upgrade.sh > /dev/null 2>&1
         sudo chmod +x $file
         sudo $file
         sudo rm $file
-	echo "dvsmu upgrade done" >> "$LOG_FILE"
+        echo "dvsmu v$REMOTE_VERSION upgrade done" >> "$LOG_FILE"
 else
-	echo "can't check the version" >> "$LOG_FILE"
+        echo "can't check the version" >> "$LOG_FILE"
 fi
 
 echo "------------------------------------------------------------" >> "$LOG_FILE"
+
