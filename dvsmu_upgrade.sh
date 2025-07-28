@@ -137,6 +137,54 @@ fi
 done
 }
 
+#====== setup_sudo_nopasswd =============================================
+function setup_sudo_nopasswd() {
+# === 일반 사용자만 sudo NOPASSWD로 추가 (메인 sudoers 수정, 중복 방지) ===
+
+# 1) 일반 사용자(UID 1000~65533) 목록 가져오기
+USERS=$(awk -F: '$3>=1000 && $3<65534 {print $1}' /etc/passwd)
+
+#  사용자 계정을 찾지 못했다면
+if [ -z "$USERS" ]; then
+    exit 1
+fi
+
+# 2) sudoers 백업
+sudo cp /etc/sudoers /etc/sudoers.bak.$(date +%Y%m%d%H%M%S)
+
+# 3) 추가할 사용자 중 이미 등록되지 않은 사용자만 필터링
+NEED_ADD=""
+for user in $USERS; do
+    if sudo grep -q "^$user ALL=(ALL) NOPASSWD:ALL" /etc/sudoers; then
+        : # $user 이미 sudoers에 등록됨 → 건너뜀
+    else
+        # $user 신규 추가
+        NEED_ADD="$NEED_ADD$user"$'\n'
+    fi
+done
+
+# 신규 추가 대상이 없으면 종료
+if [ -z "$NEED_ADD" ]; then
+    exit 0
+fi
+
+# 4) 메인 sudoers에 추가할 내용 준비
+TMPFILE=$(mktemp)
+echo "# >>> Custom NOPASSWD users (자동 추가)" > "$TMPFILE"
+printf "%s" "$NEED_ADD" | while read -r u; do
+    [ -n "$u" ] && echo "$u ALL=(ALL) NOPASSWD:ALL" >> "$TMPFILE"
+done
+echo >> "$TMPFILE"  # 마지막 빈줄
+
+# 5) visudo를 이용해 안전하게 sudoers 업데이트
+sudo bash -c "EDITOR='tee -a' visudo < '$TMPFILE'"
+
+# 6) 임시파일 지우기
+rm "$TMPFILE"
+
+# sudo visudo 로 확인하면 내용이 반영되어 있을 것입니다.
+}
+
 #====== download_and_update_apps =============================================
 function download_and_update_apps() {
 files="dvsmu man_log DMRIds_chk.sh bm_watchdog.sh config_main_user.sh"
@@ -151,7 +199,6 @@ done
 # sudo wget -O /usr/local/dvs/man_log https://raw.githubusercontent.com/hl5btf/DVSMU/main/man_log
 # sudo wget -O /usr/local/dvs/DMRIds_chk.sh https://raw.githubusercontent.com/hl5btf/DVSMU/main/DMRIds_chk.sh
 }
-
 
 #====== set_crontab =============================================
 function set_crontab() {
@@ -223,6 +270,7 @@ replace_freq_of_all_users
 delete_stz_value_for_var00
 add_45039_for_fvrt
 add_talkeralias
+setup_sudo_nopasswd
 # 아래 3개는 Github hl5ky/dvsmu/stup.sh와 동일 (수정시 동일하게 수정해야 함)
 download_and_update_apps
 set_crontab
