@@ -139,7 +139,7 @@ done
 
 #====== download_and_update_apps =============================================
 function download_and_update_apps() {
-files="dvsmu man_log DMRIds_chk.sh bm_watchdog.sh config_main_user.sh"
+files="dvsmu man_log DMRIds_chk.sh bm_watchdog.sh config_main_user.sh auto_upgrade.sh"
 
 for file in $files; do
 sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file > /dev/null 2>&1
@@ -175,6 +175,10 @@ fi
 
 if ! sudo grep -q "bm_watchdog" "$FILE_CRON"; then
     echo "*/5 * * * * root /usr/local/dvs/bm_watchdog.sh" | sudo tee -a $FILE_CRON
+fi
+
+if ! sudo grep -q "auto_upgrade.sh" "$FILE_CRON"; then
+    echo "5 3 * * * root /usr/local/dvs/auto_upgrade.sh" | sudo tee -a $FILE_CRON
 fi
 }
 
