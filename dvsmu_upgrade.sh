@@ -107,9 +107,9 @@ function add_talkeralias() {
 
 if [ -e /var/lib/dvswitch/dvs/var.txt ] && [ x${call_sign} != x ]; then
     source /var/lib/dvswitch/dvs/var.txt > /dev/null 2>&1
-    if ! sudo grep -q "talkerAlias"; then
-        add_var_line talkerAlias ""
-    fi
+#    if ! sudo grep -q "talkerAlias"; then
+#        add_var_line talkerAlias ""
+#    fi
     sudo systemctl stop mmdvm_bridge > /dev/null 2>&1
 
     file=/opt/MMDVM_Bridge/DVSwitch.ini
@@ -173,8 +173,8 @@ fi
 
 # DMRIds_chk.sh 는 아래와 같이 잘못 입력된 경우가 있기 때문에 그 라인을 완전히 변경하도록 한다
 # $cron_daily_min_plus_3 $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh
-if grep -q "DMRIds_chk.sh" /etc/crontab; then
-    sudo sed -i '/DMRIds_chk.sh/d' $FILE_CRON
+if grep -q "DMRIds_chk.sh" "$FILE_CRON"; then
+    sudo sed -i '/DMRIds_chk.sh/d' "$FILE_CRON"
     echo "28 6 * * * root /usr/local/dvs/DMRIds_chk.sh" | sudo tee -a $FILE_CRON
 fi
 
