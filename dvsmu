@@ -2304,6 +2304,11 @@ else
 	declare rpt_id_M=$rpt_id
 	declare ext_M=${rpt_id:7:2}
 	declare usrp_port_M=$usrp_port
+        if [ -z "${talkerAlias}" ]; then
+                declare talkerAlias_M="talkerAlias"
+        else
+                declare talkerAlias_M="${talkerAlias:0:13}"
+        fi
 fi
 
 
@@ -2334,7 +2339,7 @@ sel=$(whiptail --title " DVSwitch Multi User " --menu "\
 \n
 " 31 60 23 \
 "A" "시스템 관리" \
-"M" "MAIN   $call_sign_M $dmr_id_M $ext_M $usrp_port_M talkerAlias" \
+"M" "MAIN   $call_sign_M $dmr_id_M $ext_M $usrp_port_M $talkerAlias_M" \
 "=" "============================================" \
 "01" "User01 $call_sign01 $dmr_id01 $ext01 $usrp_port01 $talkerAlias01" \
 "02" "User02 $call_sign02 $dmr_id02 $ext02 $usrp_port02 $talkerAlias02" \
