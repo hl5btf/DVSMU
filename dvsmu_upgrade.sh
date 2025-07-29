@@ -44,8 +44,8 @@ if [ "$RXFrequency" = "000000000" ]; then
 fi
 
 for user in "${user_array[@]}"; do
+source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
-    source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
     update_ini="sudo /opt/user${user}/dvswitch.sh updateINIFileValue"
     if [ "$rx_freq" = "000000000" ]; then
         file=/var/lib/dvswitch/dvs/var${user}.txt
@@ -92,8 +92,8 @@ if [[ -z $(sudo grep "45039" "$file") ]]; then
 fi
 
 for user in "${user_array[@]}"; do
+source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
-    source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
     file=/var/lib/dvswitch/dvs/tgdb/user${user}/DMR_fvrt_list.txt
     if [[ -z $(sudo grep "45039" "$file") ]]; then
         sudo wget -O /var/lib/dvswitch/dvs/tgdb/user${user}/DMR_fvrt_list.txt https://raw.githubusercontent.com/hl5btf/DVSMU/main/tgdb_KR/DMR_fvrt_list.txt > /dev/null 2>&1
@@ -123,8 +123,8 @@ if [ -e /var/lib/dvswitch/dvs/var.txt ] && [ x${call_sign} != x ]; then
 fi
 
 for user in "${user_array[@]}"; do
+source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
-    source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
     sudo systemctl stop mmdvm_bridge${user} > /dev/null 2>&1
 
     file=/opt/user${user}/DVSwitch.ini
