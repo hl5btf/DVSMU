@@ -169,7 +169,10 @@ if ! sudo grep -q "man_log" "$FILE_CRON"; then
     echo "0 3 * * * root /usr/local/dvs/man_log" | sudo tee -a $FILE_CRON
 fi
 
-if ! sudo grep -q "DMRIds" "$FILE_CRON"; then
+# DMRIds_chk.sh 는 아래와 같이 잘못 입력된 경우가 있기 때문에 그 라인을 완전히 변경하도록 한다
+# $cron_daily_min_plus_3 $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh
+if grep -q "DMRIds_chk.sh" /etc/crontab; then
+    sudo sed -i '/DMRIds_chk.sh/d' $FILE_CRON
     echo "28 6 * * * root /usr/local/dvs/DMRIds_chk.sh" | sudo tee -a $FILE_CRON
 fi
 
