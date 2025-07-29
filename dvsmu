@@ -706,9 +706,8 @@ $sp04 사용자당 약 20초 소요.
 
 #-----------------------------------------------------------
 for user in $user_array; do
-
-if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
 source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
+if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
 {
 let "complete=complete+15"
 echo -e "$complete"
@@ -1746,8 +1745,8 @@ source /var/lib/dvswitch/dvs/var.txt
 
 
 for user in $user_array; do
+source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
-	source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
         declare call_sign${user}=$call_sign
         if [ ${#call_sign} = 4 ]; then declare call_sign${user}="$call_sign$sp02"; fi
         if [ ${#call_sign} = 5 ]; then declare call_sign${user}="$call_sign$sp01"; fi
@@ -2313,8 +2312,8 @@ fi
 
 
 for user in $user_array; do
+source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
-	source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 	declare call_sign${user}=$call_sign
 	if [ ${#call_sign} = 4 ]; then declare call_sign${user}="$call_sign$sp02"; fi
 	if [ ${#call_sign} = 5 ]; then declare call_sign${user}="$call_sign$sp01"; fi
