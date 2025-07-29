@@ -107,9 +107,9 @@ function add_talkeralias() {
 
 if [ -e /var/lib/dvswitch/dvs/var.txt ] && [ x${call_sign} != x ]; then
     source /var/lib/dvswitch/dvs/var.txt > /dev/null 2>&1
-#    if ! sudo grep -q "talkerAlias"; then
-#        add_var_line talkerAlias ""
-#    fi
+    if ! sudo grep -q "talkerAlias"; then
+        echo "talkerAlias=" | sudo tee -a /var/lib/dvswitch/dvs/var.txt
+    fi
     sudo systemctl stop mmdvm_bridge > /dev/null 2>&1
 
     file=/opt/MMDVM_Bridge/DVSwitch.ini
