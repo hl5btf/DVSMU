@@ -7,13 +7,26 @@ SCRIPT_DATE="2025-07-27"
 #===================================
 
 # dvsmu에서 필요한 함수만 불러오기
-eval "$(
-  awk '
-    /^main_user_dvswitch_upgrade *\(\)/,/^}/
-    /^file_copy_and_initialize *\(\)/,/^}/
-    /^var_to_ini *\(\)/,/^}/
-  ' /usr/local/dvs/dvsmu
-)"
+dvsmu_file="/usr/local/dvs/dvsmu"
+temp_func_file="/tmp/temp_dvsmu_funcs.sh"
+functions=("main_user_dvswitch_upgrade" "file_copy_and_initialize" "var_to_ini")
+
+# 초기화
+> "$temp_func_file"
+
+for fname in "${functions[@]}"; do
+    tmp_part="/tmp/func_${fname}.sh"
+    > "$tmp_part"
+    awk "/^function $fname *\\(\\)/,/^}/" "$dvsmu_file" > "$tmp_part"
+
+    if [ -s "$tmp_part" ]; then
+        cat "$tmp_part" >> "$temp_func_file"
+        echo -e "\n" >> "$temp_func_file"
+done
+
+if [ -s "$temp_func_file" ]; then
+    source "$temp_func_file"
+fi
 
 LOG_FILE="/var/log/dvswitch/auto_upgrade.log"
 
@@ -56,6 +69,8 @@ if apt-get -s upgrade | grep -q "^Inst dvswitch-server "; then
 else
 	echo "Current DVSwitch is the latest" | sudo tee -a "$LOG_FILE"
 fi
+
+sudo rm -f "$temp_func_file"
 
 # check dvsmu --------------------------
 
