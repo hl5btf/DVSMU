@@ -1701,10 +1701,8 @@ if [ $? != 0 ]; then
 done
 
 sudo sed -i -e "/time=/ c #time=$new_timeset" $file
+sudo sed -i -e "/reboot=/ c #reboot=yes" $file
 sudo sed -i -e "/man_log/ c 0 $new_timeset * * * root /usr/local/dvs/man_log" $file
-if [[ -z `sudo grep "reboot=yes" $file` ]]; then
-        echo "#reboot=yes" | sudo tee -a $file > /dev/null 2>&1
-fi
 sudo systemctl restart cron
 ${DVS}dvsmu R; exit 0 ;;
 2)
@@ -1714,8 +1712,8 @@ $sp05 매일1회 리부팅 설정을 삭제하시겠습니까?
 
 " 9 60); then
 sudo sed -i -e "/time=/ c #time=5" $file
+sudo sed -i -e "/reboot=/ c #reboot=no" $file
 sudo sed -i -e "/man_log/ c 0 5 * * * root /usr/local/dvs/man_log" $file
-sudo sed -i -e "/reboot=/d" $file
 sudo systemctl restart cron
 ${DVS}dvsmu R; exit 0
 else ${DVS}dvsmu R; exit 0
