@@ -92,7 +92,7 @@ elif [ "$LOWEST" = "$LOCAL_VERSION" ]; then
         sudo wget -O $file https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu_upgrade.sh > /dev/null 2>&1
         sudo chmod +x $file
         sudo $file
-        sudo rm $file
+        sudo rm -f $file
         echo "dvsmu v$REMOTE_VERSION upgrade done" | sudo tee -a "$LOG_FILE"
 else
         echo "can't check the version" | sudo tee -a "$LOG_FILE"
