@@ -63,7 +63,7 @@ if apt-get -s upgrade | grep -q "^Inst dvswitch-server "; then
 
     		# call Function
       		sudo systemctl stop mmdvm_bridge${user} analog_bridge${user} md380-emu${user} > /dev/null 2>&1
-		# restart루틴은 var_to_ini 함수에 있음
+		# restart루틴은 var_to_ini 함수 마지막 부분에 있음
     		file_copy_and_initialize ${user}
     		var_to_ini ${user} upgrade
 		fi
