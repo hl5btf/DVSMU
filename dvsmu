@@ -231,7 +231,7 @@ file=/opt/user$1/DVSwitch.ini
 
 source /var/lib/dvswitch/dvs/var$1.txt
 
-if [ ${macro_lan} = KOR ]; then
+if [ "${macro_lan}" = "KOR" ]; then
 
         sudo \cp -f ${adv}user00KR/*.* /opt/user$1
 else
