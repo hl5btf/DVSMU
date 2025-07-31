@@ -22,6 +22,7 @@ for fname in "${functions[@]}"; do
     if [ -s "$tmp_part" ]; then
         cat "$tmp_part" >> "$temp_func_file"
         echo -e "\n" >> "$temp_func_file"
+    fi
 done
 
 if [ -s "$temp_func_file" ]; then
