@@ -9,7 +9,7 @@ SCRIPT_DATE="2025-07-27"
 # dvsmu에서 필요한 함수만 불러오기
 dvsmu_file="/usr/local/dvs/dvsmu"
 temp_func_file="/tmp/temp_dvsmu_funcs.sh"
-functions=("main_user_dvswitch_upgrade" "file_copy_and_initialize" "var_to_ini")
+functions=("update_DV3000" "main_user_dvswitch_upgrade" "file_copy_and_initialize" "var_to_ini")
 
 # 초기화
 > "$temp_func_file"
