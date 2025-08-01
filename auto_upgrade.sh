@@ -51,7 +51,7 @@ sudo apt-get update
 
 echo "Check DVSwitch" | sudo tee -a "$LOG_FILE"
 
-if apt-get -s upgrade | grep -q "^Inst dvswitch-server "; then
+if ! dpkg -l | grep -q "^ii  dvswitch-server" || apt-get -s upgrade | grep -q "^Inst dvswitch-server "; then
 	# call Function
 	main_user_dvswitch_upgrade
 	echo "Found upgrade of DVSwitch" | sudo tee -a "$LOG_FILE"
