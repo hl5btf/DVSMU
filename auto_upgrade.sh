@@ -43,18 +43,18 @@ if [ "$TOTAL_LINES" -gt "$MAX_LINES" ]; then
     mv "${LOG_FILE}.tmp" "$LOG_FILE"
 fi
 
-echo "AutoUpgrade check started at $(date)" | sudo tee -a "$LOG_FILE"
+[ -n "$DISABLE_LOG" ] || echo "AutoUpgrade check started at $(date)" | sudo tee -a "$LOG_FILE"
 
 # check DVSwitch -----------------------------------
 
 sudo apt-get update
 
-echo "Check DVSwitch" | sudo tee -a "$LOG_FILE"
+[ -n "$DISABLE_LOG" ] || echo "Check DVSwitch" | sudo tee -a "$LOG_FILE"
 
 if ! dpkg -l | grep -q "^ii  dvswitch-server" || apt-get -s upgrade | grep -q "^Inst dvswitch-server "; then
 	# call Function
 	main_user_dvswitch_upgrade
-	echo "Found upgrade of DVSwitch" | sudo tee -a "$LOG_FILE"
+	[ -n "$DISABLE_LOG" ] || echo "Found upgrade of DVSwitch" | sudo tee -a "$LOG_FILE"
 
 	for user in $user_array; do
 		if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
@@ -68,9 +68,9 @@ if ! dpkg -l | grep -q "^ii  dvswitch-server" || apt-get -s upgrade | grep -q "^
     		var_to_ini ${user} upgrade
 		fi
 	done
-	echo "DVSwitch upgrade done" | sudo tee -a "$LOG_FILE"
+	[ -n "$DISABLE_LOG" ] || echo "DVSwitch upgrade done" | sudo tee -a "$LOG_FILE"
 else
-	echo "Current DVSwitch is the latest" | sudo tee -a "$LOG_FILE"
+	[ -n "$DISABLE_LOG" ] || echo "Current DVSwitch is the latest" | sudo tee -a "$LOG_FILE"
 fi
 
 sudo rm -f "$temp_func_file"
@@ -86,20 +86,20 @@ REMOTE_VERSION=$(curl -s --max-time 5 "$REMOTE_URL" | grep '^SCRIPT_VERSION=' | 
 # 두 버전 중 더 낮은(작은) 버전을 구함
 LOWEST=$(printf '%s\n%s\n' "$LOCAL_VERSION" "$REMOTE_VERSION" | sort -V | head -n 1)
 
-echo "Check dvsmu" | sudo tee -a "$LOG_FILE"
+[ -n "$DISABLE_LOG" ] || echo "Check dvsmu" | sudo tee -a "$LOG_FILE"
 if [ "$LOCAL_VERSION" = "$REMOTE_VERSION" ]; then
-    echo "Current dvsmu v$LOCAL_VERSION is the latest" | sudo tee -a "$LOG_FILE"
+    [ -n "$DISABLE_LOG" ] || echo "Current dvsmu v$LOCAL_VERSION is the latest" | sudo tee -a "$LOG_FILE"
 elif [ "$LOWEST" = "$LOCAL_VERSION" ]; then
-        echo "Found upgrade v$REMOTE_VERSION of dvsmu" | sudo tee -a "$LOG_FILE"
+        [ -n "$DISABLE_LOG" ] || echo "Found upgrade v$REMOTE_VERSION of dvsmu" | sudo tee -a "$LOG_FILE"
         file=/usr/local/dvs/dvsmu_upgrade.sh
         sudo wget -O $file https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu_upgrade.sh > /dev/null 2>&1
         sudo chmod +x $file
         sudo $file
         sudo rm -f $file
-        echo "dvsmu v$REMOTE_VERSION upgrade done" | sudo tee -a "$LOG_FILE"
+        [ -n "$DISABLE_LOG" ] || echo "dvsmu v$REMOTE_VERSION upgrade done" | sudo tee -a "$LOG_FILE"
 else
-        echo "can't check the version" | sudo tee -a "$LOG_FILE"
+        [ -n "$DISABLE_LOG" ] || echo "can't check the version" | sudo tee -a "$LOG_FILE"
 fi
 
-echo "------------------------------------------------------------" | sudo tee -a "$LOG_FILE"
+[ -n "$DISABLE_LOG" ] || echo "------------------------------------------------------------" | sudo tee -a "$LOG_FILE"
 
