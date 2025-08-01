@@ -2306,6 +2306,7 @@ else
         else
                 declare talkerAlias_M="${talkerAlias:0:13}"
         fi
+        if [ "$talkerAlias_M" != "talkerAlias" ]; then show_TA=yes; fi
 fi
 
 
