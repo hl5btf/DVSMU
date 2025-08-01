@@ -44,6 +44,7 @@ if [ "$TOTAL_LINES" -gt "$MAX_LINES" ]; then
 fi
 
 [ -n "$DISABLE_LOG" ] || echo "AutoUpgrade check started at $(date)" | sudo tee -a "$LOG_FILE"
+# 외부 스크립트에서 auto_upgrade.sh를 실행할때 로그기록을 하지 않으려면 sudo env DISABLE_LOG=1 /usr/local/dvs/auto_upgrade.sh
 
 # check DVSwitch -----------------------------------
 
