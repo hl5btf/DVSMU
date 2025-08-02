@@ -33,18 +33,14 @@ if [ -s "$temp_func_file" ]; then
 fi
 
 LOG_FILE="/var/log/dvswitch/auto_upgrade.log"
+TMP_FILE="/var/log/dvswitch/auto_upgrade.trim"
+MAX_LINES=300
 
 # 로그 없으면 생성
 [ -f "$LOG_FILE" ] || sudo touch "$LOG_FILE"
 
-# 로그 줄 수가 100줄 넘으면 최근 100줄만 유지
-MAX_LINES=100
-TOTAL_LINES=$(wc -l < "$LOG_FILE")
-
-if [ "$TOTAL_LINES" -gt "$MAX_LINES" ]; then
-    tail -n $MAX_LINES "$LOG_FILE" > "${LOG_FILE}.tmp"
-    mv "${LOG_FILE}.tmp" "$LOG_FILE"
-fi
+# 로그 줄 수가 MAX_LINES를 넘으면 최근 라인만 유지
+tail -n "$MAX_LINES" "$LOG_FILE" > "$TMP_FILE" && cp "$TMP_FILE" "$LOG_FILE"
 
 [ -n "$DISABLE_LOG" ] || echo "AutoUpgrade check started at $(date)" | sudo tee -a "$LOG_FILE"
 # 외부 스크립트에서 auto_upgrade.sh를 실행할때 로그기록을 하지 않으려면 sudo env DISABLE_LOG=1 /usr/local/dvs/auto_upgrade.sh
