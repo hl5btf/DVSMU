@@ -11,6 +11,7 @@ hostfile="/var/lib/mmdvm/DMR_Hosts.txt"
 bm_list_tmp_file="/var/tmp/bm_present_list.txt"
 bm_status_tmp_file="/var/tmp/bm_watchdog_status.txt"
 logfile="/var/log/dvswitch/bm_watchdog.log"
+tmpfile="/var/log/dvswitch/bm.trim"
 maxline=500
 email="onetree9@gmail.com"
 
@@ -33,11 +34,8 @@ hour=$(date '+%H')
 if [ "$hour" == "03" ]; then
     # 플래그 파일이 없거나, 날짜가 오늘이 아니면 실행
     if [ ! -f "$flagfile" ] || [ "$(cat "$flagfile")" != "$today" ]; then
-        current_lines=$(wc -l < "$logfile")
-        if [ "$current_lines" -gt "$maxline" ]; then
-            echo "[•] $(date '+%Y-%m-%d %H:%M:%S') - 최근 $maxline줄만 보존하고 정리함" >> "$logfile"
-            tail -n "$maxline" "$logfile" > "$logfile.tmp" && mv "$logfile.tmp" "$logfile"
-        fi
+        echo "[•] $(date '+%Y-%m-%d %H:%M:%S') - 최근 $maxline줄만 보존하고 정리함" >> "$logfile"
+	tail -n "$maxline" "$logfile" > "$tmpfile" && cp "$tmpfile" "$logfile"
         echo "$today" > "$flagfile"  # 오늘 실행했다고 기록
     fi
 fi
