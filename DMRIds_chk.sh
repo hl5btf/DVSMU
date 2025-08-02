@@ -16,6 +16,8 @@ LIB=/var/lib/mmdvm
 FILE_THIS=${DVS}DMRIds_chk.sh
 FILE_CRON=/etc/crontab
 FILE_LOG=/var/log/dvswitch/dvsmu.log
+FILE_TMP="/var/log/dvswitch/dvsmu.trim"
+MAX_LOG_LINE=300
 
 ORG_FILE_SIZE=4585788
 ORG_NUMBER_HL=1439
@@ -23,7 +25,8 @@ ORG_NUMBER_HL=1439
 MIN_FILE_SIZE=4584788
 MIN_NUMBER_HL=1429
 
-MAX_LOG_LINE=300
+# MAX_LOG_LINE을 넘으면 오래된 내용부터 자르기
+head -n "$MAX_LOG_LINE" "$FILE_LOG" > "$FILE_TMP" && cp "$FILE_TMP" "$FILE_LOG"
 
 CHK_CALLSIGNS="HL5KY HL5BTF HL5BHH HL5PPT HL2DRY DS5QDR DS5ANY DS5TUK JA2HWE ZL1SN"
 
@@ -54,14 +57,7 @@ fi
 }
 #--------------------------------------------------------------
 function logging() {
-    sudo sed -i "1 i\\$log_line" "$FILE_LOG" > /dev/null 2>&1
-
-    line=$(wc -l < "$FILE_LOG")
-
-    if [ "$line" -gt "$MAX_LOG_LINE" ]; then
-        # 상단 MAX_LOG_LINE줄만 유지
-        sudo head -n "$MAX_LOG_LINE" "$FILE_LOG" | sudo tee "$FILE_LOG" > /dev/null
-    fi
+	sudo sed -i "1 i\\$log_line" "$FILE_LOG" > /dev/null 2>&1
 }
 #--------------------------------------------------------------
 function cp_bak_to_dat() {
