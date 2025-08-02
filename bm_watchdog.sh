@@ -25,17 +25,21 @@ source /var/lib/dvswitch/dvs/var.txt
 # source ${bm_status_tmp_file} - 해당 Function에서 실행해야 함.
 
 # 변수 읽기
-HOUR=$(date +%H)
-TIME=$(date '+%Y-%m-%d %H:%M:%S')
+flagfile="/tmp/bm_watchdog_log_trimmed.flag"
+today=$(date '+%Y-%m-%d')
+hour=$(date '+%H')
 
-# 하루에 한 번만 로그 정리
-NOW=$(date "+%H:%M")
-if [ "$NOW" == "03:00" ]; then  # 하루에 한번만
-        current_lines=$(wc -l < "$logfile")  # 현재 줄 수 확인
+# 03시대에 한 번만 실행
+if [ "$hour" == "03" ]; then
+    # 플래그 파일이 없거나, 날짜가 오늘이 아니면 실행
+    if [ ! -f "$flagfile" ] || [ "$(cat "$flagfile")" != "$today" ]; then
+        current_lines=$(wc -l < "$logfile")
         if [ "$current_lines" -gt "$maxline" ]; then
-            echo "[•] $(date) - 최근 $maxline줄만 보존하고 정리함" >> "$logfile"
+            echo "[•] $(date '+%Y-%m-%d %H:%M:%S') - 최근 $maxline줄만 보존하고 정리함" >> "$logfile"
             tail -n "$maxline" "$logfile" > "$logfile.tmp" && mv "$logfile.tmp" "$logfile"
         fi
+        echo "$today" > "$flagfile"  # 오늘 실행했다고 기록
+    fi
 fi
 
 user_array=("" 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40)
