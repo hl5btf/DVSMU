@@ -339,7 +339,7 @@ function do_reboot() {
 
         file=/etc/crontab
         time_chk
-        sudo sed -i -e "/man_log/ c 0 $time * * * root /usr/local/dvs/man_log" $file
+        sudo sed -i -e "/man_log/ c 0 $time * * * root flock -n /var/lock/man_log.lock /usr/local/dvs/man_log" $file
 
 	if sudo grep -q "reboot=yes" "$file"; then
                 log_line="$time_now  ${cnted_callsigns}Connected, ${busy_callsigns}Busy, REBOOT"
@@ -408,9 +408,9 @@ else
 #if [ $busy_M = "yes" ] || [ "$busy_AR" = "yes" ] || [ $busy_user = "yes" ]; then
 
 	if [ $min = 60 ]; then
-                sudo sed -i -e "/man_log/ c 0 $time * * * root /usr/local/dvs/man_log" $file
+                sudo sed -i -e "/man_log/ c 0 $time * * * root flock -n /var/lock/man_log.lock /usr/local/dvs/man_log" $file
         else
-                sudo sed -i -e "/man_log/ c $min $time * * * root /usr/local/dvs/man_log" $file
+                sudo sed -i -e "/man_log/ c $min $time * * * root flock -n /var/lock/man_log.lock /usr/local/dvs/man_log" $file
 	fi
 
 	log_line="$time_now  ${cnted_callsigns}Connected, ${busy_callsigns}Busy, no REBOOT"
