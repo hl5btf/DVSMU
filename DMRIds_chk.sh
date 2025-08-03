@@ -41,7 +41,7 @@ cron_daily_min_plus_4=$((cron_daily_min + 4))
 
 #--------------------------------------------------------------
 function set_chk_time_agn_1min() {
-sudo sed -i -e "/DMRIds/ c $cron_daily_min_plus_4 $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh" $FILE_CRON
+sudo sed -i -e "/DMRIds/ c $cron_daily_min_plus_4 $cron_daily_time * * * root flock -n /var/lock/DMRIds_chk.lock /usr/local/dvs/DMRIds_chk.sh" $FILE_CRON
 }
 #--------------------------------------------------------------
 function set_chk_time_agn_10min() {
@@ -50,9 +50,9 @@ min=$(sed -n -e '/DMRIds/p' $FILE_CRON | cut -f 1 -d' ')
 new_min=$((min + 10))
 
 if [ $new_min -ge 60 ]; then
-	sudo sed -i -e "/DMRIds/ c $cron_daily_min_plus_3 $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh" $FILE_CRON
+	sudo sed -i -e "/DMRIds/ c $cron_daily_min_plus_3 $cron_daily_time * * * root flock -n /var/lock/DMRIds_chk.lock /usr/local/dvs/DMRIds_chk.sh" $FILE_CRON
 else
-	sudo sed -i -e "/DMRIds/ c $new_min $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh" $FILE_CRON
+	sudo sed -i -e "/DMRIds/ c $new_min $cron_daily_time * * * root flock -n /var/lock/DMRIds_chk.lock /usr/local/dvs/DMRIds_chk.sh" $FILE_CRON
 fi
 }
 #--------------------------------------------------------------
@@ -175,7 +175,7 @@ else
 
 # when all checks for new file are ok, excute followings
 
-        sudo sed -i -e "/DMRIds/ c $cron_daily_min_plus_3 $cron_daily_time * * * root /usr/local/dvs/DMRIds_chk.sh" $FILE_CRON
+        sudo sed -i -e "/DMRIds/ c $cron_daily_min_plus_3 $cron_daily_time * * * root flock -n /var/lock/DMRIds_chk.lock /usr/local/dvs/DMRIds_chk.sh" $FILE_CRON
 
         sudo sed -i -e "/^ORG_FILE_SIZE/ c ORG_FILE_SIZE=$FILE_SIZE" $FILE_THIS
 
