@@ -51,6 +51,7 @@ sudo apt-get update
 
 [ -n "$DISABLE_LOG" ] || echo "Check DVSwitch" | sudo tee -a "$LOG_FILE"
 
+# dvswitch-server가 설치되지 않았거나 업그레이드가 필요하면
 if ! dpkg -l | grep -q "^ii  dvswitch-server" || apt-get -s upgrade | grep -q "^Inst dvswitch-server "; then
 	# call Function
 	main_user_dvswitch_upgrade
