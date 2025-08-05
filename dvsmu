@@ -745,6 +745,8 @@ source /var/lib/dvswitch/dvs/var.txt
 
 sudo \mv -f ${DATA}var.txt ${DATA}var.old > /dev/null 2>&1
 
+sudo apt-get update -y
+
 sudo apt-get install dvswitch-server -y > /dev/null 2>&1
 
 sudo \mv -f /var/lib/dvswitch/dvs/var.old /var/lib/dvswitch/dvs/var.txt > /dev/null 2>&1
