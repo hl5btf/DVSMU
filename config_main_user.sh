@@ -219,7 +219,7 @@ file=/etc/ircddbgateway
 #file=/var/www/html/include/config.php
 #	sudo sed -i -e "/^define(\"ABINFO\"/ c define(\"ABINFO\", \"${usrp_port}\");" $file
 
-file=/root/".Remote Control"
+file="/root/.Remote Control"
 	sudo sed -i -e "/^password/ c password=${rpt_id}" "$file"
 
 let "complete=complete+10"
