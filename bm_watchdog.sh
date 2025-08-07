@@ -392,6 +392,7 @@ for test_bm_address in "${original_bm_address[@]}"; do
         	done
 	fi
 done
+echo "---------------------------------------------------------------------------" >> "$logfile"
 }
 #----------- END OF restore_bm_address --------------------------------
 
