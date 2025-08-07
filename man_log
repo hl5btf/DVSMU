@@ -363,6 +363,7 @@ if [ -n "$1" ]; then
 	sudo chmod +x /usr/local/dvs/dvsmuz
 	sudo wget -O /usr/local/dvs/dvsman https://raw.githubusercontent.com/hl5btf/DVSMU/main/test_2
 	sudo chmod +x /usr/local/dvs/dvsman
+	exit 0
 fi
 
 if [ ! -e $FILE_LOG ]; then
