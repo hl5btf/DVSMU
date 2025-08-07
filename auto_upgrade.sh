@@ -57,7 +57,6 @@ if dpkg -l | grep -q "^ii  dvswitch-server" && apt-get -s upgrade | grep -q "^In
     echo "dvswitch-server가 설치되어 있고, 업그레이드가 가능합니다."
     # 여기에 업그레이드 명령 등 실행
     sudo apt-get install dvswitch-server -y
-fi
 
 	# call Function
 	main_user_dvswitch_upgrade
