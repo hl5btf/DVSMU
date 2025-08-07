@@ -29,6 +29,7 @@ source /var/lib/dvswitch/dvs/var.txt
 flagfile="/tmp/bm_watchdog_log_trimmed.flag"
 today=$(date '+%Y-%m-%d')
 hour=$(date '+%H')
+TIME=$(date '+%Y-%m-%d %H:%M:%S')
 
 # 03시대에 한 번만 실행
 if [ "$hour" == "03" ]; then
