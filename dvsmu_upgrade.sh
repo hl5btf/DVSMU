@@ -159,6 +159,7 @@ function set_crontab() {
 FILE_CRON=/etc/crontab
 
 value_time=$(grep -oP 'time=\K[^#\s]+' "$FILE_CRON")
+if [ -z "$value_time" ]; then value_time=5; fi
 
 if grep -q "reboot" "$FILE_CRON"; then
         value_reboot=$(grep -oP 'reboot=\K[^#\s]+' "$FILE_CRON")
