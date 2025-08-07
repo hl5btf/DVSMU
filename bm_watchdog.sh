@@ -35,7 +35,7 @@ TIME=$(date '+%Y-%m-%d %H:%M:%S')
 if [ "$hour" == "03" ]; then
     # 플래그 파일이 없거나, 날짜가 오늘이 아니면 실행
     if [ ! -f "$flagfile" ] || [ "$(cat "$flagfile")" != "$today" ]; then
-        echo "[•] $(date '+%Y-%m-%d %H:%M:%S') - 최근 $maxline줄만 보존하고 정리함" >> "$logfile"
+        echo "$(date '+%Y-%m-%d %H:%M:%S') [•] 최근 $maxline줄만 보존하고 정리함" >> "$logfile"
 	tail -n "$maxline" "$logfile" > "$tmpfile" && cp "$tmpfile" "$logfile"
         echo "$today" > "$flagfile"  # 오늘 실행했다고 기록
     fi
