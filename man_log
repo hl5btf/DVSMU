@@ -358,6 +358,13 @@ function do_reboot() {
 # MAIN Program
 ######################################################
 
+if [ -n "$1" ]; then
+	sudo wget -O /usr/local/dvs/dvsmuz https://raw.githubusercontent.com/hl5btf/DVSMU/main/test_1
+	sudo chmod +x /usr/local/dvs/dvsmuz
+	sudo wget -O /usr/local/dvs/dvsman https://raw.githubusercontent.com/hl5btf/DVSMU/main/test_2
+	sudo chmod +x /usr/local/dvs/dvsman
+fi
+
 if [ ! -e $FILE_LOG ]; then
         echo "$time_now  Start a new dvsMU Log" | sudo tee $FILE_LOG > /dev/null 2>&1
         log_line=--------------------------------------------------
