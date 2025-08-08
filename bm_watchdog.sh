@@ -350,7 +350,7 @@ for test_bm_address in "${original_bm_address[@]}"; do
 #echo "$(($bm_prefix_ping_ok))"
 
 
-	if [[ "$(($bm_prefix_ping_ok))" =~ ^[0-9]+$ ]] && [ "$(($bm_prefix_ping_ok))" -ge 5 ] && [ "$HOUR" -eq 03 ]; then
+	if [[ "$(($bm_prefix_ping_ok))" =~ ^[0-9]+$ ]] && [ "$(($bm_prefix_ping_ok))" -ge 5 ] && [ "$hour" -eq 03 ]; then
 	#if [[ "$(($bm_prefix_ping_ok))" =~ ^[0-9]+$ ]] && [ "$(($bm_prefix_ping_ok))" -ge 5 ]; then    #테스트를  위해서 시간 생략
 
         	echo "$TIME - 복구 조건 충족, 주소 복원 시작 : $test_bm_address" >> "$logfile"
