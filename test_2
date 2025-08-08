@@ -2,7 +2,49 @@
 
 source /var/lib/dvswitch/dvs/var.txt
 
+#------------------------------------------------------
+function bm_watchdog_test() {
+clear
+sel=$(whiptail --title " bm_watchdog_test " --menu "\
+\n
+" 18 45 10 \
+"1" "DMR_Hosts.txt" \
+"2" "bm_present_list.txt" \
+"3" "bm_watchdog_status.txt" \
+"4" "bm_watchdog" \
+"5" "실행" \
+"6" "var.txt" \
+"7" "var01.txt" \
+"8" "var03.txt" \
+"9" "var05.txt" \
+"10" "LOG" \
+3>&1 1>&2 2>&3)
 
+if [ $? != 0 ]; then ${DVS}dvsman; exit 0; fi
+
+case $sel in
+1)
+sudo nano /var/lib/mmdvm/DMR_Hosts.txt; ${DVS}dvsman bm_test; exit 0 ;;
+2)
+sudo nano /var/tmp/bm_present_list.txt; ${DVS}dvsman bm_test; exit 0 ;;
+3)
+sudo nano /var/tmp/bm_watchdog_status.txt; ${DVS}dvsman bm_test; exit 0 ;;
+4)
+sudo nano /var/lib/mmdvm/DMR_Hosts.txt; ${DVS}dvsman bm_test; exit 0 ;;
+5)
+${DVS}dvsman bm_test; exit 0 ;;
+6)
+sudo nano /var/lib/dvswitch/dvs/var.txt; ${DVS}dvsman bm_test; exit 0 ;;
+7)
+sudo nano /var/lib/dvswitch/dvs/var01.txt; ${DVS}dvsman bm_test; exit 0 ;;
+8)
+sudo nano /var/lib/dvswitch/dvs/var03.txt; ${DVS}dvsman bm_test; exit 0 ;;
+9)
+sudo nano /var/lib/dvswitch/dvs/var05.txt; ${DVS}dvsman bm_test; exit 0 ;;
+10)
+sudo nano /var/log/dvswitch/bm_watchdog.log; ${DVS}dvsman bm_test; exit 0 ;;
+esac
+}
 #------------------------------------------------------
 function lan() {
 clear
@@ -492,11 +534,11 @@ if [ "$1" = ini ]; then ini; fi
 if [ "$1" = dvs_file ]; then dvs_file; fi
 if [ "$1" = sys ]; then sys; fi
 if [ "$1" = log ]; then log; fi
-
+if [ "$1" = bm_test ]; then bm_watchdog_test; fi
 
 sel=$(whiptail --title " DVS Management " --menu "\
 \n
-" 17 45 9 \
+" 18 45 10 \
 "1" "DVS FILES" \
 "2" "INI FILES" \
 "3" "LANGUAGE" \
@@ -506,6 +548,7 @@ sel=$(whiptail --title " DVS Management " --menu "\
 "7" "SYS" \
 "8" "LOG" \
 "9" "crontab" \
+"10" "bm_watchdog TEST" \
 3>&1 1>&2 2>&3)
 
 case $sel in
@@ -527,8 +570,8 @@ sys; ${DVS}dvsman; exit 0 ;;
 log; ${DVS}dvsman; exit 0 ;;
 9)
 sudo nano /etc/crontab; ${DVS}dvsman; exit 0 ;;
-11)
-exit 0 ;;
+10)
+bm_watchdog_test; ${DVS}dvsman; exit 0 ;;
 esac
 
 
