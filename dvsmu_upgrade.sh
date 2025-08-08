@@ -238,3 +238,5 @@ download_and_update_apps
 set_crontab
 add_variables
 
+sudo rm dvsmu_upgrade.sh  > /dev/null 2>&1
+
