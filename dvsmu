@@ -1666,7 +1666,7 @@ function set_reboot() {
 
 file=/etc/crontab
 
-if [[ ! -z `sudo grep "reboot=" $file` ]]; then
+if [[ ! -z `sudo grep "reboot=yes" $file` ]]; then
         line_no=$(grep -n "time=" $file -a | cut -d: -f1)
         line=$(cat $file | sed -n ${line_no}p)
         timeset=$(echo $line | cut -d '=' -f 2)
