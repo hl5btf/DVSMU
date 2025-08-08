@@ -545,7 +545,8 @@ update_var usrp_port ${usrp_port}
 let "complete=complete+10"
 echo -e "$complete"
 
-update_var bm_address ${bm_address_M}
+#update_var bm_address ${bm_address_M}
+update_var bm_address ${bm_address}
 update_var bm_password ${bm_password}
 update_var bm_port 62031
 
