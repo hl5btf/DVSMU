@@ -228,15 +228,16 @@ for test_bm_address in "${now_bm_address[@]}"; do
 				continue
 		        fi
 
-			echo "$TIME - 테스트 중: $new_address (index $try_index)" >> "$logfile"
+			echo "$TIME - 대체 주소 테스트: $new_address (index $try_index)" >> "$logfile"
 
 	        	if ping -c 1 -W 2 "$new_address" > /dev/null; then
-        			echo "$TIME - 사용 가능 주소 발견: $new_address" >> "$logfile"
+        			echo "$TIME - 대체 주소 사용 가능" >> "$logfile"
 
 				# 주소 전환 처리...
 				for user in "${user_array[@]}"; do
 					source_file=/var/lib/dvswitch/dvs/var${user}.txt
 					source $source_file > /dev/null 2>&1
+					present_bm_address=$bm_address
 
 					if [ "$bm_address" = "$test_bm_address" ]; then
 						bm_address=""
@@ -252,7 +253,7 @@ for test_bm_address in "${now_bm_address[@]}"; do
 					        $update_ini "$ini_file" "DMR Network" Address "$new_address"
 					        sudo systemctl restart mmdvm_bridge${user}
 
-				        	echo "$TIME - 서버 주소 전환 완료: $new_address" >> "$logfile"
+				        	echo "$TIME - USER${user} 전환 완료: $present_bm_address -> $new_address" >> "$logfile"
 
 						# 임시 변수 지우기
                                                 sed -i "/^${bm_prefix_ping_ok}=.*/d" "$bm_status_tmp_file"
@@ -318,7 +319,7 @@ for test_bm_address in "${original_bm_address[@]}"; do
 
     if ping -c 1 -W 2 "$test_bm_address" > /dev/null 2>&1; then
         eval "$bm_prefix_ping_ok=\$(( $bm_prefix_ping_ok + 1 ))"
-        echo "$TIME - 복구 ping 성공 (${!bm_prefix_ping_ok}/10)" >> "$logfile"
+        echo "$TIME - 복구 ping 성공 (${!bm_prefix_ping_ok}/5): 5회 이상 성공시 새벽 3시에 복구 실행" >> "$logfile"
         sed -i "/^${bm_prefix_ping_ok}=.*/d" "$bm_status_tmp_file"; echo "${bm_prefix_ping_ok}=${!bm_prefix_ping_ok}" >> "$bm_status_tmp_file"
 #        sed -i "/^${bm_prefix_ping_fail}=.*/d" "$bm_status_tmp_file"; echo "${bm_prefix_ping_fail}=0" >> "$bm_status_tmp_file"
 
@@ -349,16 +350,17 @@ for test_bm_address in "${original_bm_address[@]}"; do
 #echo "for 복구 loop - now_bm_add - $bm_prefix_ping_ok"
 #echo "$(($bm_prefix_ping_ok))"
 
-
 	if [[ "$(($bm_prefix_ping_ok))" =~ ^[0-9]+$ ]] && [ "$(($bm_prefix_ping_ok))" -ge 5 ] && [ "$hour" -eq 03 ]; then
-	#if [[ "$(($bm_prefix_ping_ok))" =~ ^[0-9]+$ ]] && [ "$(($bm_prefix_ping_ok))" -ge 5 ]; then    #테스트를  위해서 시간 생략
+#	if [[ "$(($bm_prefix_ping_ok))" =~ ^[0-9]+$ ]] && [ "$(($bm_prefix_ping_ok))" -ge 5 ]; then    #테스트를  위해서 시간 생략
 
-        	echo "$TIME - 복구 조건 충족, 주소 복원 시작 : $test_bm_address" >> "$logfile"
+        	#echo "$TIME - 복구 조건 충족, 주소 복원 시작 : $test_bm_address" >> "$logfile"
+                echo "$TIME - 복구 조건 충족, 주소 복원 시작" >> "$logfile"
 
 		# 주소 전환 처리...
         	for user in "${user_array[@]}"; do
         		source_file=/var/lib/dvswitch/dvs/var${user}.txt
 	            	source $source_file > /dev/null 2>&1
+			present_bm_address=$bm_address
         		if [ "$original_bm_address" = "$test_bm_address" ]; then
 				original_bm_address=""
                 		update_var bm_address "$test_bm_address"
@@ -371,7 +373,7 @@ for test_bm_address in "${original_bm_address[@]}"; do
 		                $update_ini "$ini_file" "DMR Network" Address "$test_bm_address"
         		        sudo systemctl restart mmdvm_bridge${user}
 
-                		echo "$TIME - USER${user} 복구 성공, 주소 복구 전환 완료: $test_bm_address" >> "$logfile"
+                                echo "$TIME - USER${user} 복원 성공: $present_bm_address -> $test_bm_address" >> "$logfile"
 
 		                # 임시 변수 지우기
         		        sed -i "/^${bm_prefix_ping_ok}=.*/d" "$bm_status_tmp_file"
