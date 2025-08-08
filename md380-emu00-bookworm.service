@@ -1,0 +1,19 @@
+[Unit]
+Description=MD-380 Emulator Service
+# Description=Place this file in /lib/systemd/system
+# Description=N4IRS 07/01/2024
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=3
+StandardOutput=null
+WorkingDirectory=/opt/userUSER_NO
+ExecStartPre = /usr/bin/sh -c 'echo "Starting md380-emu: [`date +%%T.%%3N`]" >> /var/log/netcheck'
+ExecStart=/opt/md380-emu/qemu-arm-static /opt/userUSER_NO/md380-emu -S 2471
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+
+[Install]
+
+WantedBy=multi-user.target
