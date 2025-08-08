@@ -272,7 +272,7 @@ for test_bm_address in "${now_bm_address[@]}"; do
 				done
 				break
 			else
-				echo "$TIME - 대체 주소 ping 실패: $test_bm_address" >> "$logfile"
+				echo "$TIME - 대체 주소 ping 실패: $test_bm_address -> 다른 대체 주소 찾기" >> "$logfile"
 			fi
 
 	        	# 다음 인덱스로 이동
