@@ -11,7 +11,7 @@ sel=$(whiptail --title " bm_watchdog_test " --menu "\
 "1" "DMR_Hosts.txt" \
 "2" "bm_present_list.txt" \
 "3" "bm_watchdog_status.txt" \
-"4" "bm_watchdog" \
+"4" "reserved" \
 "5" "실행" \
 "6" "var.txt" \
 "7" "var01.txt" \
