@@ -892,7 +892,7 @@ $sp10 $T005
         sudo chmod +x $file
         sudo $file
 
-        sudo rm $file
+        sudo rm $file > /dev/null 2>&1
 
         clear
         whiptail --msgbox "\
