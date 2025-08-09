@@ -13,6 +13,8 @@ user_array=(01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23
 #====== replace_var00_txt =============================================
 function replace_var00_txt() {
 # 최초에 var00.txt를 만들었을때 설치했던 사용자를 위함
+echo
+echo ">>> replace_var00_txt"
 file=var00.txt
 dir=/var/lib/dvswitch/dvs
 sudo wget -O ${dir}/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
@@ -20,8 +22,9 @@ sudo wget -O ${dir}/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$f
 
 #====== replace_freq_of_all_users =============================================
 function replace_freq_of_all_users() {
-
 # 주파수가 00000 일 경우에만, 430으로 수정
+echo
+echo ">>> replace_freq_of_all_users"
 
 source /var/lib/dvswitch/dvs/var.txt > /dev/null 2>&1
 if [ "$rx_freq" = "000000000" ]; then
@@ -69,6 +72,9 @@ done
 #====== add_45039_for_fvrt =============================================
 function add_45039_for_fvrt() {
 # DMR_fvrt_list.txt 수정
+echo
+echo ">>> add_45039_for_fvrt"
+
 file=/var/lib/dvswitch/dvs/tgdb/DMR_fvrt_list.txt
 if [ ! -f "$file" ] || [[ -z $(sudo grep "45039" "$file") ]]; then
     sudo wget -O $file https://raw.githubusercontent.com/hl5btf/DVSMU/main/tgdb_KR/DMR_fvrt_list.txt > /dev/null 2>&1
@@ -92,6 +98,8 @@ done
 
 #====== add_talkeralias =============================================
 function add_talkeralias() {
+echo
+echo ">>> add_talkeralias"
 
 if [ -e /var/lib/dvswitch/dvs/var.txt ] && [ x${call_sign} != x ]; then
     source /var/lib/dvswitch/dvs/var.txt > /dev/null 2>&1
@@ -129,6 +137,9 @@ done
 
 #====== download_and_update_apps =============================================
 function download_and_update_apps() {
+echo
+echo ">>> download_and_update_apps"
+
 files="dvsmu man_log DMRIds_chk.sh bm_watchdog.sh config_main_user.sh auto_upgrade.sh"
 
 for file in $files; do
@@ -144,6 +155,9 @@ done
 
 #====== set_crontab =============================================
 function set_crontab() {
+echo
+echo ">>> set_crontab"
+
 FILE_CRON=/etc/crontab
 
 value_time=$(grep -oP 'time=\K[^#\s]+' "$FILE_CRON")
@@ -182,6 +196,8 @@ function add_variables() {
 # 기존에 있는 변수는 값을 변경하지 않는다. (사용자가 변경한 값을 유지하도록)
 # 기존에 있는 변수의 값을 변경하려면 update_var 을 사용해야 한다.
 # each item needs space in between. if the item is character, it needs quotation marks.
+echo
+echo ">>> add_variables"
 
 new_var="txgain_asl txgain_stfu txgain_intercom original_bm_address"
 
