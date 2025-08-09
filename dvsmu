@@ -8,6 +8,8 @@ SCRIPT_AUTHOR="HL5KY"
 SCRIPT_DATE="2025-07-27"
 #===================================
 
+tmp_log=/var/log/dvswitch/dvsmu_tmp.log; [ ! -f "$tmp_log" ] && sudo touch "$tmp_log"
+
 if [ "$1" != "" ]; then
     case $1 in
         -v|-V|--version) echo $SCRIPT_VERSION; exit 0 ;;
@@ -1774,7 +1776,7 @@ n=$(($n+1))
 done
 
 if [ -e $file1 ]; then
-        tail -10 $file1 | sudo tee test.txt > /dev/null 2>&1
+        tail -10 $file1 | sudo tee $tmp_log > /dev/null 2>&1
         while read line
         do
         date_10min_ago=$(date -d '9 hour ago 10 minute ago' '+%Y%m%d%H%M%S')
@@ -1786,7 +1788,7 @@ if [ -e $file1 ]; then
                 declare con_BM_M=NO; break
         else declare con_BM_M=ok
         fi
-        done < test.txt
+        done < $tmp_log
 else
 con_BM_M=?? > /dev/null 2>&1
 fi
@@ -1816,7 +1818,7 @@ if [ -d $dir ]; then
 
 
         if [ -e $file1 ]; then
-                tail -10 $file1 | sudo tee test.txt > /dev/null 2>&1
+                tail -10 $file1 | sudo tee $tmp_log > /dev/null 2>&1
                 while read line
                 do
                 date_10min_ago=$(date -d '9 hour ago 10 minute ago' '+%Y%m%d%H%M%S')
@@ -1828,7 +1830,7 @@ if [ -d $dir ]; then
                         declare con_BM_${user}=NO; break
                 else declare con_BM_${user}=ok
                 fi
-                done < test.txt
+                done < $tmp_log
         else
         con_BM_${user}=?? > /dev/null 2>&1
         fi
@@ -1916,7 +1918,7 @@ function chk_AB_log() {
 
 file1=/var/log/dvswitch/Analog_Bridge.log
 
-echo "" | sudo tee test.txt > /dev/null 2>&1
+echo "" | sudo tee $tmp_log > /dev/null 2>&1
 
 n=5
 until [ $n = 0 ]; do
@@ -1925,30 +1927,28 @@ log_date=$(date -d "$n day ago" '+%Y-%m-%d')
 file2=/var/log/dvswitch/Analog_Bridge-$log_date.log
 #sudo nano $file2
 if [ -e $file2 ]; then
-        cat $file2 | sudo tee -a test.txt > /dev/null 2>&1
+        cat $file2 | sudo tee -a $tmp_log > /dev/null 2>&1
 fi
 done
 
 
 if [ -s $file1 ]; then
-        cat $file1 | sudo tee -a test.txt > /dev/null 2>&1
+        cat $file1 | sudo tee -a $tmp_log > /dev/null 2>&1
 fi
 
-file=test.txt
+if [ -e $tmp_log ] && [[ ! -z `grep "ip change" $tmp_log -a` ]]; then
 
-if [ -e $file ] && [[ ! -z `grep "ip change" $file -a` ]]; then
-
-line_no_ipchange=$(grep -n "ip change" $file -a | cut -d: -f1 | tail -1)
-line_no_connect=$(grep -n "USRP_TYPE_TEXT" $file -a | cut -d: -f1 | tail -1)
+line_no_ipchange=$(grep -n "ip change" $tmp_log -a | cut -d: -f1 | tail -1)
+line_no_connect=$(grep -n "USRP_TYPE_TEXT" $tmp_log -a | cut -d: -f1 | tail -1)
         if [ "$line_no_connect" = "" ]; then line_no_connect=0; fi
-line_no_reset=$(grep -n "USRP reset" $file -a | cut -d: -f1 | tail -1)
+line_no_reset=$(grep -n "USRP reset" $tmp_log -a | cut -d: -f1 | tail -1)
         if [ "$line_no_reset" = "" ]; then line_no_reset=0; fi
-line_no_analog_start=$(grep -n "starting" $file -a | cut -d: -f1 | tail -1)
+line_no_analog_start=$(grep -n "starting" $tmp_log -a | cut -d: -f1 | tail -1)
         if [ "$line_no_analog_start" = "" ]; then line_no_analog_start=0; fi
 
 if [ $line_no_ipchange -gt $line_no_reset ]; then
-        line=$(cat $file | sed -n ${line_no_ipchange}p)
-        else line=$(cat $file | sed -n ${line_no_reset}p)
+        line=$(cat $tmp_log | sed -n ${line_no_ipchange}p)
+        else line=$(cat $tmp_log | sed -n ${line_no_reset}p)
 fi
 
 dd=${line:3:21}
@@ -1959,8 +1959,8 @@ con_cl_time_M=$(date -d "${dd} 9 hour" +"%m-%d_%H:%M")
 if [ $line_no_ipchange -gt $line_no_connect ]; then
         callsign_cl_M=USRP
         else
-        line=$(cat $file | sed -n ${line_no_connect}p)
-        callsign_cl_M_A=$(echo $line | cut -d '(' -f 2 | cut -d ')' -f 1)
+        line=$(cat $tmp_log | sed -n ${line_no_connect}p)
+        callsign_cl_M_A=$(echo $tmp_log | cut -d '(' -f 2 | cut -d ')' -f 1)
         #echo $callsign_cl_M_A
         dmrid_cl_M=${line: -7:7}
         #echo $dmrid_cl_M
