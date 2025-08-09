@@ -174,18 +174,18 @@ sudo sed -i '/bm_watchdog.sh/d' "$FILE_CRON"
 sudo sed -i '/auto_upgrade.sh/d' "$FILE_CRON"
 
 
-echo "#time=$value_time" | sudo tee -a $FILE_CRON
+echo "#time=$value_time" | sudo tee -a $FILE_CRON > /dev/null 2>&1
 
 if [ "$value_reboot" = "yes" ]; then
-        echo "#reboot=yes" | sudo tee -a $FILE_CRON
+        echo "#reboot=yes" | sudo tee -a $FILE_CRON > /dev/null 2>&1
 else
-        echo "#reboot=no" | sudo tee -a $FILE_CRON
+        echo "#reboot=no" | sudo tee -a $FILE_CRON > /dev/null 2>&1
 fi
 
-echo "0 $value_time * * * root flock -n /var/lock/man_log.lock /usr/local/dvs/man_log" | sudo tee -a $FILE_CRON
-echo "28 6 * * * root flock -n /var/lock/DMRIds_chk.lock /usr/local/dvs/DMRIds_chk.sh" | sudo tee -a $FILE_CRON
-echo "*/5 * * * * root flock -n /var/lock/bm_watchdog.lock /usr/local/dvs/bm_watchdog.sh" | sudo tee -a $FILE_CRON
-echo "3 3 * * * root flock -n /var/lock/auto_upgrade.lock /usr/local/dvs/auto_upgrade.sh" | sudo tee -a $FILE_CRON
+echo "0 $value_time * * * root flock -n /var/lock/man_log.lock /usr/local/dvs/man_log" | sudo tee -a $FILE_CRON > /dev/null 2>&1
+echo "28 6 * * * root flock -n /var/lock/DMRIds_chk.lock /usr/local/dvs/DMRIds_chk.sh" | sudo tee -a $FILE_CRON > /dev/null 2>&1
+echo "*/5 * * * * root flock -n /var/lock/bm_watchdog.lock /usr/local/dvs/bm_watchdog.sh" | sudo tee -a $FILE_CRON > /dev/null 2>&1
+echo "3 3 * * * root flock -n /var/lock/auto_upgrade.lock /usr/local/dvs/auto_upgrade.sh" | sudo tee -a $FILE_CRON > /dev/null 2>&1
 }
 
 #====== add_variables =============================================
