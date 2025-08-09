@@ -10,6 +10,15 @@ source /var/lib/dvswitch/dvs/var.txt > /dev/null 2>&1
 
 user_array=(01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40)
 
+#====== replace_var00_txt =============================================
+function replace_var00_txt() {
+# 최초에 var00.txt를 만들었을때 설치했던 사용자를 위함
+files=var00.txt
+dir=/var/lib/dvswitch/dvs
+sudo wget -O ${dir}/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
+sudo chmod +x ${dir}/$file
+}
+
 #====== replace_freq_of_all_users =============================================
 function replace_freq_of_all_users() {
 
@@ -18,15 +27,6 @@ function replace_freq_of_all_users() {
 source /var/lib/dvswitch/dvs/var.txt > /dev/null 2>&1
 if [ "$rx_freq" = "000000000" ]; then
     file=/var/lib/dvswitch/dvs/var.txt
-    tag=rx_freq; value=430000000
-    sudo sed -i -e "/^$tag=/ c $tag=$value" $file
-    tag=tx_freq; value=430000000
-    sudo sed -i -e "/^$tag=/ c $tag=$value" $file
-fi
-
-source /var/lib/dvswitch/dvs/var00.txt > /dev/null 2>&1
-if [ "$rx_freq" = "000000000" ]; then
-    file=/var/lib/dvswitch/dvs/var00.txt
     tag=rx_freq; value=430000000
     sudo sed -i -e "/^$tag=/ c $tag=$value" $file
     tag=tx_freq; value=430000000
@@ -65,17 +65,6 @@ if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
     fi
 fi
 done
-}
-
-#====== delete_stz_value_for_var00 =============================================
-function delete_stz_value_for_var00() {
-source /var/lib/dvswitch/dvs/var00.txt > /dev/null 2>&1
-# 아래의 항목의 값은 지운다. 최초에 var00.txt를 만들었을때 설치했던 사용자를 위한 루틴 
-file=/var/lib/dvswitch/dvs/var00.txt
-sudo sed -i -e "/^bm_password=/ c bm_password=" $file
-sudo sed -i "/^lat=/ c lat=" $file
-sudo sed -i "/^lon=/ c lon=" $file
-sudo sed -i "/^desc=/ c desc=dvsMU" $file
 }
 
 #====== add_45039_for_fvrt =============================================
@@ -228,15 +217,12 @@ done
 #=======================
 # MAIN SCRIPT
 #=======================
+replace_var00_txt
 replace_freq_of_all_users
-delete_stz_value_for_var00
 add_45039_for_fvrt
 add_talkeralias
-
-# 아래 3개는 Github hl5ky/dvsmu/stup.sh와 동일 (수정시 동일하게 수정해야 함)
 download_and_update_apps
 set_crontab
 add_variables
 
-sudo rm /usr/local/dvs/dvsmu_upgrade.sh  > /dev/null 2>&1
 
