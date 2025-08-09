@@ -903,9 +903,9 @@ $sp10 $T005
 $sp08 업그레이드가 완료되었습니다.
         " 9 50 1
 
-        ${DVS}dvsmu U; exit 0
+        ${DVS}dvsmu; exit 0
 
-        else ${DVS}dvsmu U; exit 0
+        else ${DVS}dvsmu; exit 0
         fi
 else
         clear
