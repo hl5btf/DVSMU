@@ -900,8 +900,8 @@ $sp10 $T005
         clear
         whiptail --msgbox "\
 
-$sp08 업그레이드가 완료되었습니다.
-        " 9 50 1
+$sp08 dvsMU 및 관련 프로그램이 모두 업그레이드 되었습니다.
+        " 9 55 1
 
         ${DVS}dvsmu; exit 0
 
