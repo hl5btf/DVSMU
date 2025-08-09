@@ -5,7 +5,8 @@
 # 차후에 upgrade 할 내용이 있으면 여기에 계속 주가하면 됨.
 # 차후에 변수가 추가될때를 고려하여 변수가 추가되는 루틴을 미리 작성해 둠.
 # 이미 있는 내용은 추가하지 않음.
-
+sudo cp /var/lib/dvswitch/dvs/lan/korean.txt /var/lib/dvswitch/dvs/lan/language.txt
+# language.txt 가 없으면 아래 source에서 에러가 발생함
 source /var/lib/dvswitch/dvs/var.txt > /dev/null 2>&1
 
 user_array=(01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40)
