@@ -76,7 +76,7 @@ echo -e "$complete"
 #-----------------------------------------------------------
 
 do_macro() {
-	sudo ${DVS}temp_msg.sh -y
+#	sudo ${DVS}temp_msg.sh -y
 
 	sudo \mv -f ${AB}dvsm.macro ${AB}dvsm.basic
 	sudo \cp -f ${adv}dvsm.* ${AB}
