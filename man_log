@@ -331,7 +331,7 @@ function do_reboot() {
 
         cmd="sudo systemctl restart"
 
-        if [ $con_cl_M = "NO" ]; then
+        if [ "$con_cl_M" = "NO" ]; then
         cmd="$cmd analog_bridge"
         fi
 
@@ -342,7 +342,7 @@ function do_reboot() {
         sudo sed -i -e "/man_log/ c 0 $time * * * root flock -n /var/lock/man_log.lock /usr/local/dvs/man_log" $file
 
 	if sudo grep -q "reboot=yes" "$file"; then
-                log_line="$time_now  ${cnted_callsigns}Connected, ${busy_callsigns}Busy, REBOOT"
+                log_line="$time_now  ${busy_callsigns}Busy, REBOOT"
                 sudo sed -i "1 i\\$log_line" $FILE_LOG
 
 #echo "REBOOT"; exit 0
@@ -380,26 +380,37 @@ fi
 # 확인루틴에서의 일시적인 에러가 있더라도 busy인 경우를 최우선으로 고려함
 
 
-main_user_connection_chk
-sub_user_connection_chk
+
+
+file=/etc/crontab
+
+if sudo grep -q "reboot=no" "$file"; then
+        log_line="$time_now  "reboot=no" do not reboot"
+        sudo sed -i "1 i\\$log_line" $FILE_LOG
+	exit 0
+fi
+
+#main_user_connection_chk
+#sub_user_connection_chk
 
 #echo "con_cl_M $con_cl_M"
 #echo "cnted_callsigns $cnted_callsigns"
 #echo "con_cl_one_of_sub_users $con_cl_one_of_sub_users"
 
-if [ $con_cl_M = "NO" ] && [ $con_cl_one_of_sub_users = "NO" ]; then
-	cnted_callsigns="Not "
-	busy_callsigns="Not "
-	do_reboot
-else
+#if [ $con_cl_M = "NO" ] && [ $con_cl_one_of_sub_users = "NO" ]; then
+#	cnted_callsigns="Not "
+#	busy_callsigns="Not "
+#	do_reboot
+#else
 	main_user_busy_check
 	AR_user_busy_check
 	sub_user_busy_check
-fi
+#fi
 
 #echo "busy_M $busy_M"
 #echo "busy_AR $busy_AR"
 #echo "busy_user $busy_user"
+#echo "busy_callsigns $busy_callsigns"
 #exit 0
 
 
@@ -417,12 +428,16 @@ else
 
 	if [ $min = 60 ]; then
                 sudo sed -i -e "/man_log/ c 0 $time * * * root flock -n /var/lock/man_log.lock /usr/local/dvs/man_log" $file
+        	log_line="$time_now  still Busy, no REBOOT, check again tomorrow"
+	        sudo sed -i "1 i\\$log_line" $FILE_LOG
+
         else
                 sudo sed -i -e "/man_log/ c $min $time * * * root flock -n /var/lock/man_log.lock /usr/local/dvs/man_log" $file
-	fi
+	        log_line="$time_now  ${busy_callsigns}Busy, no REBOOT, check again in 10min"
+        	sudo sed -i "1 i\\$log_line" $FILE_LOG
 
-	log_line="$time_now  ${cnted_callsigns}Connected, ${busy_callsigns}Busy, no REBOOT"
-	sudo sed -i "1 i\\$log_line" $FILE_LOG
+	fi
+	#log_line="$time_now  ${cnted_callsigns}Connected, ${busy_callsigns}Busy, no REBOOT"
 fi
 #-----------------------------------------------------------------
 
