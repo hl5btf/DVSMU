@@ -13,7 +13,7 @@ user_array=(01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23
 #====== replace_var00_txt =============================================
 function replace_var00_txt() {
 # 최초에 var00.txt를 만들었을때 설치했던 사용자를 위함
-files=var00.txt
+file=var00.txt
 dir=/var/lib/dvswitch/dvs
 sudo wget -O ${dir}/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
 }
