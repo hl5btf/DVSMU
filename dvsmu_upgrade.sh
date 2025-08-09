@@ -17,7 +17,7 @@ echo
 echo ">>> replace_var00_txt"
 file=var00.txt
 dir=/var/lib/dvswitch/dvs
-sudo wget -O ${dir}/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
+sudo wget -O ${dir}/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file > /dev/null 2>&1
 }
 
 #====== replace_freq_of_all_users =============================================
@@ -198,7 +198,7 @@ function add_variables() {
 # each item needs space in between. if the item is character, it needs quotation marks.
 echo
 echo ">>> add_variables"
-
+echo
 new_var="txgain_asl txgain_stfu txgain_intercom original_bm_address"
 
 new_val=(0.35 0.35 0.35 "")
