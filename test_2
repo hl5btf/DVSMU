@@ -32,7 +32,7 @@ sudo nano /var/tmp/bm_watchdog_status.txt; ${DVS}dvsman bm_test; exit 0 ;;
 4)
 sudo nano /var/lib/mmdvm/DMR_Hosts.txt; ${DVS}dvsman bm_test; exit 0 ;;
 5)
-${DVS}dvsman bm_test; exit 0 ;;
+sudo ${DVS}bm_watchdog.sh; ${DVS}dvsman bm_test; exit 0 ;;
 6)
 sudo nano /var/lib/dvswitch/dvs/var.txt; ${DVS}dvsman bm_test; exit 0 ;;
 7)
