@@ -385,7 +385,7 @@ fi
 file=/etc/crontab
 
 if sudo grep -q "reboot=no" "$file"; then
-        log_line="$time_now  "reboot=no", do not reboot"
+        log_line="$time_now  reboot=no, do not reboot"
         sudo sed -i "1 i\\$log_line" $FILE_LOG
 	exit 0
 fi
