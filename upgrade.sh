@@ -2,7 +2,7 @@
 
 # dvsmu v2.01 또는 이전 사용자를 위해서 필요함
 
-file=/usr/local/dvs/dvsmu_upgrade.sh
+file=/tmp/dvsmu_upgrade.sh
 sudo wget -O $file https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu_upgrade.sh > /dev/null 2>&1
 sudo chmod +x $file
 sudo $file
