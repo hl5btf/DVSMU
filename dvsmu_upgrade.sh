@@ -16,7 +16,6 @@ function replace_var00_txt() {
 files=var00.txt
 dir=/var/lib/dvswitch/dvs
 sudo wget -O ${dir}/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file
-sudo chmod +x ${dir}/$file
 }
 
 #====== replace_freq_of_all_users =============================================
