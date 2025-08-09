@@ -82,12 +82,12 @@ sudo sed -i "/^desc=/ c desc=dvsMU" $file
 function add_45039_for_fvrt() {
 # DMR_fvrt_list.txt 수정
 file=/var/lib/dvswitch/dvs/tgdb/DMR_fvrt_list.txt
-if [[ -z $(sudo grep "45039" "$file") ]]; then
+if [ ! -f "$file" ] || [[ -z $(sudo grep "45039" "$file") ]]; then
     sudo wget -O $file https://raw.githubusercontent.com/hl5btf/DVSMU/main/tgdb_KR/DMR_fvrt_list.txt > /dev/null 2>&1
 fi
 
 file=/var/lib/dvswitch/dvs/tgdb/KR/DMR_fvrt_list.txt
-if [[ -z $(sudo grep "45039" "$file") ]]; then
+if [ ! -f "$file" ] || [[ -z $(sudo grep "45039" "$file") ]]; then
     sudo wget -O $file https://raw.githubusercontent.com/hl5btf/DVSMU/main/tgdb_KR/DMR_fvrt_list.txt > /dev/null 2>&1
 fi
 
@@ -95,7 +95,7 @@ for user in "${user_array[@]}"; do
 source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
     file=/var/lib/dvswitch/dvs/tgdb/user${user}/DMR_fvrt_list.txt
-    if [[ -z $(sudo grep "45039" "$file") ]]; then
+    if [ ! -f "$file" ] || [[ -z $(sudo grep "45039" "$file") ]]; then
         sudo wget -O /var/lib/dvswitch/dvs/tgdb/user${user}/DMR_fvrt_list.txt https://raw.githubusercontent.com/hl5btf/DVSMU/main/tgdb_KR/DMR_fvrt_list.txt > /dev/null 2>&1
     fi
 fi
