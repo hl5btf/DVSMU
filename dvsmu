@@ -1118,6 +1118,45 @@ ${DVS}dvsmu M; exit 0 ;;
 esac
 }
 
+# Function TA_input
+#--------------------------------------------------------------
+function TA_input_main_user() {
+
+source /var/lib/dvswitch/dvs/var.txt > /dev/null 2>&1
+TA_in=$(whiptail --title "talkerAlias" --inputbox "\
+
+기본값(공백) :
+    안드로이드 사용자의 호출부호/이름 전달(BM의 기능)
+    (예: VK3AZN Bob)
+
+정보 수정 :
+    수정한 내용으로 전달
+    (예: VK3AZN dvsMU)
+
+" 16 60 "${talkerAlias}" 3>&1 1>&2 2>&3)
+if [ $? != 0 ]; then ${DVS}dvsmu $USER_NO; exit 0; fi
+
+TA_in_no_blank=$(echo ${TA_in} | tr -d ' ')
+TA_no=${#TA_in_no_blank}
+
+if [ ${TA_no} = 0 ]; then TA_in=""; fi
+
+source /var/lib/dvswitch/dvs/var.txt > /dev/null 2>&1
+if [ "${TA_in}" != "${talkerAlias}" ]; then
+        pse_wait
+        update_var talkerAlias "${TA_in}"
+
+sudo systemctl stop mmdvm_bridge
+file=${MB}DVSwitch.ini
+        if [ "${TA_in}" = "" ];
+        then    sudo sed -i -e "/talkerAlias/ c talkerAlias = " $file
+        else    $update_ini $file DMR talkerAlias "${TA_in}"
+        fi
+sudo systemctl start mmdvm_bridge
+fi
+${DVS}dvsmu M
+}
+
 
 ###############################################################
 # Function main_user_config
@@ -1135,7 +1174,9 @@ if [ "$opt2" = main_file ]; then main_user_file_menu; fi
 if [ "$opt2" = main_log_z ]; then main_user_log_menu_z; fi
 if [ "$opt2" = main_file_z ]; then main_user_file_menu_z; fi
 
-declare ext=${rpt_id:7:2}
+declare ext_M=${rpt_id:7:2}
+declare TA_M="${talkerAlias:0:15}"
+if [ "$TA_M" = "" ]; then TA_M="현재 공백"; fi
 
 ar_status=$(systemctl is-active analog_reflector)
 if [ $ar_status = "active" ]; then
@@ -1159,14 +1200,15 @@ else
 
 sel3=$(whiptail --title " Main User Configuration " --menu "\
 \n
-$sp05 MAIN_USER  $call_sign_M $dmr_id $ext $usrp_port_M
+$sp06 MAIN_USER  $call_sign_M $dmr_id $ext_M $usrp_port_M
 -------------------------------------------------------
-" 16 55 5 \
+" 17 50 6 \
 "1" "주사용자 설정및변경" \
 "2" "로그 확인--->" \
 "3" "파일 관리--->" \
 "4" "서비스 재시작" \
-"5" "Back to MAIN" \
+"5" "talkerAlias ($TA_M)" \
+"6" "Back to MAIN" \
 3>&1 1>&2 2>&3)
 
 if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
@@ -1182,6 +1224,8 @@ main_user_file_menu; exit 0 ;;
 pse_wait
 sudo ${DVS}88_restart.sh; ${DVS}dvsmu M; exit 0 ;;
 5)
+TA_input_main_user; exit 0 ;;
+6)
 ${DVS}dvsmu; exit 0 ;;
 esac
 
@@ -1291,12 +1335,14 @@ source /var/lib/dvswitch/dvs/var$USER_NO.txt > /dev/null 2>&1
 if [ "${TA_in}" != "${talkerAlias}" ]; then
         pse_wait
         update_var talkerAlias "${TA_in}"
+
+sudo systemctl stop mmdvm_bridge$USER_NO
 file=/opt/user$USER_NO/DVSwitch.ini
         if [ "${TA_in}" = "" ];
         then    sudo sed -i -e "/talkerAlias/ c talkerAlias = " $file
         else    $update_ini $file DMR talkerAlias "${TA_in}"
         fi
-	restart $USER_NO
+sudo systemctl start mmdvm_bridge$USER_NO
 fi
 ${DVS}dvsmu $USER_NO
 }
@@ -1421,18 +1467,16 @@ else
 
 sel2=$(whiptail --title " User Configuration " --menu "\
 \n
-$sp02 User$USER_NO  $call_sign $dmr_id $ext $usrp_port $macro_status
+$sp05 User$USER_NO  $call_sign $dmr_id $ext $usrp_port
 -------------------------------------------------------
-" 20 55 9 \
+" 18 45 7 \
 "1" "로그 확인 --->" \
 "2" "파일 관리 --->" \
 "3" "사용자 설정 변경" \
 "4" "사용자 삭제" \
 "5" "서비스 재시작" \
-"6" "기본매크로로 변경" \
-"7" "수정매크로로 변경" \
-"8" "talkerAlias ($TA)" \
-"9" "Back to MAIN" \
+"6" "talkerAlias ($TA)" \
+"7" "Back to MAIN" \
 3>&1 1>&2 2>&3)
 
 if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
@@ -1449,12 +1493,8 @@ user_delete $USER_NO; exit 0 ;;
 5)
 restart $USER_NO; exit 0 ;;
 6)
-sudo \cp -f /opt/user$USER_NO/dvsm.basic /opt/user$USER_NO/dvsm.macro; ${DVS}dvsmu $USER_NO; exit 0 ;;
-7)
-sudo \cp -f /opt/user$USER_NO/dvsm.adv /opt/user$USER_NO/dvsm.macro; ${DVS}dvsmu $USER_NO; exit 0 ;;
-8)
 TA_input $USER_NO; exit 0 ;;
-9)
+7)
 ${DVS}dvsmu; exit 0 ;;
 esac
 fi
