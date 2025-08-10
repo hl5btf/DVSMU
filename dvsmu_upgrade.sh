@@ -204,11 +204,10 @@ function add_variables() {
 echo
 echo ">>> add_variables"
 echo
+function do_add() {
 new_var="txgain_asl txgain_stfu txgain_intercom original_bm_address"
-
 new_val=(0.35 0.35 0.35 "")
 
-function do_add() {
 for var in ${new_var}; do
         if ! sudo grep -q "^$var" "$file"; then
                 echo "$var=" | sudo tee -a $file > /dev/null 2>&1
@@ -226,8 +225,8 @@ file=/var/lib/dvswitch/dvs/var00.txt
     do_add; n=0
 
 for user in "${user_array[@]}"; do
-if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
     source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
+if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
     file=/var/lib/dvswitch/dvs/var${user}.txt
     do_add; n=0
 fi
