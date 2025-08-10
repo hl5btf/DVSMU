@@ -43,6 +43,26 @@ fi
 
 user_array=("" 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40)
 
+# msmtp/mail 환경 자동 결정: MAIL_ENV 배열에 env-assignments 세팅
+function prepare_mail_env() {
+  REAL_USER="${SUDO_USER:-$(id -un)}"
+  REAL_HOME="$(getent passwd "$REAL_USER" | cut -d: -f6)"
+  [ -z "$REAL_HOME" ] && REAL_HOME="$HOME"
+
+  # msmtp 설정 파일 우선순위: 지정 MSMTP_CONFIG > ~/.msmtprc > /etc/msmtprc
+  if [ -n "${MSMTP_CONFIG:-}" ] && [ -f "$MSMTP_CONFIG" ]; then
+    MSMTP_CFG="$MSMTP_CONFIG"
+  elif [ -n "$REAL_HOME" ] && [ -f "$REAL_HOME/.msmtprc" ]; then
+    MSMTP_CFG="$REAL_HOME/.msmtprc"
+  elif [ -f /etc/msmtprc ]; then
+    MSMTP_CFG="/etc/msmtprc"
+  else
+    MSMTP_CFG=""
+  fi
+
+  MAIL_BIN="$(command -v mail || echo /usr/bin/mail)"
+}
+
 ######################################################################
 # extract_bm_list
 ######################################################################
@@ -263,8 +283,34 @@ for test_bm_address in "${now_bm_address[@]}"; do
 						source /var/lib/dvswitch/dvs/var.txt
 
 						if [ "$call_sign" = "HL5KY" ]; then
-    						echo -e "$TIME\nUSER${user}\n초기 주소: $bm_address\n변경된 주소: $new_address" \
-    						| mail -s "bm_watchdog - 마스터서버 장애 감지 및 서버 변경" "$email"
+	  
+prepare_mail_env
+
+# ---- 여기부터 전송 ----
+TO="${email:-}"   # 비어 있으면 스킵
+SUBJECT="bm_watchdog - 마스터서버 장애 감지 및 서버 변경"
+
+[ -z "$TO" ] && { logger -t bm_watchdog "email unset; skip"; exit 0; }
+
+if [ -n "$MSMTP_CFG" ] && [ -d "$REAL_HOME" ]; then
+  HOME="$REAL_HOME" MSMTP_CONFIG="$MSMTP_CFG" \
+  "$MAIL_BIN" -a 'Content-Type: text/plain; charset=UTF-8' \
+              -s "$SUBJECT" "$TO" <<EOF
+${TIME:-$(date '+%F %T')}
+USER${user:-}
+초기 설정 주소: ${present_bm_address:-unknown}}
+대체 변경 주소: ${new_address:-unknown}
+EOF
+else
+  "$MAIL_BIN" -a 'Content-Type: text/plain; charset=UTF-8' \
+              -s "$SUBJECT" "$TO" <<EOF
+${TIME:-$(date '+%F %T')}
+USER${user:-}
+초기 설정 주소: ${present_bm_address:-${bm_address:-unknown}}
+대체 변경 주소: ${new_address:-unknown}
+EOF
+fi
+
 							# 다음의 두 가지 조건에 맞으면 email 전송
 							# 주사용자에 설정한 마스터서버가 작동되지 않아서 서버를 변경한 경우
 							# 주사용자의 호출부호가 HL5KY인 경우
@@ -387,8 +433,33 @@ for test_bm_address in "${original_bm_address[@]}"; do
 						source /var/lib/dvswitch/dvs/var.txt
 
 						if [ "$call_sign" = "HL5KY" ]; then
-                		echo -e "$TIME\nUSER${user}\변경전 주소: $bm_address\n변경된 주소: $new_address" \
-	                	| mail -s "bm_watchdog - 원래의 마스터서버 복구 및 서버 주소 변경" "$email"
+
+prepare_mail_env
+
+# ---- 여기부터 전송 ----
+TO="${email:-}"   # 비어 있으면 스킵
+SUBJECT="bm_watchdog - 원래의 마스터서버 주소로 복원"
+
+[ -z "$TO" ] && { logger -t bm_watchdog "email unset; skip"; exit 0; }
+
+if [ -n "$MSMTP_CFG" ] && [ -d "$REAL_HOME" ]; then
+  HOME="$REAL_HOME" MSMTP_CONFIG="$MSMTP_CFG" \
+  "$MAIL_BIN" -a 'Content-Type: text/plain; charset=UTF-8' \
+              -s "$SUBJECT" "$TO" <<EOF
+${TIME:-$(date '+%F %T')}
+USER${user:-}
+임시 사용 주소: ${present_bm_address:-unknown}}
+복원된 원래 주소: ${new_address:-unknown}
+EOF
+else
+  "$MAIL_BIN" -a 'Content-Type: text/plain; charset=UTF-8' \
+              -s "$SUBJECT" "$TO" <<EOF
+${TIME:-$(date '+%F %T')}
+USER${user:-}
+임시 사용 주소: ${present_bm_address:-unknown}}
+복원된 원래 주소: ${new_address:-unknown}
+EOF
+fi
 	        	        # 다음의 두 가지 조건에 맞으면 email 전송
         	        	# 주사용자에 설정한 마스터서버가 작동되지 않아서 서버를 변경한 경우
 	        	        # 주사용자의 호출부호가 HL5KY인 경우
