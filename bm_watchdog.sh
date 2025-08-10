@@ -260,9 +260,11 @@ for test_bm_address in "${now_bm_address[@]}"; do
                                                 sed -i "/^${bm_prefix_ping_fail}=.*/d" "$bm_status_tmp_file"
 
 						# email 보내기
-					        if [ "$source_file" = "/var/lib/dvswitch/dvs/var.txt" ] && [ "$call_sign" = "HL5KY" ]; then
-				        		echo -e "$TIME\nvar${user}.txt\n초기 주소: $bm_address\n변경된 주소: $new_address" \
-				                	| mail -s "마스터서버 장애 감지 및 서버 변경" "$email"
+						source /var/lib/dvswitch/dvs/var.txt
+
+						if [ "$call_sign" = "HL5KY" ]; then
+    						echo -e "$TIME\nvar${user}.txt\n초기 주소: $bm_address\n변경된 주소: $new_address" \
+    						| mail -s "bm_watchdog - 마스터서버 장애 감지 및 서버 변경" "$email"
 							# 다음의 두 가지 조건에 맞으면 email 전송
 							# 주사용자에 설정한 마스터서버가 작동되지 않아서 서버를 변경한 경우
 							# 주사용자의 호출부호가 HL5KY인 경우
@@ -382,9 +384,11 @@ for test_bm_address in "${original_bm_address[@]}"; do
 				sed -i "/^${bm_short}=.*/d" "$bm_status_tmp_file"
 
 		                # email 보내기
-        		        if [ "$source_file" = "/var/lib/dvswitch/dvs/var.txt" ] && [ "$call_sign" = "HL5KY" ]; then
+						source /var/lib/dvswitch/dvs/var.txt
+
+						if [ "$call_sign" = "HL5KY" ]; then
                 		echo -e "$TIME\nUSER${user}.txt\변경전 주소: $bm_address\n변경된 주소: $new_address" \
-	                	| mail -s "원래의 마스터서버 복구 및 서버 주소 변경" "$email"
+	                	| mail -s "bm_watchdog - 원래의 마스터서버 복구 및 서버 주소 변경" "$email"
 	        	        # 다음의 두 가지 조건에 맞으면 email 전송
         	        	# 주사용자에 설정한 마스터서버가 작동되지 않아서 서버를 변경한 경우
 	        	        # 주사용자의 호출부호가 HL5KY인 경우
