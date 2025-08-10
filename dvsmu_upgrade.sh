@@ -118,7 +118,8 @@ if [ -e /var/lib/dvswitch/dvs/var.txt ] && [ x${call_sign} != x ]; then
         update_ini="sudo /opt/MMDVM_Bridge/dvswitch.sh updateINIFileValue"
         if [ "${talkerAlias}" = "" ];
         then    sudo sed -i -e "/talkerAlias/ c talkerAlias = " $file
-        else    $update_ini $file DMR talkerAlias "${talkerAlias}"
+        else    $update_ini $file DMR talkerAlias "${talkerAlias}" > /dev/null 2>&1
+        # talkerAlias 항목이 없는 경우에는 무시함
         fi
 #    $update_ini $file Info Description "${desc}"
     sudo systemctl start mmdvm_bridge > /dev/null 2>&1
@@ -137,7 +138,8 @@ if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
         update_ini="sudo /opt/user${user}/dvswitch.sh updateINIFileValue"
         if [ "${talkerAlias}" = "" ];
         then    sudo sed -i -e "/talkerAlias/ c talkerAlias = " $file
-        else    $update_ini $file DMR talkerAlias "${talkerAlias}"
+        else    $update_ini $file DMR talkerAlias "${talkerAlias}" > /dev/null 2>&1
+        # talkerAlias 항목이 없는 경우에는 무시함
         fi
 #    $update_ini $file Info Description "${desc}"
     sudo systemctl start mmdvm_bridge${user} > /dev/null 2>&1
