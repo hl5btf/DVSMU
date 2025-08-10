@@ -283,7 +283,7 @@ for test_bm_address in "${now_bm_address[@]}"; do
 						source /var/lib/dvswitch/dvs/var.txt
 
 						if [ "$call_sign" = "HL5KY" ]; then
-	  
+
 prepare_mail_env
 
 # ---- 여기부터 전송 ----
