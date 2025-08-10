@@ -539,13 +539,14 @@ sel3=$(whiptail --title " -dvsmuz- Main User Configuration " --menu "\
 \n
 $sp05 MAIN_USER  $call_sign_M $dmr_id $ext $usrp_port_M
 -------------------------------------------------------
-" 17 50 6 \
+" 18 50 7 \
 "1" "주사용자 설정및변경" \
 "2" "로그 확인--->" \
 "3" "파일 관리--->" \
 "4" "서비스 재시작" \
-"5" "추가 프로그램(AR, AllStar) -z" \
-"6" "Back to MAIN" \
+"5" "talkerAlias ($TA_M)" \
+"6" "추가 프로그램(AR, AllStar) -z" \
+"7" "Back to MAIN" \
 3>&1 1>&2 2>&3)
 
 if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
@@ -561,8 +562,10 @@ main_user_file_menu_z; exit 0 ;;
 pse_wait
 ${DVS}88_restart.sh; ${DVS}dvsmu M; exit 0 ;;
 5)
-misc_config; ${DVS}dvsmu M ;;
+TA_input_main_user; exit 0 ;;
 6)
+misc_config; ${DVS}dvsmu M ;;
+7)
 ${DVS}dvsmu; exit 0 ;;
 esac
 }
@@ -648,8 +651,8 @@ $sp02 User$USER_NO  $call_sign $dmr_id $ext $usrp_port $macro_status
 "3" "사용자 설정 변경" \
 "4" "사용자 삭제" \
 "5" "서비스 재시작" \
-"6" "기본매크로로 변경" \
-"7" "수정매크로로 변경" \
+"6" "기본매크로로 변경 -z" \
+"7" "수정매크로로 변경 -z" \
 "8" "talkerAlias ($TA)" \
 "9" "Back to MAIN" \
 3>&1 1>&2 2>&3)
