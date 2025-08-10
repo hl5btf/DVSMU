@@ -114,12 +114,13 @@ if [ -e /var/lib/dvswitch/dvs/var.txt ] && [ x${call_sign} != x ]; then
     
     sudo systemctl stop mmdvm_bridge > /dev/null 2>&1
 
-    file=/opt/MMDVM_Bridge/DVSwitch.ini
+   file=/opt/MMDVM_Bridge/DVSwitch.ini
         update_ini="sudo /opt/MMDVM_Bridge/dvswitch.sh updateINIFileValue"
-        if [ "${talkerAlias}" = "" ];
-        then    sudo sed -i -e "/talkerAlias/ c talkerAlias = " $file
-        else    $update_ini $file DMR talkerAlias "${talkerAlias}" > /dev/null 2>&1
-        # talkerAlias 항목이 없는 경우에는 무시함
+        if sudo grep -q "talkerAlias" "$file"; then
+                if [ "${talkerAlias}" = "" ];
+                        then    sudo sed -i -e "/talkerAlias/ c talkerAlias = " $file
+                        else    $update_ini $file DMR talkerAlias "${talkerAlias}" > /dev/null 2>&1
+                fi
         fi
 #    $update_ini $file Info Description "${desc}"
     sudo systemctl start mmdvm_bridge > /dev/null 2>&1
@@ -136,10 +137,11 @@ if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
 
     file=/opt/user${user}/DVSwitch.ini
         update_ini="sudo /opt/user${user}/dvswitch.sh updateINIFileValue"
-        if [ "${talkerAlias}" = "" ];
-        then    sudo sed -i -e "/talkerAlias/ c talkerAlias = " $file
-        else    $update_ini $file DMR talkerAlias "${talkerAlias}" > /dev/null 2>&1
-        # talkerAlias 항목이 없는 경우에는 무시함
+        if sudo grep -q "talkerAlias" "$file"; then
+                if [ "${talkerAlias}" = "" ];
+                        then    sudo sed -i -e "/talkerAlias/ c talkerAlias = " $file
+                        else    $update_ini $file DMR talkerAlias "${talkerAlias}" > /dev/null 2>&1
+                fi
         fi
 #    $update_ini $file Info Description "${desc}"
     sudo systemctl start mmdvm_bridge${user} > /dev/null 2>&1
