@@ -163,9 +163,9 @@ echo -e "$complete"
         $update_ini $file "DMR Network" Port ${bm_port}
 
 file=/opt/user$USER_NO/DVSwitch.ini
-        if [ "${talkerAlias}" = "" ];
-        then    sudo sed -i -e "/talkerAlias/ c talkerAlias = " $file
-        else    $update_ini $file DMR talkerAlias "${talkerAlias}"
+        # $file에 "talkerAlias"가 존재하고, var.txt${user}의 talkerAlias 변수가 빈 문자열이 아닌 경우
+        if sudo grep -q "talkerAlias" "$file" && [ -n "${talkerAlias}" ]; then
+            $update_ini $file DMR talkerAlias ${talkerAlias}
         fi
         declare txport=$(($USER_NO_NO+31000))
         declare rxport=$(($USER_NO_NO+31300))
@@ -228,8 +228,8 @@ file=/opt/user$1/dvsm.basic
 file=/opt/user$1/dvsm.sh
         sudo sed -i "s/USER_NO/$1/g" $file
 
-file=/opt/user$1/DVSwitch.ini
-        sudo sed -i -e "/talkerAlias/ c talkerAlias = " $file
+#file=/opt/user$1/DVSwitch.ini
+#        sudo sed -i -e "/talkerAlias/ c talkerAlias = " $file
 
 source /var/lib/dvswitch/dvs/var$1.txt
 
@@ -1146,13 +1146,16 @@ if [ "${TA_in}" != "${talkerAlias}" ]; then
         pse_wait
         update_var talkerAlias "${TA_in}"
 
-sudo systemctl stop mmdvm_bridge
 file=${MB}DVSwitch.ini
-        if [ "${TA_in}" = "" ];
-        then    sudo sed -i -e "/talkerAlias/ c talkerAlias = " $file
-        else    $update_ini $file DMR talkerAlias "${TA_in}"
+        # $file에 "talkerAlias"가 존재하면
+        if sudo grep -q "talkerAlias" "$file"; then
+		sudo systemctl stop mmdvm_bridge > /dev/null 2>&1
+                if [ "${TA_in}" = "" ];
+                        then    sudo sed -i -e "/talkerAlias/ c talkerAlias = " $file
+                        else    $update_ini $file DMR talkerAlias "${TA_in}"
+                fi
+		sudo systemctl start mmdvm_bridge > /dev/null 2>&1
         fi
-sudo systemctl start mmdvm_bridge
 fi
 ${DVS}dvsmu M
 }
@@ -1306,9 +1309,9 @@ fi
 }
 
 #--------------------------------------------------------------
-# Function TA_input
+# Function TA_input_user
 #--------------------------------------------------------------
-function TA_input() {
+function TA_input_user() {
 
 USER_NO=$1
 
@@ -1336,13 +1339,16 @@ if [ "${TA_in}" != "${talkerAlias}" ]; then
         pse_wait
         update_var talkerAlias "${TA_in}"
 
-sudo systemctl stop mmdvm_bridge$USER_NO
 file=/opt/user$USER_NO/DVSwitch.ini
-        if [ "${TA_in}" = "" ];
-        then    sudo sed -i -e "/talkerAlias/ c talkerAlias = " $file
-        else    $update_ini $file DMR talkerAlias "${TA_in}"
-        fi
-sudo systemctl start mmdvm_bridge$USER_NO
+        # $file에 "talkerAlias"가 존재하면
+        if sudo grep -q "talkerAlias" "$file"; then
+		sudo systemctl stop mmdvm_bridge$USER_NO > /dev/null 2>&1
+	        if [ "${TA_in}" = "" ];
+        		then    sudo sed -i -e "/talkerAlias/ c talkerAlias = " $file
+	        	else    $update_ini $file DMR talkerAlias "${TA_in}"
+        	fi
+		sudo systemctl start mmdvm_bridge$USER_NO > /dev/null 2>&1
+	fi
 fi
 ${DVS}dvsmu $USER_NO
 }
@@ -1493,7 +1499,7 @@ user_delete $USER_NO; exit 0 ;;
 5)
 restart $USER_NO; exit 0 ;;
 6)
-TA_input $USER_NO; exit 0 ;;
+TA_input_user $USER_NO; exit 0 ;;
 7)
 ${DVS}dvsmu; exit 0 ;;
 esac
