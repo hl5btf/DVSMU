@@ -112,18 +112,15 @@ if [ -e /var/lib/dvswitch/dvs/var.txt ] && [ x${call_sign} != x ]; then
         echo "talkerAlias=" | sudo tee -a /var/lib/dvswitch/dvs/var.txt
     fi
     
-    sudo systemctl stop mmdvm_bridge > /dev/null 2>&1
-
-   file=/opt/MMDVM_Bridge/DVSwitch.ini
+    file=/opt/MMDVM_Bridge/DVSwitch.ini
         update_ini="sudo /opt/MMDVM_Bridge/dvswitch.sh updateINIFileValue"
-        if sudo grep -q "talkerAlias" "$file"; then
-                if [ "${talkerAlias}" = "" ];
-                        then    sudo sed -i -e "/talkerAlias/ c talkerAlias = " $file
-                        else    $update_ini $file DMR talkerAlias "${talkerAlias}" > /dev/null 2>&1
-                fi
+        # $file에 "talkerAlias"가 존재하고, var.txt의 talkerAlias 변수가 빈 문자열이 아닌 경우
+        if sudo grep -q "talkerAlias" "$file" && [ -n "${talkerAlias}" ]; then
+            sudo systemctl stop mmdvm_bridge > /dev/null 2>&1
+            $update_ini $file DMR talkerAlias "${talkerAlias}"
+            sudo systemctl start mmdvm_bridge > /dev/null 2>&1
         fi
 #    $update_ini $file Info Description "${desc}"
-    sudo systemctl start mmdvm_bridge > /dev/null 2>&1
 fi
 
 for user in "${user_array[@]}"; do
@@ -133,18 +130,15 @@ if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
         echo "talkerAlias=" | sudo tee -a /var/lib/dvswitch/dvs/var${user}.txt
     fi
     
-    sudo systemctl stop mmdvm_bridge${user} > /dev/null 2>&1
-
     file=/opt/user${user}/DVSwitch.ini
         update_ini="sudo /opt/user${user}/dvswitch.sh updateINIFileValue"
-        if sudo grep -q "talkerAlias" "$file"; then
-                if [ "${talkerAlias}" = "" ];
-                        then    sudo sed -i -e "/talkerAlias/ c talkerAlias = " $file
-                        else    $update_ini $file DMR talkerAlias "${talkerAlias}" > /dev/null 2>&1
-                fi
+        # $file에 "talkerAlias"가 존재하고, var${user}.txt의 talkerAlias 변수가 빈 문자열이 아닌 경우
+        if sudo grep -q "talkerAlias" "$file" && [ -n "${talkerAlias}" ]; then
+            sudo systemctl stop mmdvm_bridge${user} > /dev/null 2>&1
+            $update_ini $file DMR talkerAlias "${talkerAlias}"
+            sudo systemctl start mmdvm_bridge${user} > /dev/null 2>&1
         fi
 #    $update_ini $file Info Description "${desc}"
-    sudo systemctl start mmdvm_bridge${user} > /dev/null 2>&1
 fi
 done
 }
