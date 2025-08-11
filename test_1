@@ -675,7 +675,7 @@ sudo \cp -f /opt/user$USER_NO/dvsm.basic /opt/user$USER_NO/dvsm.macro; ${DVS}dvs
 7)
 sudo \cp -f /opt/user$USER_NO/dvsm.adv /opt/user$USER_NO/dvsm.macro; ${DVS}dvsmu $USER_NO; exit 0 ;;
 8)
-TA_input $USER_NO; exit 0 ;;
+TA_input_user $USER_NO; exit 0 ;;
 9)
 ${DVS}dvsmu; exit 0 ;;
 esac
