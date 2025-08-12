@@ -178,6 +178,38 @@ edit_info Location "${lctn}"
 edit_info Description "${desc}"
 edit_info URL ${url}
 
+
+file=/opt/MMDVM_Bridge/DVSwitch.ini
+file_var=/var/lib/dvswitch/dvs/var.txt
+
+        # file에 talkerAlias 항목이 있으면 값을 가져온다
+        if sudo grep -q "talkerAlias" "$file"; then
+                dvs_TA=$($update_ini $file DMR talkerAlias)  # 라인의 내용 추출
+                dvs_TA=$(echo "$dvs_TA" | sed -E 's/^[^=]*=\s*//;s/;.*//;s/^[[:space:]]*//;s/[[:space:]]*$//') # 라인에서 값을 추출
+        else
+            dvs_TA=""
+        fi
+
+        var_TA="$talkerAlias"
+
+        # file에 talkerAlias라는 텍스트가 있으면
+        if sudo grep -q "talkerAlias" "$file"; then
+                # ((dvs_TA에 %callsign이 포함) 또는 (dvs_TA가 공란))이면
+                if [[ "$dvs_TA" == *"%callsign"* || -z "$dvs_TA" ]]; then
+                        tag=talkerAlias; value="dvsMultiUser by HL5KY"
+                        sudo sed -i -e "s/^$tag=.*/$tag=\"$value\"/" $file_var
+
+                        sudo systemctl stop mmdvm_bridge > /dev/null 2>&1
+                        $update_ini $file DMR talkerAlias "dvsMultiUser by HL5KY"
+                        sudo systemctl start mmdvm_bridge > /dev/null 2>&1
+
+                # dvs_TA가 공란이 아니면
+                elif [[ -n "$dvs_TA" ]]; then
+                        tag=talkerAlias; value="$dvs_TA"
+                        sudo sed -i -e "s/^$tag=.*/$tag=\"$value\"/" $file_var
+                fi
+        fi
+
 #-----------------------------------------------------------
 #-----------------------------------------
 let "complete=complete+10"
