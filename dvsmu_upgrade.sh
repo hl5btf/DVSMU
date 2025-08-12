@@ -153,7 +153,7 @@ if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
     fi
 
 file=/opt/user${user}/DVSwitch.ini
-file_var=/var/lib/dvswitch/dvs/var$USER_NO.txt
+file_var=/var/lib/dvswitch/dvs/var${user}.txt
 
         # file에 talkerAlias 항목이 있으면 값을 가져온다
         if sudo grep -q "talkerAlias" "$file"; then
