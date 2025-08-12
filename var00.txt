@@ -121,5 +121,5 @@ new_val=()
 
 # ETC
 cpu_temp=
-talkerAlias=
+talkerAlias="dvsMU(MultiUser) by HL5KY"
 original_bm_address=
