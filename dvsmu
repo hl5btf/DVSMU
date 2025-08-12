@@ -1231,13 +1231,12 @@ sel3=$(whiptail --title " Main User Configuration " --menu "\
 \n
 $sp06 MAIN_USER  $call_sign_M $dmr_id $ext_M $usrp_port_M
 -------------------------------------------------------
-" 17 50 6 \
+" 16 50 5 \
 "1" "주사용자 설정및변경" \
 "2" "로그 확인--->" \
 "3" "파일 관리--->" \
 "4" "서비스 재시작" \
-"5" "talkerAlias ($TA_M)" \
-"6" "Back to MAIN" \
+"5" "Back to MAIN" \
 3>&1 1>&2 2>&3)
 
 if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
@@ -1253,8 +1252,6 @@ main_user_file_menu; exit 0 ;;
 pse_wait
 sudo ${DVS}88_restart.sh; ${DVS}dvsmu M; exit 0 ;;
 5)
-TA_input_main_user; exit 0 ;;
-6)
 ${DVS}dvsmu; exit 0 ;;
 esac
 
@@ -1501,14 +1498,13 @@ sel2=$(whiptail --title " User Configuration " --menu "\
 \n
 $sp05 User$USER_NO  $call_sign $dmr_id $ext $usrp_port
 -------------------------------------------------------
-" 18 45 7 \
+" 17 45 6 \
 "1" "로그 확인 --->" \
 "2" "파일 관리 --->" \
 "3" "사용자 설정 변경" \
 "4" "사용자 삭제" \
 "5" "서비스 재시작" \
-"6" "talkerAlias ($TA)" \
-"7" "Back to MAIN" \
+"6" "Back to MAIN" \
 3>&1 1>&2 2>&3)
 
 if [ $? != 0 ]; then ${DVS}dvsmu; exit 0; fi
@@ -1525,8 +1521,6 @@ user_delete $USER_NO; exit 0 ;;
 5)
 restart $USER_NO; exit 0 ;;
 6)
-TA_input_user $USER_NO; exit 0 ;;
-7)
 ${DVS}dvsmu; exit 0 ;;
 esac
 fi
@@ -2401,6 +2395,8 @@ if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
 	if [ "$talkerAlias" != "" ]; then show_TA=yes; fi
 fi
 done
+
+if ! source /usr/local/dvs/dvsmuz 2>/dev/null; then show_TA=no; fi
 
 if [ "$show_TA" = yes ];
 
