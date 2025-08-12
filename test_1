@@ -544,7 +544,7 @@ $sp05 MAIN_USER  $call_sign_M $dmr_id $ext $usrp_port_M
 "2" "로그 확인--->" \
 "3" "파일 관리--->" \
 "4" "서비스 재시작" \
-"5" "talkerAlias ($TA_M)" \
+"5" "talkerAlias ($TA_M) -z" \
 "6" "추가 프로그램(AR, AllStar) -z" \
 "7" "Back to MAIN" \
 3>&1 1>&2 2>&3)
@@ -653,7 +653,7 @@ $sp02 User$USER_NO  $call_sign $dmr_id $ext $usrp_port $macro_status
 "5" "서비스 재시작" \
 "6" "기본매크로로 변경 -z" \
 "7" "수정매크로로 변경 -z" \
-"8" "talkerAlias ($TA)" \
+"8" "talkerAlias ($TA) -z" \
 "9" "Back to MAIN" \
 3>&1 1>&2 2>&3)
 
