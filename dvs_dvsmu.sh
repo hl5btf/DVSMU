@@ -513,7 +513,7 @@ rm "$TMPFILE"
 #==================================================
 # run_all_functions
 #==================================================
-function run_all_functions() {
+#function run_all_functions() {
 # --- dvswitch-server가 설치되었는지 확인
 check_dvswitch
 
@@ -568,44 +568,6 @@ fi
 #sudo ./dvsmu_upgrade.sh
 #sleep 1
 #sudo rm dvsmu_upgrade.sh
-}
+#}
 
-#====== run_all_functions_with_progress_bar =============================================
-function run_all_functions_with_progress_bar() {
-(
-run_all_functions
-) > /dev/null 2>&1 &
-pid=$!
 
-echo
-echo -n "약 5분 소요. 완료되면 리부팅합니다."
-echo -e "\n"
-
-while kill -0 $pid 2>/dev/null; do
-    echo -n "#"
-    sleep 1
-done
-}
-
-#==================================================
-# MAIN SCRIPT
-#==================================================
-if [[ "$1" == "show" || "$1" == "continue" ]]; then
-	run_all_functions_with_progress_bar
-else
-	run_all_functions
-fi
-
-echo -e "\n"
-echo "setup 설정이 완료되었습니다."
-echo
-
-if [[ "$1" == "continue" ]]; then exit 0; fi
-
-echo "ENTER를 누르면 리부팅합니다."
-echo
-sleep 1
-sudo rm setup
-read
-sudo reboot
-exit 0
