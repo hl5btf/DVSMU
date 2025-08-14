@@ -510,6 +510,41 @@ rm "$TMPFILE"
 # sudo visudo 로 확인하면 내용이 반영되어 있음
 }
 
+#====== set_shellinabox =============================================
+function set_shellinabox() {
+# shellinabox 설치
+echo
+echo ">>> install shellinabox and change stanzas"
+
+sudo apt-get update
+sudo apt-get install shellinabox
+
+FILE="/etc/default/shellinabox"
+
+# 1. SHELLINABOX_PORT 처리
+if grep -q "^SHELLINABOX_PORT" "$FILE"; then
+    sudo sed -i 's|^SHELLINABOX_PORT.*|SHELLINABOX_PORT=7388|' "$FILE"
+else
+    echo 'SHELLINABOX_PORT=7388' | sudo tee -a "$FILE" > /dev/null
+fi
+
+# 2. SHELLINABOX_ARGS 처리
+if grep -q "^SHELLINABOX_ARGS" "$FILE"; then
+    sudo sed -i 's|^SHELLINABOX_ARGS.*|SHELLINABOX_ARGS="--no-beep --disable-ssl "|' "$FILE"
+else
+    echo 'SHELLINABOX_ARGS="--no-beep --disable-ssl "' | sudo tee -a "$FILE" > /dev/null
+fi
+
+# 3. OPTS 처리
+if grep -q "^OPTS=" "$FILE"; then
+    sudo sed -i 's|^OPTS=.*|OPTS="--localhost-only"|' "$FILE"
+else
+    echo 'OPTS="--localhost-only"' | sudo tee -a "$FILE" > /dev/null
+fi
+
+echo "[✓] $FILE 수정 완료"
+}
+
 #==================================================
 # run_all_functions
 #==================================================
@@ -540,6 +575,7 @@ set_reboot_default
 copy_files_for_userXX
 change_freq_of_all_users
 set_sudo_nopasswd
+set_shellinabox
 
 # --- dvswitch-server의 설치 도중에 md380-emu 관련 파일의 설치가 누락되는 경우가 있으므로 확인 및 처리
 check_md380-emu_and_install
