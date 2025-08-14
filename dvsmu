@@ -235,7 +235,7 @@ function file_copy_and_initialize() {
 
 sudo cp /opt/Analog_Bridge/* /opt/user$1
 sudo cp /opt/MMDVM_Bridge/* /opt/user$1
-sudo cp /opt/md380-emu/* /opt/user$1
+sudo cp /opt/md380-emu/md380-emu /opt/user$1
 
 file=/opt/user$1/MMDVM_Bridge.ini
 	$update_ini $file "DMR Network" Password none
