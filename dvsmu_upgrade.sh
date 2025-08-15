@@ -106,14 +106,14 @@ function add_talkeralias() {
 echo
 echo ">>> add_talkeralias"
 
+source /var/lib/dvswitch/dvs/var.txt > /dev/null 2>&1
+
+if ! sudo grep -q "talkerAlias" /var/lib/dvswitch/dvs/var.txt; then
+    echo "talkerAlias=" | sudo tee -a /var/lib/dvswitch/dvs/var.txt > /dev/null 2>&1
+fi
+
 #=================================================================================================
 ######## MAIN USER의 talkerAlias는 기본값을 그대로 두기 위해서 아래의 부분은 remark 처리함. #######
-
-#source /var/lib/dvswitch/dvs/var.txt > /dev/null 2>&1
-
-#if ! sudo grep -q "talkerAlias" /var/lib/dvswitch/dvs/var.txt; then
-#    echo "talkerAlias=" | sudo tee -a /var/lib/dvswitch/dvs/var.txt > /dev/null 2>&1
-#fi
 
 #file=/opt/MMDVM_Bridge/DVSwitch.ini
 #file_var=/var/lib/dvswitch/dvs/var.txt
