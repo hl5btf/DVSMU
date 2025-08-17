@@ -196,17 +196,39 @@ function download_and_update_apps() {
 echo
 echo ">>> download_and_update_apps"
 
-files="dvsmu man_log DMRIds_chk.sh bm_watchdog.sh config_main_user.sh auto_upgrade.sh"
+files="man_log DMRIds_chk.sh bm_watchdog.sh config_main_user.sh auto_upgrade.sh"
 
 for file in $files; do
 sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file > /dev/null 2>&1
 sudo chmod +x /usr/local/dvs/$file
 done
 
-# 필요시 아래와 같이 다운로드 가능
-# sudo wget -O /usr/local/dvs/dvsmu https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu
-# sudo wget -O /usr/local/dvs/man_log https://raw.githubusercontent.com/hl5btf/DVSMU/main/man_log
-# sudo wget -O /usr/local/dvs/DMRIds_chk.sh https://raw.githubusercontent.com/hl5btf/DVSMU/main/DMRIds_chk.sh
+echo
+echo ">>> dvsmu 설치"
+
+file=dvsmu
+# 아키텍처 정보
+ARCH_DPKG=$(dpkg --print-architecture)   # 예: armhf, arm64, amd64
+ARCH_UNAME=$(uname -m)                   # 예: armv7l, aarch64, x86_64
+
+# 아키텍처 및 배포판 기반 분기
+if [[ "$ARCH_DPKG" == "armhf" || "$ARCH_UNAME" == "armv7l" ]]; then
+    echo ">>> 32비트 ARM 시스템"
+    file_download=dvsmu_armhf_glibc228
+
+elif [[ "$ARCH_DPKG" == "arm64" || "$ARCH_UNAME" == "aarch64" ]]; then
+    echo ">>> 64비트 ARM 시스템"
+    file_download=dvsmu_arm64_glibc231
+
+elif [[ "$ARCH_DPKG" == "amd64" || "$ARCH_UNAME" == "x86_64" ]]; then
+    echo ">>> 64비트 PC 시스템"
+    file_download=dvsmu_amd64_glibc231
+else
+    echo "dvsMU 설치 불가"
+fi
+
+sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file_download > /dev/null 2>&1
+sudo chmod +x /usr/local/dvs/$file
 }
 
 #====== set_crontab =============================================
