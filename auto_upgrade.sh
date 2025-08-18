@@ -7,7 +7,7 @@ SCRIPT_AUTHOR="HL5KY"
 SCRIPT_DATE="2025-07-27"
 #===================================
 
-# 외부스크립트에서 auto_upgrade.sh를 호출할때 로그기록이 필요없다면, sudo env DISABLE_LOG=1 /usr/local/dvs/auto_upgrade.sh
+# 외부스크립트(dvsstart.sh)에서 auto_upgrade.sh를 호출할때 로그기록이 필요없다면, sudo env DISABLE_LOG=1 /usr/local/dvs/auto_upgrade.sh
 # dvsstart.sh 스크립트에서 호출함
 
 #----------- dvsmu에서 필요한 함수만 불러오기---------------------------------
