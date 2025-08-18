@@ -196,7 +196,7 @@ function download_and_update_apps() {
 echo
 echo ">>> download_and_update_apps"
 
-files="man_log DMRIds_chk.sh bm_watchdog.sh config_main_user.sh auto_upgrade.sh"
+files="funcs.sh config_main_user.sh man_log DMRIds_chk.sh bm_watchdog.sh auto_upgrade.sh"
 
 for file in $files; do
 sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file > /dev/null 2>&1
