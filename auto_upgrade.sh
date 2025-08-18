@@ -10,7 +10,7 @@ SCRIPT_DATE="2025-07-27"
 # 외부스크립트에서 auto_upgrade.sh를 호출할때 로그기록이 필요없다면, sudo env DISABLE_LOG=1 /usr/local/dvs/auto_upgrade.sh
 # dvsstart.sh 스크립트에서 호출함
 
-# dvsmu에서 필요한 함수만 불러오기
+#----------- dvsmu에서 필요한 함수만 불러오기---------------------------------
 dvsmu_file="/usr/local/dvs/dvsmu"
 temp_func_file="/tmp/temp_dvsmu_funcs.sh"
 functions=("update_DV3000" "main_user_dvswitch_upgrade" "file_copy_and_initialize" "var_to_ini")
@@ -32,6 +32,7 @@ done
 if [ -s "$temp_func_file" ]; then
     source "$temp_func_file"
 fi
+#----------- 함수 불러오기 끝 ------------------------------------
 
 LOG_FILE="/var/log/dvswitch/auto_upgrade.log"
 TMP_FILE="/var/log/dvswitch/auto_upgrade.trim"
