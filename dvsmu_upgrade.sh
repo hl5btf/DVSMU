@@ -196,11 +196,28 @@ function download_and_update_apps() {
 echo
 echo ">>> download_and_update_apps"
 
-files="funcs.sh config_main_user.sh man_log DMRIds_chk.sh bm_watchdog.sh auto_upgrade.sh"
+if [ "$1" = "call_from_auto_upgrade" ]; then
+    files="funcs.sh config_main_user.sh man_log DMRIds_chk.sh bm_watchdog.sh"
+else
+    files="funcs.sh config_main_user.sh man_log DMRIds_chk.sh bm_watchdog.sh auto_upgrade.sh"
+fi
 
 for file in $files; do
-sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file > /dev/null 2>&1
-sudo chmod +x /usr/local/dvs/$file
+    dst="/usr/local/dvs/$file"
+    tmp="/tmp/$file"
+    url="https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file" > /dev/null 2>&1
+    sudo wget -O "$tmp" "$url"
+    if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
+	    sudo mv -f "$tmp" "$dst"
+	    sudo chmod +x $dst
+	    sudo rm -f "$tmp"
+	    echo "updated to new file"
+    else
+	    sudo rm -f "$tmp"
+	    echo "no change"
+    fi
+#sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file > /dev/null 2>&1
+#sudo chmod +x /usr/local/dvs/$file
 done
 
 echo
@@ -227,8 +244,22 @@ else
     echo "dvsMU 설치 불가"
 fi
 
-sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file_download > /dev/null 2>&1
-sudo chmod +x /usr/local/dvs/$file
+dst="/usr/local/dvs/$file"
+tmp="/tmp/$file"
+url="https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file_download" > /dev/null 2>&1
+sudo wget -O "$tmp" "$url"
+if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
+	sudo mv -f "$tmp" "$dst"
+	sudo chmod +x $dst
+	sudo rm -f "$tmp"
+	echo "updated to new file"
+else
+	sudo rm -f "$tmp"
+	echo "no change"
+fi
+
+#sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file_download > /dev/null 2>&1
+#sudo chmod +x /usr/local/dvs/$file
 }
 
 #====== set_crontab =============================================
