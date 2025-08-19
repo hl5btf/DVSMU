@@ -412,6 +412,7 @@ if [[ -f "$CHECK_FILE" ]]; then
 		fi
 fi
 
+echo
 echo ">>> copy dvsm files for user00"
 
 dir="/var/lib/dvswitch/dvs/adv/user00"
