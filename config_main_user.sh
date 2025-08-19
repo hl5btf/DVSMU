@@ -74,30 +74,27 @@ echo -e "$complete"
 
 
 #-----------------------------------------------------------
+do_KR() {
+        sudo ${DVS}temp_msg.sh -y
 
-do_macro() {
-#	sudo ${DVS}temp_msg.sh -y
-
-	sudo \mv -f ${AB}dvsm.macro ${AB}dvsm.basic
-	sudo \cp -f ${adv}dvsm.* ${AB}
-	sudo chmod +x ${AB}dvsm.sh
+        sudo \mv -f ${AB}dvsm.macro ${AB}dvsm.basic
+        sudo \cp -f ${adv}dvsm.* ${AB}
+        sudo chmod +x ${AB}dvsm.sh
         if [ -d ${adv}${LN} ]; then
-		sudo \cp -f ${adv}${LN}/*.* ${AB}
-	else
-                sudo \cp -f ${adv}EN/*.* ${AB}
-	fi
+                sudo \cp -f ${adv}${LN}/*.* ${AB}
+        fi
 
-	update_var dmrplus_address ipsc.dvham.com
-	update_var dmrplus_password PASSWORD
-	update_var dmrplus_port 55555
+        update_var dmrplus_address ipsc.dvham.com
+        update_var dmrplus_password PASSWORD
+        update_var dmrplus_port 55555
 }
 
 do_tgdb_file_copy() {
-	if [ -d ${tgdb}${LN} ]; then
-        	sudo \cp -f ${tgdb}${LN}/* ${tgdb}
-	else
-        	sudo \cp -f ${tgdb}EN/* ${tgdb}
-	fi
+        if [ -d ${tgdb}${LN} ]; then
+                sudo \cp -f ${tgdb}${LN}/* ${tgdb}
+        else
+                sudo \cp -f ${tgdb}EN/* ${tgdb}
+        fi
 }
 
 do_AB_ini_audio_edit() {
@@ -111,16 +108,27 @@ do_AB_ini_audio_edit() {
 
 if [ "${first_time_instl}" = "1" ]; then
 
-	do_macro
-	do_tgdb_file_copy
-	do_AB_ini_audio_edit
+		if [ "${dmr_id:0:3}" = "450" ]; then LN="KR"; fi
+		if [ "$1" = "KR" ]; then
+			LN="KR"
+		else
+			LN="EN"
+		fi
 
-	# update DMR server list on the macro, adv_dmr.txt
-	${DVS}adnl_dmr.sh advdmr_return
+        if [ "${LN}" == "KR" ]; then
+                do_KR
+                do_tgdb_file_copy
+                do_AB_ini_audio_edit
+        else
+                do_tgdb_file_copy
+#                do_AB_ini_audio_edit
+        fi
+# update DMR server list on the macro, adv_dmr.txt
+${DVS}adnl_dmr.sh advdmr_return
 
-	update_var first_time_instl 73
+update_var first_time_instl 73
+
 fi
-
 #-----------------------------------------------------------
 let "complete=complete+20"
 echo -e "$complete"
