@@ -113,7 +113,8 @@ if [ "${first_time_instl}" = "1" ]; then
                 do_tgdb_file_copy
                 do_AB_ini_audio_edit
         else
-                do_tgdb_file_copy
+                LN=EN
+				do_tgdb_file_copy
 #                do_AB_ini_audio_edit
         fi
 # update DMR server list on the macro, adv_dmr.txt
