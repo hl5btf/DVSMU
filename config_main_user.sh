@@ -107,8 +107,9 @@ do_AB_ini_audio_edit() {
 #-----------------------------------------------------------
 
 if [ "${first_time_instl}" = "1" ]; then
-        if [ "${LN}" == "KR" ]; then
-                do_KR
+        if [ "${macro_lan}" = "KOR" ]; then
+                LN=KR
+				do_KR
                 do_tgdb_file_copy
                 do_AB_ini_audio_edit
         else
@@ -626,9 +627,9 @@ if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 
 case $sel in
 1)
-LN=KR ;;
+macro_lan=KOR ;;
 2)
-LN=EN ;;
+macro_lan=ENG ;;
 esac
 
 #-----------------------------------------------------------
