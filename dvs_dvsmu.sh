@@ -371,20 +371,45 @@ function copy_files_for_userXX() {
 echo
 echo "========================="
 echo ">>> copy files for userXX"
-files="analog_bridge00.service md380-emu00.service mmdvm_bridge00.service var00.txt"
 
-dir=/var/lib/dvswitch/dvs
+files="analog_bridge00.service md380-emu00.service mmdvm_bridge00.service var00.txt"
 for file in $files; do
-sudo wget -O ${dir}/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file > /dev/null 2>&1
-sudo chmod +x ${dir}/$file
+		dst="/var/lib/dvswitch/dvs/$file"
+		tmp="/tmp/$file"
+		SHA=$(wget -qO- "https://api.github.com/repos/hl5btf/DVSMU/commits/main" | awk -F\" '/"sha"/{print $4; exit}')
+		sudo wget -qO "$tmp" "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/${file}"
+
+		if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
+    	    sudo mv -f "$tmp" "$dst"
+        	sudo chmod +x $dst
+        	sudo rm -f "$tmp"
+        	echo ">>> $file copied or updated"
+		else
+        	sudo rm -f "$tmp"
+        	echo ">>> $file not changed"
+		fi
 done
 
 # /opt/md380-emu/qemu-arm-static 파일이 있으면, md380-emu00.service를 new로 변경
 CHECK_FILE="/opt/md380-emu/qemu-arm-static"
 if [[ -f "$CHECK_FILE" ]]; then
 	echo ">>> /opt/md380-emu 에 qemu-arm-static 파일이 있으므로 md380-emu00.service를 new로 변경"
-	sudo wget -O /var/lib/dvswitch/dvs/md380-emu00.service https://raw.githubusercontent.com/hl5btf/DVSMU/main/md380-emu00-new.service > /dev/null 2>&1
-	sudo chmod +x /var/lib/dvswitch/dvs/md380-emu00.service
+	file="md380-emu00.service"
+		file_download="md380-emu00-new.service"
+		dst="/var/lib/dvswitch/dvs/$file"
+		tmp="/tmp/$file"
+		SHA=$(wget -qO- "https://api.github.com/repos/hl5btf/DVSMU/commits/main" | awk -F\" '/"sha"/{print $4; exit}')
+		sudo wget -qO "$tmp" "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/${file_download}"
+
+		if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
+        		sudo mv -f "$tmp" "$dst"
+        		sudo chmod +x $dst
+        		sudo rm -f "$tmp"
+        		echo ">>> $file copied or updated"
+		else
+        		sudo rm -f "$tmp"
+        		echo ">>> $file not changed"
+		fi
 fi
 
 echo ">>> copy dvsm files for user00"
@@ -394,8 +419,20 @@ if [ ! -d "$dir" ]; then sudo mkdir -p "$dir"; fi
 
 files="dvsm.adv dvsm.basic dvsm.macro dvsm.sh"
 for file in $files; do
-sudo wget -O ${dir}/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file > /dev/null 2>&1
-sudo chmod +x ${dir}/$file
+		dst="/var/lib/dvswitch/dvs/adv/user00/$file"
+		tmp="/tmp/$file"
+		SHA=$(wget -qO- "https://api.github.com/repos/hl5btf/DVSMU/commits/main" | awk -F\" '/"sha"/{print $4; exit}')
+		sudo wget -qO "$tmp" "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/${file}"
+
+		if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
+        		sudo mv -f "$tmp" "$dst"
+        		sudo chmod +x $dst
+        		sudo rm -f "$tmp"
+        		echo ">>> $file copied or updated"
+		else
+        		sudo rm -f "$tmp"
+        		echo ">>> $file not changed"
+		fi
 done
 
 
@@ -405,8 +442,35 @@ if [ ! -d "/var/lib/dvswitch/dvs/adv/user00KR" ]; then sudo mkdir -p "/var/lib/d
 files="adv_audio.txt adv_dmr.txt adv_hotspot.txt adv_main.txt adv_managetg.txt adv_resetfvrt.txt adv_rxgain.txt adv_tgref.txt adv_tools.txt adv_txgain.txt"
 
 for file in $files; do
-sudo wget -O /var/lib/dvswitch/dvs/adv/user00EN/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/EN/$file > /dev/null 2>&1
-sudo wget -O /var/lib/dvswitch/dvs/adv/user00KR/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/KR/$file > /dev/null 2>&1
+		dst="/var/lib/dvswitch/dvs/adv/user00EN/$file"
+		tmp="/tmp/$file"
+		SHA=$(wget -qO- "https://api.github.com/repos/hl5btf/DVSMU/commits/main" | awk -F\" '/"sha"/{print $4; exit}')
+		sudo wget -qO "$tmp" "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/EN/${file}"
+
+		if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
+        		sudo mv -f "$tmp" "$dst"
+        		sudo chmod +x $dst
+        		sudo rm -f "$tmp"
+        		echo ">>> $file for English copied or updated"
+		else
+        		sudo rm -f "$tmp"
+        		echo ">>> $file for English not changed"
+		fi
+
+		dst="/var/lib/dvswitch/dvs/adv/user00KR/$file"
+		tmp="/tmp/$file"
+		SHA=$(wget -qO- "https://api.github.com/repos/hl5btf/DVSMU/commits/main" | awk -F\" '/"sha"/{print $4; exit}')
+		sudo wget -qO "$tmp" "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/KR/${file}"
+
+		if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
+        		sudo mv -f "$tmp" "$dst"
+        		sudo chmod +x $dst
+        		sudo rm -f "$tmp"
+        		echo ">>> $file for Korean copied or updated"
+		else
+        		sudo rm -f "$tmp"
+        		echo ">>> $file for Korean not changed"
+		fi
 done
 }
 
