@@ -95,16 +95,12 @@ if [ "$LOCAL_VERSION" = "$REMOTE_VERSION" ]; then
     [ -n "$DISABLE_LOG" ] || echo "Current dvsmu v$LOCAL_VERSION is the latest" | sudo tee -a "$LOG_FILE"
 elif [ "$LOWEST" = "$LOCAL_VERSION" ]; then
         [ -n "$DISABLE_LOG" ] || echo "Found upgrade v$REMOTE_VERSION of dvsmu" | sudo tee -a "$LOG_FILE"
-file=auto_upgrade.sh
-sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file > /dev/null 2>&1
-sudo chmod +x /usr/local/dvs/$file
-		
-  		#file=/usr/local/dvs/dvsmu_upgrade.sh
-        #sudo wget -O $file https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu_upgrade.sh > /dev/null 2>&1
-        #sudo chmod +x $file
-        #sudo $file
-        #sudo rm -f $file
-        #[ -n "$DISABLE_LOG" ] || echo "dvsmu v$REMOTE_VERSION upgrade done" | sudo tee -a "$LOG_FILE"
+  		file=/usr/local/dvs/dvsmu_upgrade.sh
+        sudo wget -O $file https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu_upgrade.sh > /dev/null 2>&1
+        sudo chmod +x $file
+        sudo $file call_from_auto_upgrade
+        sudo rm -f $file
+        [ -n "$DISABLE_LOG" ] || echo "dvsmu v$REMOTE_VERSION upgrade done" | sudo tee -a "$LOG_FILE"
 else
         [ -n "$DISABLE_LOG" ] || echo "LOCAL_VERSION is higher than REMOTE_VERSION" | sudo tee -a "$LOG_FILE"
 fi
