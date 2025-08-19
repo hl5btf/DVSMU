@@ -6,6 +6,8 @@ SCRIPT_VERSION="1.0"
 SCRIPT_AUTHOR="HL5KY"
 SCRIPT_DATE="2025-07-27"
 #===================================
+# 외부 스크립트(dvsstart.sh)에서 auto_upgrade.sh를 실행할때 로그기록을 하지 않으려면 sudo env DISABLE_LOG=1 /usr/local/dvs/auto_upgrade.sh
+
 #-----------------------------------------------------------------------------------
 # auto_upgrade.sh 파일의 변경이 있으면 tmp에 다운로드 (본 스크립트의 마지막에 dst로 복사)
 	file=auto_upgrade.sh
