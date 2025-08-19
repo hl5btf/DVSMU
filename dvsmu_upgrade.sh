@@ -30,7 +30,7 @@ if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
 	sudo mv -f "$tmp" "$dst"
 	sudo chmod +x $dst
 	sudo rm -f "$tmp"
-	echo ">>> $file updated to a new file"
+	echo ">>> $file copied or updated"
 else
 	sudo rm -f "$tmp"
 	echo ">>> $file not changed"
@@ -225,7 +225,7 @@ for file in $files; do
 	    sudo mv -f "$tmp" "$dst"
 	    sudo chmod +x $dst
 	    sudo rm -f "$tmp"
-	    echo ">>> $file updated to a new file"
+	    echo ">>> $file copied or updated"
     else
 	    sudo rm -f "$tmp"
 	    echo ">>> $file not changed"
@@ -267,7 +267,7 @@ if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
 	sudo mv -f "$tmp" "$dst"
 	sudo chmod +x $dst
 	sudo rm -f "$tmp"
-	echo ">>> $file updated to a new file"
+	echo ">>> $file copied or updated"
 else
 	sudo rm -f "$tmp"
 	echo ">>> $file not changed"
