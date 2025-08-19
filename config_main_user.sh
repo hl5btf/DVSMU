@@ -107,14 +107,6 @@ do_AB_ini_audio_edit() {
 #-----------------------------------------------------------
 
 if [ "${first_time_instl}" = "1" ]; then
-
-		if [ "${dmr_id:0:3}" = "450" ]; then LN="KR"; fi
-		if [ "$1" = "KR" ]; then
-			LN="KR"
-		else
-			LN="EN"
-		fi
-
         if [ "${LN}" == "KR" ]; then
                 do_KR
                 do_tgdb_file_copy
