@@ -70,8 +70,8 @@ fi
 sudo rm -f "$temp_func_file"
 
 # CHECK DVSMU =============================================================================
-LOCAL_FILE=/usr/local/dvs/dvsmu
-LOCAL_VERSION=$(LC_ALL=C strings -a -- $LOCAL_FILE | grep -F '@(#)' | awk '{print $2; exit}')
+source /var/lib/dvswitch/dvs/var00.txt
+LOCAL_VERSION=$dvsmu_version
 
 # LOCAL_VERSION을 확인하지 못하면 중단
 if [[ "$LOCAL_VERSION" != *.* ]]; then
@@ -79,13 +79,22 @@ if [[ "$LOCAL_VERSION" != *.* ]]; then
         exit 0
 fi
 
-SHA=$(git ls-remote https://github.com/hl5btf/DVSMU.git refs/heads/main | awk '{print $1}')
-REMOTE_VERSION=$(
-  LC_ALL=C curl -fsSL "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/dvsmu_ver" \
-  | tr -d '\r' \
-  | sed -n 's/^[[:space:]]*ver[[:space:]]*=[[:space:]]*//p' \
-  | head -n1
-)
+file=dvsmu_ver
+dst="/usr/local/dvs/$file"
+tmp="/tmp/$file"
+url="https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file" > /dev/null 2>&1
+        SHA=$(wget -qO- "https://api.github.com/repos/hl5btf/DVSMU/commits/main" | awk -F\" '/"sha"/{print $4; exit}')
+        sudo wget -qO "$tmp" "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/${file}"
+
+        if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
+                sudo mv -f "$tmp" "$dst"; sudo rm -f "$tmp"
+        else
+                sudo rm -f "$tmp"
+        fi
+
+source /usr/local/dvs/dvsmu_ver
+REMOTE_VERSION=$ver
+sudo rm -f "$dst"
 
 # 두 버전 중 더 낮은(작은) 버전을 구함
 LOWEST=$(awk -v a="$LOCAL_VERSION" -v b="$REMOTE_VERSION" 'BEGIN{print (a+0 <= b+0 ? a : b)}')
