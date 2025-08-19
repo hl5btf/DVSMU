@@ -1,5 +1,5 @@
 #!/bin/bash
-111
+
 DVS=/usr/local/dvs/
 AB=/opt/userUSER_NO/
 MB=/opt/userUSER_NO/
