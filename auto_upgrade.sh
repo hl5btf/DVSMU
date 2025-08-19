@@ -101,3 +101,4 @@ else
 fi
 
 [ -n "$DISABLE_LOG" ] || echo "------------------------------------------------------------" | sudo tee -a "$LOG_FILE"
+echo "kkk"
