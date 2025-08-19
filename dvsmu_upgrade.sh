@@ -225,10 +225,10 @@ for file in $files; do
 	    sudo mv -f "$tmp" "$dst"
 	    sudo chmod +x $dst
 	    sudo rm -f "$tmp"
-	    echo ">>> $file copied or updated"
+	    echo "> $file copied or updated"
     else
 	    sudo rm -f "$tmp"
-	    echo ">>> $file not changed"
+	    echo "> $file not changed"
     fi
 #sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file > /dev/null 2>&1
 #sudo chmod +x /usr/local/dvs/$file
@@ -267,10 +267,10 @@ if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
 	sudo mv -f "$tmp" "$dst"
 	sudo chmod +x $dst
 	sudo rm -f "$tmp"
-	echo ">>> $file copied or updated"
+	echo "> $file copied or updated"
 else
 	sudo rm -f "$tmp"
-	echo ">>> $file not changed"
+	echo "> $file not changed"
 fi
 
 #sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file_download > /dev/null 2>&1
