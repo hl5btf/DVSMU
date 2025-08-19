@@ -6,6 +6,15 @@ SCRIPT_VERSION="1.0"
 SCRIPT_AUTHOR="HL5KY"
 SCRIPT_DATE="2025-07-27"
 #===================================
+#-----------------------------------------------------------------------------------
+# auto_upgrade.sh 파일의 변경이 있으면 tmp에 다운로드 (본 스크립트의 마지막에 dst로 복사)
+file=auto_upgrade.sh
+dst="/usr/local/dvs/$file"
+tmp="/tmp/$file"
+url="https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file"
+
+sudo wget -O "$tmp" "$url"
+#-----------------------------------------------------------------------------------
 
 source /usr/local/dvs/funcs.sh
 
@@ -101,3 +110,17 @@ else
 fi
 
 [ -n "$DISABLE_LOG" ] || echo "------------------------------------------------------------" | sudo tee -a "$LOG_FILE"
+
+#-----------------------------------------------------------------------------------
+# tmp파일이 있고 && 크기가 0이 아니면서 && tmp와 dst의 내용이 다르면(변경이 되었으면)
+if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
+	sudo mv -f "$tmp" "$dst"
+	sudo chmod +x $dst
+	sudo rm -f "$tmp"
+        [ -n "$DISABLE_LOG" ] || echo "auto_upgrade.sh has changed to a new file" | sudo tee -a "$LOG_FILE"
+else
+	sudo rm -f "$tmp"
+	echo "no change"
+fi
+#-----------------------------------------------------------------------------------
+echo "new"
