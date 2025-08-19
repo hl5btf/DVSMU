@@ -383,10 +383,10 @@ for file in $files; do
     	    sudo mv -f "$tmp" "$dst"
         	sudo chmod +x $dst
         	sudo rm -f "$tmp"
-        	echo ">>> $file copied or updated"
+        	echo "> $file copied or updated"
 		else
         	sudo rm -f "$tmp"
-        	echo ">>> $file not changed"
+        	echo "> $file not changed"
 		fi
 done
 
@@ -405,10 +405,10 @@ if [[ -f "$CHECK_FILE" ]]; then
         		sudo mv -f "$tmp" "$dst"
         		sudo chmod +x $dst
         		sudo rm -f "$tmp"
-        		echo ">>> $file copied or updated"
+        		echo "> $file copied or updated"
 		else
         		sudo rm -f "$tmp"
-        		echo ">>> $file not changed"
+        		echo "> $file not changed"
 		fi
 fi
 
@@ -428,10 +428,10 @@ for file in $files; do
         		sudo mv -f "$tmp" "$dst"
         		sudo chmod +x $dst
         		sudo rm -f "$tmp"
-        		echo ">>> $file copied or updated"
+        		echo "> $file copied or updated"
 		else
         		sudo rm -f "$tmp"
-        		echo ">>> $file not changed"
+        		echo "> $file not changed"
 		fi
 done
 
@@ -451,10 +451,10 @@ for file in $files; do
         		sudo mv -f "$tmp" "$dst"
         		sudo chmod +x $dst
         		sudo rm -f "$tmp"
-        		echo ">>> $file for English copied or updated"
+        		echo "> $file for English copied or updated"
 		else
         		sudo rm -f "$tmp"
-        		echo ">>> $file for English not changed"
+        		echo "> $file for English not changed"
 		fi
 
 		dst="/var/lib/dvswitch/dvs/adv/user00KR/$file"
@@ -466,10 +466,10 @@ for file in $files; do
         		sudo mv -f "$tmp" "$dst"
         		sudo chmod +x $dst
         		sudo rm -f "$tmp"
-        		echo ">>> $file for Korean copied or updated"
+        		echo "> $file for Korean copied or updated"
 		else
         		sudo rm -f "$tmp"
-        		echo ">>> $file for Korean not changed"
+        		echo "> $file for Korean not changed"
 		fi
 done
 }
