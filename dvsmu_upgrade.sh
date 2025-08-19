@@ -23,6 +23,21 @@ echo ">>> replace_var00_txt"
 file=var00.txt
 dir=/var/lib/dvswitch/dvs
 sudo wget -O ${dir}/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file > /dev/null 2>&1
+
+dst="/var/lib/dvswitch/dvs/$file"
+tmp="/tmp/$file"
+SHA=$(wget -qO- "https://api.github.com/repos/hl5btf/DVSMU/commits/main" | awk -F\" '/"sha"/{print $4; exit}')
+sudo wget -qO "$tmp" "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/${file}"
+
+if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
+	sudo mv -f "$tmp" "$dst"
+	sudo chmod +x $dst
+	sudo rm -f "$tmp"
+	echo ">>> $file updated to a new file"
+else
+	sudo rm -f "$tmp"
+	echo ">>> $file not changed"
+fi
 }
 
 #====== replace_freq_of_all_users =============================================
