@@ -7,32 +7,7 @@ SCRIPT_AUTHOR="HL5KY"
 SCRIPT_DATE="2025-07-27"
 #===================================
 
-# 외부스크립트(dvsstart.sh)에서 auto_upgrade.sh를 호출할때 로그기록이 필요없다면, sudo env DISABLE_LOG=1 /usr/local/dvs/auto_upgrade.sh
-# dvsstart.sh 스크립트에서 호출함
-
-#----------- dvsmu에서 필요한 함수만 불러오기---------------------------------
-dvsmu_file="/usr/local/dvs/dvsmu"
-temp_func_file="/tmp/temp_dvsmu_funcs.sh"
-functions=("update_DV3000" "main_user_dvswitch_upgrade" "file_copy_and_initialize" "var_to_ini")
-
-# 초기화
-> "$temp_func_file"
-
-for fname in "${functions[@]}"; do
-    tmp_part="/tmp/func_${fname}.sh"
-    > "$tmp_part"
-    awk "/^function $fname *\\(\\)/,/^}/" "$dvsmu_file" > "$tmp_part"
-
-    if [ -s "$tmp_part" ]; then
-        cat "$tmp_part" >> "$temp_func_file"
-        echo -e "\n" >> "$temp_func_file"
-    fi
-done
-
-if [ -s "$temp_func_file" ]; then
-    source "$temp_func_file"
-fi
-#----------- 함수 불러오기 끝 ------------------------------------
+source /usr/local/dvs/funcs.sh
 
 LOG_FILE="/var/log/dvswitch/auto_upgrade.log"
 TMP_FILE="/var/log/dvswitch/auto_upgrade.trim"
@@ -47,7 +22,7 @@ tail -n "$MAX_LINES" "$LOG_FILE" > "$TMP_FILE" && cp "$TMP_FILE" "$LOG_FILE"
 [ -n "$DISABLE_LOG" ] || echo "AutoUpgrade check started at $(date)" | sudo tee -a "$LOG_FILE"
 # 외부 스크립트에서 auto_upgrade.sh를 실행할때 로그기록을 하지 않으려면 sudo env DISABLE_LOG=1 /usr/local/dvs/auto_upgrade.sh
 
-# check DVSwitch -----------------------------------
+# CHECK DVSwitch ===========================================================================
 
 sudo apt-get update
 
@@ -84,31 +59,45 @@ fi
 
 sudo rm -f "$temp_func_file"
 
-# check dvsmu --------------------------
+# CHECK DVSMU =============================================================================
+LOCAL_FILE=/usr/local/dvs/dvsmu
+LOCAL_VERSION=$(LC_ALL=C strings -a -- $LOCAL_FILE | grep -F '@(#)' | awk '{print $2; exit}')
 
-LOCAL_FILE="/usr/local/dvs/dvsmu"
-REMOTE_URL="https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu"
+# LOCAL_VERSION을 확인하지 못하면 중단
+if [[ "$LOCAL_VERSION" != *.* ]]; then
+        [ -n "$DISABLE_LOG" ] || echo "Can't check the LOCAL_VERSION" | sudo tee -a "$LOG_FILE"
+        exit 0
+fi
 
-LOCAL_VERSION=$(grep '^SCRIPT_VERSION=' "$LOCAL_FILE" | cut -d'"' -f2)
-REMOTE_VERSION=$(curl -s --max-time 5 "$REMOTE_URL" | grep '^SCRIPT_VERSION=' | head -n 1 | cut -d'"' -f2)
+SHA=$(git ls-remote https://github.com/hl5btf/DVSMU.git refs/heads/main | awk '{print $1}')
+REMOTE_VERSION=$(
+  LC_ALL=C curl -fsSL "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/dvsmu_ver" \
+  | tr -d '\r' \
+  | sed -n 's/^[[:space:]]*ver[[:space:]]*=[[:space:]]*//p' \
+  | head -n1
+)
 
 # 두 버전 중 더 낮은(작은) 버전을 구함
-LOWEST=$(printf '%s\n%s\n' "$LOCAL_VERSION" "$REMOTE_VERSION" | sort -V | head -n 1)
+LOWEST=$(awk -v a="$LOCAL_VERSION" -v b="$REMOTE_VERSION" 'BEGIN{print (a+0 <= b+0 ? a : b)}')
+
 
 [ -n "$DISABLE_LOG" ] || echo "Check dvsmu" | sudo tee -a "$LOG_FILE"
 if [ "$LOCAL_VERSION" = "$REMOTE_VERSION" ]; then
     [ -n "$DISABLE_LOG" ] || echo "Current dvsmu v$LOCAL_VERSION is the latest" | sudo tee -a "$LOG_FILE"
 elif [ "$LOWEST" = "$LOCAL_VERSION" ]; then
         [ -n "$DISABLE_LOG" ] || echo "Found upgrade v$REMOTE_VERSION of dvsmu" | sudo tee -a "$LOG_FILE"
-        file=/usr/local/dvs/dvsmu_upgrade.sh
-        sudo wget -O $file https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu_upgrade.sh > /dev/null 2>&1
-        sudo chmod +x $file
-        sudo $file
-        sudo rm -f $file
-        [ -n "$DISABLE_LOG" ] || echo "dvsmu v$REMOTE_VERSION upgrade done" | sudo tee -a "$LOG_FILE"
+file=auto_upgrade.sh
+sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file > /dev/null 2>&1
+sudo chmod +x /usr/local/dvs/$file
+		
+  		#file=/usr/local/dvs/dvsmu_upgrade.sh
+        #sudo wget -O $file https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu_upgrade.sh > /dev/null 2>&1
+        #sudo chmod +x $file
+        #sudo $file
+        #sudo rm -f $file
+        #[ -n "$DISABLE_LOG" ] || echo "dvsmu v$REMOTE_VERSION upgrade done" | sudo tee -a "$LOG_FILE"
 else
-        [ -n "$DISABLE_LOG" ] || echo "can't check the version" | sudo tee -a "$LOG_FILE"
+        [ -n "$DISABLE_LOG" ] || echo "LOCAL_VERSION is higher than REMOTE_VERSION" | sudo tee -a "$LOG_FILE"
 fi
 
 [ -n "$DISABLE_LOG" ] || echo "------------------------------------------------------------" | sudo tee -a "$LOG_FILE"
-
