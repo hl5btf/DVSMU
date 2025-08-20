@@ -105,8 +105,11 @@ if [ "$LOCAL_VERSION" = "$REMOTE_VERSION" ]; then
     [ -n "$DISABLE_LOG" ] || echo "Current dvsmu v.$LOCAL_VERSION is the latest" | sudo tee -a "$LOG_FILE"
 elif [ "$LOWEST" = "$LOCAL_VERSION" ]; then
         [ -n "$DISABLE_LOG" ] || echo "Found upgrade v.$REMOTE_VERSION of dvsmu" | sudo tee -a "$LOG_FILE"
-  		file=/usr/local/dvs/dvsmu_upgrade.sh
-        sudo wget -O $file https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu_upgrade.sh > /dev/null 2>&1
+    	file=dvsmu_upgrade.sh
+		dst="/usr/local/dvs/$file"
+		tmp="tmp/$file"
+		SHA=$(wget -qO- "https://api.github.com/repos/hl5btf/DVSMU/commits/main" | awk -F\" '/"sha"/{print $4; exit}')
+    	sudo wget -qO "$tmp" "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/${file}"
         sudo chmod +x $file
         sudo $file call_from_auto_upgrade
         sudo rm -f $file
