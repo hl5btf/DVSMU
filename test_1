@@ -540,7 +540,7 @@ sel3=$(whiptail --title " -dvsmuz- Main User Configuration " --menu "\
 $sp05 MAIN_USER  $call_sign_M $dmr_id $ext $usrp_port_M
 -------------------------------------------------------
 " 18 50 7 \
-"1" "주사용자 설정및변경" \
+"1" "주사용자 설정 변경" \
 "2" "로그 확인--->" \
 "3" "파일 관리--->" \
 "4" "서비스 재시작" \
