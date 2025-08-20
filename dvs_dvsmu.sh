@@ -393,6 +393,7 @@ done
 # /opt/md380-emu/qemu-arm-static 파일이 있으면, md380-emu00.service를 new로 변경
 CHECK_FILE="/opt/md380-emu/qemu-arm-static"
 if [[ -f "$CHECK_FILE" ]]; then
+	echo
 	echo ">>> /opt/md380-emu 에 qemu-arm-static 파일이 있으므로 md380-emu00.service를 new로 변경"
 	file="md380-emu00.service"
 		file_download="md380-emu00-new.service"
