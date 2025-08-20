@@ -23,8 +23,8 @@ echo ">>> replace_var00_txt"
 file=var00.txt
 dst="/var/lib/dvswitch/dvs/$file"
 tmp="/tmp/$file"
-SHA=$(wget -qO- "https://api.github.com/repos/hl5btf/DVSMU/commits/main" | awk -F\" '/"sha"/{print $4; exit}')
-sudo wget -qO "$tmp" "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/${file}"
+url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
+sudo wget -O "$tmp" "$url/$file"
 
 if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
 	sudo mv -f "$tmp" "$dst"
@@ -217,8 +217,8 @@ fi
 for file in $files; do
     dst="/usr/local/dvs/$file"
     tmp="/tmp/$file"
-	SHA=$(wget -qO- "https://api.github.com/repos/hl5btf/DVSMU/commits/main" | awk -F\" '/"sha"/{print $4; exit}')
-	sudo wget -qO "$tmp" "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/${file}"
+	url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
+	sudo wget -O "$tmp" "$url/$file"
 
     if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
 	    sudo mv -f "$tmp" "$dst"
@@ -259,8 +259,8 @@ fi
 
 dst="/usr/local/dvs/$file"
 tmp="/tmp/$file"
-SHA=$(wget -qO- "https://api.github.com/repos/hl5btf/DVSMU/commits/main" | awk -F\" '/"sha"/{print $4; exit}')
-sudo wget -qO "$tmp" "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/${file_download}"
+url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
+sudo wget -O "$tmp" "$url/$file_download"
 
 if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
 	sudo mv -f "$tmp" "$dst"
