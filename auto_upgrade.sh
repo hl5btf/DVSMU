@@ -96,6 +96,12 @@ source /usr/local/dvs/dvsmu_ver
 REMOTE_VERSION=$ver
 sudo rm -f "$dst"
 
+# REMOTE_VERSION을 확인하지 못하면 중단
+if [[ "$REMOTE_VERSION" != *.* ]]; then
+        [ -n "$DISABLE_LOG" ] || echo "Can't check the REMOTE_VERSION" | sudo tee -a "$LOG_FILE"
+        exit 0
+fi
+
 # 두 버전 중 더 낮은(작은) 버전을 구함
 LOWEST=$(awk -v a="$LOCAL_VERSION" -v b="$REMOTE_VERSION" 'BEGIN{print (a+0 <= b+0 ? a : b)}')
 
