@@ -217,7 +217,6 @@ fi
 for file in $files; do
     dst="/usr/local/dvs/$file"
     tmp="/tmp/$file"
-    #url="https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file" > /dev/null 2>&1
 	SHA=$(wget -qO- "https://api.github.com/repos/hl5btf/DVSMU/commits/main" | awk -F\" '/"sha"/{print $4; exit}')
 	sudo wget -qO "$tmp" "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/${file}"
 
