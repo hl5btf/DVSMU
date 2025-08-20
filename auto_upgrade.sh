@@ -10,7 +10,6 @@ SCRIPT_DATE="2025-07-27"
 
 #-----------------------------------------------------------------------------------
 # auto_upgrade.sh 파일의 변경이 있으면 tmp에 다운로드 (본 스크립트의 마지막에 dst_auto로 복사)
-# download를 SHA로 처리하는 것은, Github의 cache문제로 변경된 파일을 즉시 받을 수 없는 문제를 해결.
 	file=auto_upgrade.sh
 	dst_auto="/usr/local/dvs/$file"
 	tmp_auto="/tmp/$file"
