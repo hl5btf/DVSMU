@@ -110,9 +110,11 @@ elif [ "$LOWEST" = "$LOCAL_VERSION" ]; then
 		tmp="tmp/$file"
 		SHA=$(wget -qO- "https://api.github.com/repos/hl5btf/DVSMU/commits/main" | awk -F\" '/"sha"/{print $4; exit}')
     	sudo wget -qO "$tmp" "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/${file}"
-        sudo chmod +x $file
-        sudo $file call_from_auto_upgrade
-        sudo rm -f $file
+		sudo mv -f "$tmp" "$dst"
+		sudo chmod +x $dst
+		sudo $dst call_from_auto_upgrade
+		sudo rm -f "$dst"
+		sudo rm -f "$tmp"
         [ -n "$DISABLE_LOG" ] || echo "dvsmu v.$REMOTE_VERSION upgrade done" | sudo tee -a "$LOG_FILE"
 else
         [ -n "$DISABLE_LOG" ] || echo "Local dvsMU v.$LOCAL_VERSION is higher than the Remote v.$REMOTE_VERSION" | sudo tee -a "$LOG_FILE"
