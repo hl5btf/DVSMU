@@ -363,6 +363,8 @@ clear
 
 if [ -e /var/lib/dvswitch/dvs/var.txt ] && [ x${call_sign} != x ]; then
 
+
+# 파일이 있고, 콜싸인이 비어있지 않으면
 if (whiptail --title " 주사용자 설정 변경 " --yesno "\
 $sp05 주사용자의 설정을 변경합니다.
 
@@ -372,19 +374,6 @@ $sp05 $T005
 " 12 65); then :
         else ${DVS}dvsmu M; exit 0
 fi
-
-else
-
-if (whiptail --title " 주사용자 설정 " --yesno "\
-$sp05 주사용자의 설정을 위한 입력을 시작합니다.
-
-$sp05 (Start configuring Main user)
-
-$sp05 $T005
-" 12 65); then :
-        else ${DVS}dvsmu M; exit 0
-fi
-
 fi
 
 # USRP Port 중복 확인 루틴 이후에 다시 source를 변경하므로, 입력 변수를 call_sign_in 등과 같이 변경해서 사용함
