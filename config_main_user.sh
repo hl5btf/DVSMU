@@ -200,16 +200,17 @@ file_var=/var/lib/dvswitch/dvs/var.txt
         # file에 talkerAlias라는 텍스트가 있으면
         if sudo grep -q "talkerAlias" "$file"; then
                 # ((dvs_TA에 %callsign이 포함) 또는 (dvs_TA가 공란))이면
-                if [[ "$dvs_TA" == *"%callsign"* || -z "$dvs_TA" ]]; then
-                        tag=talkerAlias; value="dvsMultiUser by HL5KY"
-                        sudo sed -i -e "s/^$tag=.*/$tag=\"$value\"/" $file_var
-
-                        sudo systemctl stop mmdvm_bridge > /dev/null 2>&1
-                        $update_ini $file DMR talkerAlias "dvsMultiUser by HL5KY"
-                        sudo systemctl start mmdvm_bridge > /dev/null 2>&1
-
-                # dvs_TA가 공란이 아니면
-                elif [[ -n "$dvs_TA" ]]; then
+#                if [[ "$dvs_TA" == *"%callsign"* || -z "$dvs_TA" ]]; then
+#                        tag=talkerAlias; value="dvsMultiUser by HL5KY"
+#                        sudo sed -i -e "s/^$tag=.*/$tag=\"$value\"/" $file_var
+#
+#                        sudo systemctl stop mmdvm_bridge > /dev/null 2>&1
+#                        $update_ini $file DMR talkerAlias "dvsMultiUser by HL5KY"
+#                        sudo systemctl start mmdvm_bridge > /dev/null 2>&1
+#
+#                # dvs_TA가 공란이 아니면
+#                elif [[ -n "$dvs_TA" ]]; then
+				if [[ -n "$dvs_TA" ]]; then
                         tag=talkerAlias; value="$dvs_TA"
                         sudo sed -i -e "s/^$tag=.*/$tag=\"$value\"/" $file_var
                 fi
