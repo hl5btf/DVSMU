@@ -14,8 +14,8 @@ SCRIPT_DATE="2025-07-27"
 	file=auto_upgrade.sh
 	dst_auto="/usr/local/dvs/$file"
 	tmp_auto="/tmp/$file"
-	SHA=$(wget -qO- "https://api.github.com/repos/hl5btf/DVSMU/commits/main" | awk -F\" '/"sha"/{print $4; exit}')
-    sudo wget -qO "$tmp_auto" "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/${file}"
+	url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
+	sudo wget -O "$tmp_auto" "$url/$file"
 #-----------------------------------------------------------------------------------
 
 source /usr/local/dvs/funcs.sh
@@ -83,8 +83,8 @@ fi
 file=dvsmu_ver
 dst="/usr/local/dvs/$file"
 tmp="/tmp/$file"
-        SHA=$(wget -qO- "https://api.github.com/repos/hl5btf/DVSMU/commits/main" | awk -F\" '/"sha"/{print $4; exit}')
-        sudo wget -qO "$tmp" "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/${file}"
+url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
+		sudo wget -O "$tmp" "$url/$file"
         sudo mv -f "$tmp" "$dst"
         sudo rm -f "$tmp"
 
@@ -110,8 +110,8 @@ elif [ "$LOWEST" = "$LOCAL_VERSION" ]; then
     	file=dvsmu_upgrade.sh
 		dst="/usr/local/dvs/$file"
 		tmp="/tmp/$file"
-		SHA=$(wget -qO- "https://api.github.com/repos/hl5btf/DVSMU/commits/main" | awk -F\" '/"sha"/{print $4; exit}')
-    	sudo wget -qO "$tmp" "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/${file}"
+		url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
+		sudo wget -O "$tmp" "$url/$file"
 		sudo mv -f "$tmp" "$dst"
 		sudo chmod +x $dst
 		sudo $dst call_from_auto_upgrade
