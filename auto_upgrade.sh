@@ -11,10 +11,10 @@ SCRIPT_DATE="2025-07-27"
 #-----------------------------------------------------------------------------------
 # auto_upgrade.sh 파일의 변경이 있으면 tmp에 다운로드 (본 스크립트의 마지막에 dst로 복사)
 	file=auto_upgrade.sh
-	dst="/usr/local/dvs/$file"
-	tmp="/tmp/$file"
+	dst_auto="/usr/local/dvs/$file"
+	tmp_auto="/tmp/$file"
 	SHA=$(wget -qO- "https://api.github.com/repos/hl5btf/DVSMU/commits/main" | awk -F\" '/"sha"/{print $4; exit}')
-    sudo wget -qO "$tmp" "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/${file}"
+    sudo wget -qO "$tmp_auto" "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/${file}"
 #-----------------------------------------------------------------------------------
 
 source /usr/local/dvs/funcs.sh
@@ -125,13 +125,13 @@ fi
 
 #-----------------------------------------------------------------------------------
 # tmp파일이 있고 && 크기가 0이 아니면서 && tmp와 dst의 내용이 다르면(변경이 되었으면)
-if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
-	sudo mv -f "$tmp" "$dst"
-	sudo chmod +x $dst
-	sudo rm -f "$tmp"
+if [ -s "$tmp_auto" ] && ! cmp -s -- "$tmp_auto" "$dst_auto"; then
+	sudo mv -f "$tmp_auto" "$dst_auto"
+	sudo chmod +x $dst_auto
+	sudo rm -f "$tmp_auto"
         [ -n "$DISABLE_LOG" ] || echo "auto_upgrade.sh has updated to a new file" | sudo tee -a "$LOG_FILE"
 else
-	sudo rm -f "$tmp"
+	sudo rm -f "$tmp_auto"
 	echo "auto_upgrade.sh hasn't changed"
 fi
 #-----------------------------------------------------------------------------------
