@@ -361,10 +361,8 @@ user_array="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23
 
 clear
 
-if [ -e /var/lib/dvswitch/dvs/var.txt ] && [ x${call_sign} != x ]; then
-
-
 # 파일이 있고, 콜싸인이 비어있지 않으면
+if [ -e /var/lib/dvswitch/dvs/var.txt ] && [ x${call_sign} != x ]; then
 if (whiptail --title " 주사용자 설정 변경 " --yesno "\
 $sp05 주사용자의 설정을 변경합니다.
 
