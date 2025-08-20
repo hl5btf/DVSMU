@@ -30,10 +30,10 @@ if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
 	sudo mv -f "$tmp" "$dst"
 	sudo chmod +x $dst
 	sudo rm -f "$tmp"
-	echo ">>> $file copied or updated"
+	echo "> $file copied or updated"
 else
 	sudo rm -f "$tmp"
-	echo ">>> $file not changed"
+	echo "> $file not changed"
 fi
 }
 
