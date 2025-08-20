@@ -82,14 +82,10 @@ fi
 file=dvsmu_ver
 dst="/usr/local/dvs/$file"
 tmp="/tmp/$file"
-#url="https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file" > /dev/null 2>&1
         SHA=$(wget -qO- "https://api.github.com/repos/hl5btf/DVSMU/commits/main" | awk -F\" '/"sha"/{print $4; exit}')
         sudo wget -qO "$tmp" "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/${file}"
-
-        #if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
-                sudo mv -f "$tmp" "$dst"; sudo rm -f "$tmp"
-        #else
-         #       sudo rm -f "$tmp"
+        sudo mv -f "$tmp" "$dst"
+        sudo rm -f "$tmp"
 
 source /usr/local/dvs/dvsmu_ver
 REMOTE_VERSION=$ver
