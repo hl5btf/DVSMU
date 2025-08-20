@@ -108,7 +108,7 @@ do_AB_ini_audio_edit() {
 #-----------------------------------------------------------
 
 if [ "${first_time_instl}" = "1" ]; then
-        if [ "${macro_lan}" == "KOR" ]; then
+        if [ "${macro_lan}" = "KOR" ]; then
                 LN=KR
 		do_KR
                 do_tgdb_file_copy
