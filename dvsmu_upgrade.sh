@@ -355,11 +355,12 @@ done
 #=======================
 # MAIN SCRIPT
 #=======================
+parameter=$1
 replace_var00_txt
 replace_freq_of_all_users
 add_45039_for_fvrt
 add_talkeralias
-download_and_update_apps
+download_and_update_apps $parameter
 set_crontab
 add_variables
 
