@@ -107,7 +107,7 @@ elif [ "$LOWEST" = "$LOCAL_VERSION" ]; then
         [ -n "$DISABLE_LOG" ] || echo "Found upgrade v.$REMOTE_VERSION of dvsmu" | sudo tee -a "$LOG_FILE"
     	file=dvsmu_upgrade.sh
 		dst="/usr/local/dvs/$file"
-		tmp="tmp/$file"
+		tmp="/tmp/$file"
 		SHA=$(wget -qO- "https://api.github.com/repos/hl5btf/DVSMU/commits/main" | awk -F\" '/"sha"/{print $4; exit}')
     	sudo wget -qO "$tmp" "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/${file}"
 		sudo mv -f "$tmp" "$dst"
