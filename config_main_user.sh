@@ -74,6 +74,7 @@ echo -e "$complete"
 
 
 #-----------------------------------------------------------
+
 do_KR() {
         sudo ${DVS}temp_msg.sh -y
 
@@ -90,11 +91,11 @@ do_KR() {
 }
 
 do_tgdb_file_copy() {
-        if [ -d ${tgdb}${LN} ]; then
-                sudo \cp -f ${tgdb}${LN}/* ${tgdb}
-        else
-                sudo \cp -f ${tgdb}EN/* ${tgdb}
-        fi
+	if [ -d ${tgdb}${LN} ]; then
+        	sudo \cp -f ${tgdb}${LN}/* ${tgdb}
+	else
+        	sudo \cp -f ${tgdb}EN/* ${tgdb}
+	fi
 }
 
 do_AB_ini_audio_edit() {
@@ -107,22 +108,24 @@ do_AB_ini_audio_edit() {
 #-----------------------------------------------------------
 
 if [ "${first_time_instl}" = "1" ]; then
-        if [ "${macro_lan}" = "KOR" ]; then
+        if [ "${macro_lan}" == "KOR" ]; then
                 LN=KR
-				do_KR
+		do_KR
                 do_tgdb_file_copy
                 do_AB_ini_audio_edit
         else
                 LN=EN
-				do_tgdb_file_copy
+		do_tgdb_file_copy
 #                do_AB_ini_audio_edit
         fi
-# update DMR server list on the macro, adv_dmr.txt
-${DVS}adnl_dmr.sh advdmr_return
 
-update_var first_time_instl 73
 
+	# update DMR server list on the macro, adv_dmr.txt
+	${DVS}adnl_dmr.sh advdmr_return
+
+	update_var first_time_instl 73
 fi
+
 #-----------------------------------------------------------
 let "complete=complete+20"
 echo -e "$complete"
@@ -305,7 +308,7 @@ fi
 sudo systemctl restart $services > /dev/null 2>&1
 #-----------------------------------------
 
-} |whiptail --title " 주사용자 설정 진행 중" --gauge "$T006..." 6 60 0
+} |whiptail --title " 주사용자 설정 진행 중" --gauge "$T006... (Please Wait...)" 6 60 0
 
 #-----------------------------------------
 
@@ -321,9 +324,12 @@ $sp11 주사용자의 세부설정은 dvs에서 가능합니다.
 
 $sp11 GPIO형식의 AMBE는 리부팅이 필요합니다.
 
+$sp11 (Main user configuration finished)
+$sp11 (GPIO-type AMBE needs Reboot)
+
 $sp11 $T192
 
-" 13 70 1
+" 16 70 1
 clear; sudo reboot; exit 0
 
 
@@ -333,9 +339,11 @@ $sp11 주사용자 설정 완료.
 
 $sp11 주사용자의 세부설정은 dvs에서 가능합니다.
 
+$sp11 (Main user configuration finished)
+
 $sp11 $T004
 
-" 11 70 1
+" 12 70 1
 clear; ${DVS}dvsmu M; exit 0
 fi
 
@@ -353,18 +361,35 @@ user_array="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23
 
 clear
 
-if (whiptail --title " 주사용자 설정 " --yesno "\
-$sp05 주사용자의 설정을 위한 입력을 시작합니다.
+if [ -e /var/lib/dvswitch/dvs/var.txt ] && [ x${call_sign} != x ]; then
+
+if (whiptail --title " 주사용자 설정 변경 " --yesno "\
+$sp05 주사용자의 설정을 변경합니다.
+
+$sp05 (EDIT configuration of Main user)
 
 $sp05 $T005
-" 10 65); then :
+" 12 65); then :
         else ${DVS}dvsmu M; exit 0
 fi
 
+else
+
+if (whiptail --title " 주사용자 설정 " --yesno "\
+$sp05 주사용자의 설정을 위한 입력을 시작합니다.
+
+$sp05 (Start configuring Main user)
+
+$sp05 $T005
+" 12 65); then :
+        else ${DVS}dvsmu M; exit 0
+fi
+
+fi
 
 # USRP Port 중복 확인 루틴 이후에 다시 source를 변경하므로, 입력 변수를 call_sign_in 등과 같이 변경해서 사용함
 
-call_sign_in=$(whiptail --title "$T009" --inputbox "$T160" 10 60 ${call_sign} 3>&1 1>&2 2>&3)
+call_sign_in=$(whiptail --title "$T009" --inputbox "$T160  (Callsign)" 10 60 ${call_sign} 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 #
 
@@ -380,7 +405,7 @@ if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 #
 
 until [ ${#dmr_id_in} = 7 ]; do
-dmr_id_in=$(whiptail --title "$T009" --inputbox "CCS7/DMR ID ?  ($T165)" 10 60 ${dmr_id} 3>&1 1>&2 2>&3)
+dmr_id_in=$(whiptail --title "$T009" --inputbox "CCS7/DMR ID ?  ($T165)  (7 digits)" 10 60 ${dmr_id} 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 done
 
@@ -393,9 +418,9 @@ if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 
 until [ ${#rpt_id_in} = 9 ]; do
 if [ ${dmr_id_old} = ${dmr_id} ]; then
-rpt_id_in=$(whiptail --title "$T009" --inputbox "CCS7/DMR ID + $T166 ($T167)" 10 70 ${rpt_id} 3>&1 1>&2 2>&3)
+rpt_id_in=$(whiptail --title "$T009" --inputbox "CCS7/DMR ID + $T166 ($T167)  (9 digits)" 10 70 ${rpt_id} 3>&1 1>&2 2>&3)
 else
-rpt_id_in=$(whiptail --title "$T009" --inputbox "CCS7/DMR ID + $T166 ($T167)" 10 70 ${dmr_id} 3>&1 1>&2 2>&3)
+rpt_id_in=$(whiptail --title "$T009" --inputbox "CCS7/DMR ID + $T166 ($T167)  (9 digits)" 10 70 ${dmr_id} 3>&1 1>&2 2>&3)
 fi
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 done
@@ -433,8 +458,9 @@ done
 
 #-------------------------------
 
-until [ "$port_check_ar" != no ] && [ "$port_check" != no ]; do
-usrp_port_in=$(whiptail --title "$T009" --inputbox "Port $usrp_port_in 다른 사용자와 중복됨. 다시 입력하세요." 10 60 3>&1 1>&2 2>&3)
+until [ $usrp_port_in != "" ] && [ "$port_check_ar" != no ] && [ "$port_check" != no ]; do
+
+usrp_port_in=$(whiptail --title "$T009" --inputbox "Port $usrp_port_in 다른 사용자와 중복됨. 다시 입력.  (Port NO conflicts)" 10 60 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 
 ar_status=$(systemctl is-active analog_reflector)
@@ -483,7 +509,7 @@ module=$(whiptail --title "$T009" --inputbox "Dstar module ? (A~Z) ? " 10 60 ${m
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 #
 
-nxdn_id=$(whiptail --title "$T009" --inputbox "$T161" 10 60 ${nxdn_id} 3>&1 1>&2 2>&3)
+nxdn_id=$(whiptail --title "$T009" --inputbox "$T161  (if none, press ENTER)" 10 60 ${nxdn_id} 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 #
 
@@ -541,7 +567,7 @@ bm_address=$(awk '$1 == "'${sel_line}'" { print $3 }' ${dir_host}DMR_Hosts.txt)
 # bm_password=$(awk '$1 == "'${sel_line}'" { print $4 }' ${dir_host}DMR_Hosts.txt)
 bm_port=$(awk '$1 == "'${sel_line}'" { print $5 }' ${dir_host}DMR_Hosts.txt)
 
-bm_password=$(whiptail --title "$T009" --inputbox "브랜드마이스터 비밀번호" 10 60 ${bm_password} 3>&1 1>&2 2>&3)
+bm_password=$(whiptail --title "$T009" --inputbox "브랜드마이스터 비밀번호  (BM SelfCare password)" 10 60 ${bm_password} 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 
 #------- AMBE -----------------------------------------------------------------------------
@@ -549,10 +575,10 @@ if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 OPTION=$(whiptail --title " $T170 " --menu "\
 \n
 " 13 80 4 \
-"$T171  " "$T172" \
-"$T173  " "$T174" \
-"$T175  " "$T176" \
-"$T177  " "$T178" \
+"1 AMBE Server  " "External AMBE Server e.g., ZumAMBE Server" \
+"2 USB Type AMBE  " "ThumbDV, DVstick" \
+"3 GPIO type AMBE  " "DV3000 or PAMBE Board" \
+"4 하드웨어 보코더 없음  "  "No Hardware Vocoder" \
 3>&1 1>&2 2>&3)
 
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
@@ -618,10 +644,11 @@ if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 sel=$(whiptail --title " DVSM 매크로 언어 설정 " --menu "\
 
               DVSM 매크로 언어
+              DVSM Macro Language
 \n
-" 11 50 2 \
-"1" "한글" \
-"2" "영어" \
+" 12 55 2 \
+"1" "한글(Korean)" \
+"2" "영어(English)" \
 3>&1 1>&2 2>&3)
 
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
@@ -639,8 +666,10 @@ $sp15 입력 완료.
 
 $sp15 입력된 내용으로 설정하시겠습니까?
 
+$sp15 (Input finished, start configuring)
+
 $sp15 $T005
-" 12 70);
+" 14 70);
     then
         clear
         do_config
