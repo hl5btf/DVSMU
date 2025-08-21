@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source /var/lib/dvswitch/dvs/var.txt
-
 #===================================
 SCRIPT_VERSION="3.0"
 SCRIPT_AUTHOR="HL5KY"
