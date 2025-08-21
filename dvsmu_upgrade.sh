@@ -363,4 +363,9 @@ download_and_update_apps $parameter
 set_crontab
 add_variables
 
+echo
+echo "========================="
+echo ">>> setup part2 finished"
+echo
+
 
