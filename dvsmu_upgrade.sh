@@ -30,10 +30,10 @@ if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
 	sudo mv -f "$tmp" "$dst"
 	sudo chmod +x $dst
 	sudo rm -f "$tmp"
-	echo "> $file copied or updated"
+	echo "> [●] $file copied or updated"
 else
 	sudo rm -f "$tmp"
-	echo "> $file not changed. identical file already exists."
+	echo "> [✗] $file not changed. identical file already exists."
 fi
 }
 
@@ -300,10 +300,10 @@ for file in $files; do
 	    sudo mv -f "$tmp" "$dst"
 	    sudo chmod +x $dst
 	    sudo rm -f "$tmp"
-	    echo "> $file copied or updated" | sudo tee -a "$LOG_FILE"
+	    echo "> [●] $file copied or updated" | sudo tee -a "$LOG_FILE"
     else
 	    sudo rm -f "$tmp"
-	    echo "> $file not changed" | sudo tee -a "$LOG_FILE"
+	    echo "> [✗] $file not changed" | sudo tee -a "$LOG_FILE"
     fi
 #sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file > /dev/null 2>&1
 #sudo chmod +x /usr/local/dvs/$file
@@ -342,10 +342,10 @@ if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
 	sudo mv -f "$tmp" "$dst"
 	sudo chmod +x $dst
 	sudo rm -f "$tmp"
-	echo "> $file copied or updated" | sudo tee -a "$LOG_FILE"
+	echo "> [●] $file copied or updated" | sudo tee -a "$LOG_FILE"
 else
 	sudo rm -f "$tmp"
-	echo "> $file not changed" | sudo tee -a "$LOG_FILE"
+	echo "> [✗] $file not changed" | sudo tee -a "$LOG_FILE"
 fi
 
 }
