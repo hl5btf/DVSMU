@@ -83,9 +83,10 @@ file=dvsmu_ver
 dst="/usr/local/dvs/$file"
 tmp="/tmp/$file"
 url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
-		sudo wget -O "$tmp" "$url/$file"
-        sudo mv -f "$tmp" "$dst"
-        sudo rm -f "$tmp"
+		sudo wget -O "$dst" "$url/$file"
+#  		sudo wget -O "$tmp" "$url/$file"
+#        sudo mv -f "$tmp" "$dst"
+#        sudo rm -f "$tmp"
 
 source /usr/local/dvs/dvsmu_ver
 REMOTE_VERSION=$ver
@@ -110,12 +111,13 @@ elif [ "$LOWEST" = "$LOCAL_VERSION" ]; then
 		dst="/usr/local/dvs/$file"
 		tmp="/tmp/$file"
 		url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
-		sudo wget -O "$tmp" "$url/$file"
-		sudo mv -f "$tmp" "$dst"
+		sudo wget -O "$dst" "$url/$file"  
+#		sudo wget -O "$tmp" "$url/$file"
+#		sudo mv -f "$tmp" "$dst"
 		sudo chmod +x $dst
 		sudo $dst call_from_auto_upgrade
 		sudo rm -f "$dst"
-		sudo rm -f "$tmp"
+#		sudo rm -f "$tmp"
         [ -n "$DISABLE_LOG" ] || echo "dvsmu v.$REMOTE_VERSION upgrade done" | sudo tee -a "$LOG_FILE"
 else
         [ -n "$DISABLE_LOG" ] || echo "Local dvsMU v.$LOCAL_VERSION is higher than the Remote v.$REMOTE_VERSION" | sudo tee -a "$LOG_FILE"
