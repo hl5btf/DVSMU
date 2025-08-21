@@ -4,11 +4,15 @@
 
 #===================================
 SCRIPT_VERSION="2.01"
+SCRIPT_AUTHOR="HL5KY"
+SCRIPT_DATE=
 #===================================
 
 if [ "$1" != "" ]; then
     case $1 in
         -v|-V|--version) echo $SCRIPT_VERSION; exit 0 ;;
+        -a|-A|--author) echo $SCRIPT_AUTHOR; exit 0 ;;
+        -d|-D|--date) echo $SCRIPT_DATE; exit 0 ;;
     esac
 fi
 
