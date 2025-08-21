@@ -69,61 +69,6 @@ fi
 
 sudo rm -f "$temp_func_file"
 
-# CHECK DVSMU =============================================================================
-source /var/lib/dvswitch/dvs/var00.txt
-LOCAL_VERSION=$dvsmu_version
-
-# LOCAL_VERSION을 확인하지 못하면 중단
-if [[ "$LOCAL_VERSION" != *.* ]]; then
-        [ -n "$DISABLE_LOG" ] || echo "> Can't check the LOCAL_VERSION" | sudo tee -a "$LOG_FILE"
-        exit 0
-fi
-
-file=dvsmu_ver
-dst="/usr/local/dvs/$file"
-tmp="/tmp/$file"
-url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
-		sudo wget -O "$dst" "$url/$file"
-#  		sudo wget -O "$tmp" "$url/$file"
-#        sudo mv -f "$tmp" "$dst"
-#        sudo rm -f "$tmp"
-
-source /usr/local/dvs/dvsmu_ver
-REMOTE_VERSION=$ver
-sudo rm -f "$dst"
-
-# REMOTE_VERSION을 확인하지 못하면 중단
-if [[ "$REMOTE_VERSION" != *.* ]]; then
-        [ -n "$DISABLE_LOG" ] || echo "> Can't check the REMOTE_VERSION" | sudo tee -a "$LOG_FILE"
-        exit 0
-fi
-
-# 두 버전 중 더 낮은(작은) 버전을 구함
-LOWEST=$(awk -v a="$LOCAL_VERSION" -v b="$REMOTE_VERSION" 'BEGIN{print (a+0 <= b+0 ? a : b)}')
-
-
-[ -n "$DISABLE_LOG" ] || echo "Check dvsmu" | sudo tee -a "$LOG_FILE"
-if [ "$LOCAL_VERSION" = "$REMOTE_VERSION" ]; then
-    [ -n "$DISABLE_LOG" ] || echo "Current dvsmu v.$LOCAL_VERSION is the latest" | sudo tee -a "$LOG_FILE"
-elif [ "$LOWEST" = "$LOCAL_VERSION" ]; then
-        [ -n "$DISABLE_LOG" ] || echo "Found upgrade v.$REMOTE_VERSION of dvsmu" | sudo tee -a "$LOG_FILE"
-    	file=dvsmu_upgrade.sh
-		dst="/usr/local/dvs/$file"
-		tmp="/tmp/$file"
-		url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
-		sudo wget -O "$dst" "$url/$file"  
-#		sudo wget -O "$tmp" "$url/$file"
-#		sudo mv -f "$tmp" "$dst"
-		sudo chmod +x $dst
-		sudo $dst call_from_auto_upgrade
-		sudo rm -f "$dst"
-#		sudo rm -f "$tmp"
-        [ -n "$DISABLE_LOG" ] || echo "> dvsmu v.$REMOTE_VERSION upgrade done" | sudo tee -a "$LOG_FILE"
-else
-        [ -n "$DISABLE_LOG" ] || echo "> Local dvsMU v.$LOCAL_VERSION is higher than the Remote v.$REMOTE_VERSION" | sudo tee -a "$LOG_FILE"
-fi
-
-
 #----- execute dvsmu_upgrade.sh (only function download_and_update_apps --------------------------------------
 file=dvsmu_upgrade.sh
 tmp="/tmp/$file"
