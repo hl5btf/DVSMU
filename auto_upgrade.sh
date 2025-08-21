@@ -83,10 +83,10 @@ if [ -s "$tmp_auto" ] && ! cmp -s -- "$tmp_auto" "$dst_auto"; then
 	sudo mv -f "$tmp_auto" "$dst_auto"
 	sudo chmod +x $dst_auto
 	sudo rm -f "$tmp_auto"
-        [ -n "$DISABLE_LOG" ] || echo "> auto_upgrade.sh has updated to a new file" | sudo tee -a "$LOG_FILE"
+        [ -n "$DISABLE_LOG" ] || echo "> [●] auto_upgrade.sh has updated to a new file" | sudo tee -a "$LOG_FILE"
 else
 	sudo rm -f "$tmp_auto"
-	echo "> auto_upgrade.sh hasn't changed"
+	echo "> [✗] auto_upgrade.sh hasn't changed"
 fi
 
 [ -n "$DISABLE_LOG" ] || echo "------------------------------------------------------------" | sudo tee -a "$LOG_FILE"
