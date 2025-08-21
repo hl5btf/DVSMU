@@ -181,10 +181,10 @@ function check_md380-emu_and_install() {
 	echo ">>> check_md380-emu_and_install"
     # dvswitch-server의 설치 도중에 md380-emu 관련 파일의 설치가 누락되는 경우가 있으므로 아래와 확인 및 처리
     if [ ! -d "/opt/md380-emu" ] || [ ! -f /opt/md380-emu/md380-emu ]; then
-        echo ">>> /opt/md380-emu/md380-emu 파일이 없으므로, md380-emu 추가 설치함"
+        echo ">>> [●] /opt/md380-emu/md380-emu 파일이 없으므로, md380-emu 추가 설치함"
         sudo apt-get install md380-emu
     else
-        echo ">>> /opt/md380-emu/md380-emu 파일이 있으므로, md380-emu 추가 설치하지 않음"
+        echo ">>> [✗] /opt/md380-emu/md380-emu 파일이 있으므로, md380-emu 추가 설치하지 않음"
     fi
 }
 #===================================================
@@ -383,10 +383,10 @@ for file in $files; do
     	    sudo mv -f "$tmp" "$dst"
         	sudo chmod +x $dst
         	sudo rm -f "$tmp"
-        	echo "> $file copied or updated"
+        	echo "> [●] $file copied or updated"
 		else
         	sudo rm -f "$tmp"
-        	echo "> $file not changed"
+        	echo "> [✗] $file not changed"
 		fi
 done
 
@@ -406,10 +406,10 @@ if [[ -f "$CHECK_FILE" ]]; then
         		sudo mv -f "$tmp" "$dst"
         		sudo chmod +x $dst
         		sudo rm -f "$tmp"
-        		echo "> $file copied or updated"
+        		echo "> [●] $file copied or updated"
 		else
         		sudo rm -f "$tmp"
-        		echo "> $file not changed"
+        		echo "> [✗] $file not changed"
 		fi
 fi
 
@@ -430,10 +430,10 @@ for file in $files; do
         		sudo mv -f "$tmp" "$dst"
         		sudo chmod +x $dst
         		sudo rm -f "$tmp"
-        		echo "> $file copied or updated"
+        		echo "> [●] $file copied or updated"
 		else
         		sudo rm -f "$tmp"
-        		echo "> $file not changed"
+        		echo "> [✗] $file not changed"
 		fi
 done
 
