@@ -29,24 +29,24 @@ MAX_LINES=300
 # 로그 줄 수가 MAX_LINES를 넘으면 최근 라인만 유지
 tail -n "$MAX_LINES" "$LOG_FILE" > "$TMP_FILE" && cp "$TMP_FILE" "$LOG_FILE"
 
-[ -n "$DISABLE_LOG" ] || echo "AutoUpgrade check started at $(date)" | sudo tee -a "$LOG_FILE"
+[ -n "$DISABLE_LOG" ] || echo ">>> AutoUpgrade check started at $(date)" | sudo tee -a "$LOG_FILE"
 # 외부 스크립트에서 auto_upgrade.sh를 실행할때 로그기록을 하지 않으려면 sudo env DISABLE_LOG=1 /usr/local/dvs/auto_upgrade.sh
 
 # CHECK DVSwitch ===========================================================================
 
 sudo apt-get update
 
-[ -n "$DISABLE_LOG" ] || echo "Check DVSwitch" | sudo tee -a "$LOG_FILE"
+[ -n "$DISABLE_LOG" ] || echo "> Check DVSwitch" | sudo tee -a "$LOG_FILE"
 
 # dvswitch-server가 설치되어 있고, 업그레이드할 내용이 있으면
 if dpkg -l | grep -q "^ii  dvswitch-server" && apt-get -s upgrade | grep -q "^Inst dvswitch-server "; then
-    echo "dvswitch-server가 설치되어 있고, 업그레이드가 가능합니다."
+    echo "> dvswitch-server가 설치되어 있고, 업그레이드가 가능합니다."
     # 여기에 업그레이드 명령 등 실행
     sudo apt-get install dvswitch-server -y
 
 	# call Function
 	main_user_dvswitch_upgrade
-	[ -n "$DISABLE_LOG" ] || echo "Found upgrade of DVSwitch" | sudo tee -a "$LOG_FILE"
+	[ -n "$DISABLE_LOG" ] || echo "> Found upgrade of DVSwitch" | sudo tee -a "$LOG_FILE"
 
 	user_array="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40"
 
@@ -62,9 +62,9 @@ if dpkg -l | grep -q "^ii  dvswitch-server" && apt-get -s upgrade | grep -q "^In
     		var_to_ini ${user} upgrade
 		fi
 	done
-	[ -n "$DISABLE_LOG" ] || echo "DVSwitch upgrade done" | sudo tee -a "$LOG_FILE"
+	[ -n "$DISABLE_LOG" ] || echo "> DVSwitch upgrade done" | sudo tee -a "$LOG_FILE"
 else
-	[ -n "$DISABLE_LOG" ] || echo "Current DVSwitch is the latest" | sudo tee -a "$LOG_FILE"
+	[ -n "$DISABLE_LOG" ] || echo "> Current DVSwitch is the latest" | sudo tee -a "$LOG_FILE"
 fi
 
 sudo rm -f "$temp_func_file"
@@ -75,7 +75,7 @@ LOCAL_VERSION=$dvsmu_version
 
 # LOCAL_VERSION을 확인하지 못하면 중단
 if [[ "$LOCAL_VERSION" != *.* ]]; then
-        [ -n "$DISABLE_LOG" ] || echo "Can't check the LOCAL_VERSION" | sudo tee -a "$LOG_FILE"
+        [ -n "$DISABLE_LOG" ] || echo "> Can't check the LOCAL_VERSION" | sudo tee -a "$LOG_FILE"
         exit 0
 fi
 
@@ -94,7 +94,7 @@ sudo rm -f "$dst"
 
 # REMOTE_VERSION을 확인하지 못하면 중단
 if [[ "$REMOTE_VERSION" != *.* ]]; then
-        [ -n "$DISABLE_LOG" ] || echo "Can't check the REMOTE_VERSION" | sudo tee -a "$LOG_FILE"
+        [ -n "$DISABLE_LOG" ] || echo "> Can't check the REMOTE_VERSION" | sudo tee -a "$LOG_FILE"
         exit 0
 fi
 
@@ -118,23 +118,33 @@ elif [ "$LOWEST" = "$LOCAL_VERSION" ]; then
 		sudo $dst call_from_auto_upgrade
 		sudo rm -f "$dst"
 #		sudo rm -f "$tmp"
-        [ -n "$DISABLE_LOG" ] || echo "dvsmu v.$REMOTE_VERSION upgrade done" | sudo tee -a "$LOG_FILE"
+        [ -n "$DISABLE_LOG" ] || echo "> dvsmu v.$REMOTE_VERSION upgrade done" | sudo tee -a "$LOG_FILE"
 else
-        [ -n "$DISABLE_LOG" ] || echo "Local dvsMU v.$LOCAL_VERSION is higher than the Remote v.$REMOTE_VERSION" | sudo tee -a "$LOG_FILE"
+        [ -n "$DISABLE_LOG" ] || echo "> Local dvsMU v.$LOCAL_VERSION is higher than the Remote v.$REMOTE_VERSION" | sudo tee -a "$LOG_FILE"
 fi
 
-[ -n "$DISABLE_LOG" ] || echo "------------------------------------------------------------" | sudo tee -a "$LOG_FILE"
 
+#----- execute dvsmu_upgrade.sh (only function download------------------------------------------------------------------------------
+    	file=dvsmu_upgrade.sh
+		dst="/usr/local/dvs/$file"
+		tmp="/tmp/$file"
+		url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
+		sudo wget -O "$dst" "$url/$file"  
+#		sudo wget -O "$tmp" "$url/$file"
+#		sudo mv -f "$tmp" "$dst"
+		sudo chmod +x $dst
+		sudo $dst call_from_auto_upgrade
+		sudo rm -f "$dst"
 #-----------------------------------------------------------------------------------
 # tmp파일이 있고 && 크기가 0이 아니면서 && tmp와 dst의 내용이 다르면(변경이 되었으면)
 if [ -s "$tmp_auto" ] && ! cmp -s -- "$tmp_auto" "$dst_auto"; then
 	sudo mv -f "$tmp_auto" "$dst_auto"
 	sudo chmod +x $dst_auto
 	sudo rm -f "$tmp_auto"
-        [ -n "$DISABLE_LOG" ] || echo "auto_upgrade.sh has updated to a new file" | sudo tee -a "$LOG_FILE"
+        [ -n "$DISABLE_LOG" ] || echo "> auto_upgrade.sh has updated to a new file" | sudo tee -a "$LOG_FILE"
 else
 	sudo rm -f "$tmp_auto"
-	echo "auto_upgrade.sh hasn't changed"
+	echo "> auto_upgrade.sh hasn't changed"
 fi
-#-----------------------------------------------------------------------------------
 
+[ -n "$DISABLE_LOG" ] || echo "------------------------------------------------------------" | sudo tee -a "$LOG_FILE"
