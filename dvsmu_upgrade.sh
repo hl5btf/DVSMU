@@ -203,79 +203,6 @@ fi
 done
 }
 
-#====== download_and_update_apps =============================================
-function download_and_update_apps() {
-echo
-echo ">>> download_and_update_apps"
-
-if [ "$1" = "call_from_auto_upgrade" ]; then
-    files="funcs.sh config_main_user.sh man_log DMRIds_chk.sh bm_watchdog.sh"
-else
-    files="funcs.sh config_main_user.sh man_log DMRIds_chk.sh bm_watchdog.sh auto_upgrade.sh"
-fi
-
-for file in $files; do
-    dst="/usr/local/dvs/$file"
-    tmp="/tmp/$file"
-	url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
-	sudo wget -O "$tmp" "$url/$file" > /dev/null 2>&1
-
-    if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
-	    sudo mv -f "$tmp" "$dst"
-	    sudo chmod +x $dst
-	    sudo rm -f "$tmp"
-	    echo "> $file copied or updated"
-    else
-	    sudo rm -f "$tmp"
-	    echo "> $file not changed"
-    fi
-#sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file > /dev/null 2>&1
-#sudo chmod +x /usr/local/dvs/$file
-done
-
-echo
-echo ">>> dvsmu 설치"
-
-file=dvsmu
-# 아키텍처 정보
-ARCH_DPKG=$(dpkg --print-architecture)   # 예: armhf, arm64, amd64
-ARCH_UNAME=$(uname -m)                   # 예: armv7l, aarch64, x86_64
-
-# 아키텍처 및 배포판 기반 분기
-if [[ "$ARCH_DPKG" == "armhf" || "$ARCH_UNAME" == "armv7l" ]]; then
-    echo ">>> 32비트 ARMHF 시스템"
-    file_download=dvsmu_armhf_glibc228
-
-elif [[ "$ARCH_DPKG" == "arm64" || "$ARCH_UNAME" == "aarch64" ]]; then
-    echo ">>> 64비트 ARM64 시스템"
-    file_download=dvsmu_arm64_glibc231
-
-elif [[ "$ARCH_DPKG" == "amd64" || "$ARCH_UNAME" == "x86_64" ]]; then
-    echo ">>> 64비트 AMD64 PC 시스템"
-    file_download=dvsmu_amd64_glibc231
-else
-    echo "dvsMU 설치 불가"
-fi
-
-dst="/usr/local/dvs/$file"
-tmp="/tmp/$file"
-url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
-sudo wget -O "$tmp" "$url/$file_download" > /dev/null 2>&1
-
-if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
-	sudo mv -f "$tmp" "$dst"
-	sudo chmod +x $dst
-	sudo rm -f "$tmp"
-	echo "> $file copied or updated"
-else
-	sudo rm -f "$tmp"
-	echo "> $file not changed"
-fi
-
-#sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file_download > /dev/null 2>&1
-#sudo chmod +x /usr/local/dvs/$file
-}
-
 #====== set_crontab =============================================
 function set_crontab() {
 echo
@@ -351,21 +278,96 @@ fi
 done
 }
 
+#====== download_and_update_apps =============================================
+function download_and_update_apps() {
+echo
+echo ">>> download_and_update_apps"
+
+if [ "$1" = "call_from_auto_upgrade" ]; then
+    files="funcs.sh config_main_user.sh man_log DMRIds_chk.sh bm_watchdog.sh"
+else
+    files="funcs.sh config_main_user.sh man_log DMRIds_chk.sh bm_watchdog.sh auto_upgrade.sh"
+fi
+
+for file in $files; do
+    dst="/usr/local/dvs/$file"
+    tmp="/tmp/$file"
+	url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
+	sudo wget -O "$tmp" "$url/$file" > /dev/null 2>&1
+
+    if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
+	    sudo mv -f "$tmp" "$dst"
+	    sudo chmod +x $dst
+	    sudo rm -f "$tmp"
+	    echo "> $file copied or updated"
+    else
+	    sudo rm -f "$tmp"
+	    echo "> $file not changed"
+    fi
+#sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file > /dev/null 2>&1
+#sudo chmod +x /usr/local/dvs/$file
+done
+
+echo
+echo ">>> dvsmu 설치"
+
+file=dvsmu
+# 아키텍처 정보
+ARCH_DPKG=$(dpkg --print-architecture)   # 예: armhf, arm64, amd64
+ARCH_UNAME=$(uname -m)                   # 예: armv7l, aarch64, x86_64
+
+# 아키텍처 및 배포판 기반 분기
+if [[ "$ARCH_DPKG" == "armhf" || "$ARCH_UNAME" == "armv7l" ]]; then
+    echo ">>> 32비트 ARMHF 시스템"
+    file_download=dvsmu_armhf_glibc228
+
+elif [[ "$ARCH_DPKG" == "arm64" || "$ARCH_UNAME" == "aarch64" ]]; then
+    echo ">>> 64비트 ARM64 시스템"
+    file_download=dvsmu_arm64_glibc231
+
+elif [[ "$ARCH_DPKG" == "amd64" || "$ARCH_UNAME" == "x86_64" ]]; then
+    echo ">>> 64비트 AMD64 PC 시스템"
+    file_download=dvsmu_amd64_glibc231
+else
+    echo "dvsMU 설치 불가"
+fi
+
+dst="/usr/local/dvs/$file"
+tmp="/tmp/$file"
+url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
+sudo wget -O "$tmp" "$url/$file_download" > /dev/null 2>&1
+
+if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
+	sudo mv -f "$tmp" "$dst"
+	sudo chmod +x $dst
+	sudo rm -f "$tmp"
+	echo "> $file copied or updated"
+else
+	sudo rm -f "$tmp"
+	echo "> $file not changed"
+fi
+
+#sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file_download > /dev/null 2>&1
+#sudo chmod +x /usr/local/dvs/$file
+}
+
 #=======================
 # MAIN SCRIPT
 #=======================
-parameter=$1
-replace_var00_txt
-replace_freq_of_all_users
-add_45039_for_fvrt
-add_talkeralias
-download_and_update_apps $parameter
-set_crontab
-add_variables
+if [ "$1" = "call_from_auto_upgrade" ]; then
+	download_and_update_apps $1
+else
+	replace_var00_txt
+	replace_freq_of_all_users
+	add_45039_for_fvrt
+	add_talkeralias
+	set_crontab
+	add_variables  
+	download_and_update_apps
 
-echo
-echo "========================="
-echo ">>> setup part2 finished"
-echo
-
+	echo
+	echo "========================="
+	echo ">>> setup part2 finished"
+	echo
+fi
 
