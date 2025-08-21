@@ -1,3 +1,22 @@
+#!/bin/bash
+
+source /var/lib/dvswitch/dvs/var.txt
+
+#===================================
+SCRIPT_VERSION="3.0"
+SCRIPT_AUTHOR="HL5KY"
+SCRIPT_DATE="2025-08-17"
+#===================================
+
+if [ "$1" != "" ]; then
+    case $1 in
+        -v|-V|--version) echo $SCRIPT_VERSION; exit 0 ;;
+        -a|-A|--author) echo $SCRIPT_AUTHOR; exit 0 ;;
+        -d|-D|--date) echo $SCRIPT_DATE; exit 0 ;;
+    esac
+fi
+
+
+
 # dvsmu v.2.01 에서 버전 확인시 참조하는 내용
 
-SCRIPT_VERSION="3.0"
