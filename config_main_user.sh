@@ -309,7 +309,7 @@ fi
 sudo systemctl restart $services > /dev/null 2>&1
 #-----------------------------------------
 
-} |whiptail --title " 주사용자 설정 진행 중" --gauge "$T006... (Please Wait...)" 6 60 0
+} |whiptail --title " 주사용자 설정 진행 중" --gauge "잠깐만 기다리세요... (Please Wait...)" 6 60 0
 
 #-----------------------------------------
 
@@ -377,7 +377,7 @@ fi
 
 # USRP Port 중복 확인 루틴 이후에 다시 source를 변경하므로, 입력 변수를 call_sign_in 등과 같이 변경해서 사용함
 
-call_sign_in=$(whiptail --title "$T009" --inputbox "$T160  (Callsign)" 10 60 ${call_sign} 3>&1 1>&2 2>&3)
+call_sign_in=$(whiptail --title " 입력 " --inputbox "호출부호? (대소문자 구분없음)  (Callsign)" 10 60 ${call_sign} 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 #
 
@@ -388,34 +388,34 @@ dmr_id_old=${dmr_id}
 else dmr_id_old=none
 fi
 
-dmr_id_in=$(whiptail --title "$T009" --inputbox "CCS7/DMR ID ?" 10 60 ${dmr_id} 3>&1 1>&2 2>&3)
+dmr_id_in=$(whiptail --title " 입력 " --inputbox "CCS7/DMR ID ?" 10 60 ${dmr_id} 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 #
 
 until [ ${#dmr_id_in} = 7 ]; do
-dmr_id_in=$(whiptail --title "$T009" --inputbox "CCS7/DMR ID ?  ($T165)  (7 digits)" 10 60 ${dmr_id} 3>&1 1>&2 2>&3)
+dmr_id_in=$(whiptail --title " 입력 " --inputbox "CCS7/DMR ID ?  (7자리 숫자)  (7 digits)" 10 60 ${dmr_id} 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 done
 
 if [ "${dmr_id_old}" = ${dmr_id_in} ]; then
-rpt_id_in=$(whiptail --title "$T009" --inputbox "CCS7/DMR ID + $T166 (00 ~99) ?" 10 60 ${rpt_id} 3>&1 1>&2 2>&3)
+rpt_id_in=$(whiptail --title " 입력 " --inputbox "CCS7/DMR ID + 2자리숫자 (00 ~99) (+ 2 digits) ?" 10 60 ${rpt_id} 3>&1 1>&2 2>&3)
 else
-rpt_id_in=$(whiptail --title "$T009" --inputbox "CCS7/DMR ID + $T166 (00 ~99) ?" 10 60 ${dmr_id_in} 3>&1 1>&2 2>&3)
+rpt_id_in=$(whiptail --title " 입력 " --inputbox "CCS7/DMR ID + 2자리숫자 (00 ~99) (+ 2 digits) ?" 10 60 ${dmr_id_in} 3>&1 1>&2 2>&3)
 fi
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 
 until [ ${#rpt_id_in} = 9 ]; do
 if [ ${dmr_id_old} = ${dmr_id} ]; then
-rpt_id_in=$(whiptail --title "$T009" --inputbox "CCS7/DMR ID + $T166 ($T167)  (9 digits)" 10 70 ${rpt_id} 3>&1 1>&2 2>&3)
+rpt_id_in=$(whiptail --title " 입력 " --inputbox "CCS7/DMR ID + 2자리숫자 (합계9자리)  (9 digits)" 10 70 ${rpt_id} 3>&1 1>&2 2>&3)
 else
-rpt_id_in=$(whiptail --title "$T009" --inputbox "CCS7/DMR ID + $T166 ($T167)  (9 digits)" 10 70 ${dmr_id} 3>&1 1>&2 2>&3)
+rpt_id_in=$(whiptail --title " 입력 " --inputbox "CCS7/DMR ID + 2자리숫자 (합계9자리)  (9 digits)" 10 70 ${dmr_id} 3>&1 1>&2 2>&3)
 fi
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 done
 
 #--------------USRP PORT 입력 중복 확인 시작 부분 -------------------------------
 
-usrp_port_in=$(whiptail --title "$T009" --inputbox "USRP Port? ( 50000 ~ 55000 )" 10 60 ${usrp_port} 3>&1 1>&2 2>&3)
+usrp_port_in=$(whiptail --title " 입력 " --inputbox "USRP Port? ( 50000 ~ 55000 )" 10 60 ${usrp_port} 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 #
 
@@ -448,7 +448,7 @@ done
 
 until [ $usrp_port_in != "" ] && [ "$port_check_ar" != no ] && [ "$port_check" != no ]; do
 
-usrp_port_in=$(whiptail --title "$T009" --inputbox "Port $usrp_port_in 다른 사용자와 중복됨. 다시 입력.  (Port NO conflicts)" 10 60 3>&1 1>&2 2>&3)
+usrp_port_in=$(whiptail --title " 입력 " --inputbox "Port $usrp_port_in 다른 사용자와 중복됨. 다시 입력.  (Port NO conflicts)" 10 60 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 
 ar_status=$(systemctl is-active analog_reflector)
@@ -493,21 +493,21 @@ if [ x${module} = x ]; then
         fi
 fi
 
-module=$(whiptail --title "$T009" --inputbox "Dstar module ? (A~Z) ? " 10 60 ${module} 3>&1 1>&2 2>&3)
+module=$(whiptail --title " 입력 " --inputbox "Dstar module ? (A~Z) ? " 10 60 ${module} 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 #
 
-nxdn_id=$(whiptail --title "$T009" --inputbox "$T161  (if none, press ENTER)" 10 60 ${nxdn_id} 3>&1 1>&2 2>&3)
+nxdn_id=$(whiptail --title " 입력 " --inputbox "없으면 ENTER  (if none, press ENTER)" 10 60 ${nxdn_id} 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 #
 
 rx_MHz=${rx_freq:0:3}"."${rx_freq:3:4}
 
-rx_MHz=$(whiptail --title " $T009 " --inputbox "송수신 주파수(xxx.xxxx MHz)" 10 60 ${rx_MHz} 3>&1 1>&2 2>&3)
+rx_MHz=$(whiptail --title " 입력 " --inputbox "송수신 주파수(xxx.xxxx MHz)" 10 60 ${rx_MHz} 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 
 until [ ${#rx_MHz} = 8 ]; do
-rx_MHz=$(whiptail --title " $T009 " --inputbox "송수신 주파파수(xxx.xxxx MHz, 소수점 4자리)" 10 60 ${rx_MHz} 3>&1 1>&2 2>&3)
+rx_MHz=$(whiptail --title " 입력 " --inputbox "송수신 주파파수(xxx.xxxx MHz, 소수점 4자리)" 10 60 ${rx_MHz} 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 done
 
@@ -555,12 +555,12 @@ bm_address=$(awk '$1 == "'${sel_line}'" { print $3 }' ${dir_host}DMR_Hosts.txt)
 # bm_password=$(awk '$1 == "'${sel_line}'" { print $4 }' ${dir_host}DMR_Hosts.txt)
 bm_port=$(awk '$1 == "'${sel_line}'" { print $5 }' ${dir_host}DMR_Hosts.txt)
 
-bm_password=$(whiptail --title "$T009" --inputbox "브랜드마이스터 비밀번호  (BM SelfCare password)" 10 60 ${bm_password} 3>&1 1>&2 2>&3)
+bm_password=$(whiptail --title " 입력 " --inputbox "브랜드마이스터 비밀번호  (BM SelfCare password)" 10 60 ${bm_password} 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 
 #------- AMBE -----------------------------------------------------------------------------
 
-OPTION=$(whiptail --title " $T170 " --menu "\
+OPTION=$(whiptail --title " 하드웨어 보코더 (AMBE) " --menu "\
 \n
 " 13 80 4 \
 "1 AMBE Server  " "External AMBE Server e.g., ZumAMBE Server" \
@@ -588,11 +588,11 @@ if [ $ambe_option = "1" ]; then
         if [ $? != 0 ]; then ${DVS}dvsmu M exit 0; fi
 
 elif [ $ambe_option = "2" ]; then
-        ambe_baud=$(whiptail --title " Baudrate of ThumbDV or DVstick " --inputbox "Baudrate ? [$T168]" 8 50 ${ambe_baud} 3>&1 1>&2 2>&3)
+        ambe_baud=$(whiptail --title " Baudrate of ThumbDV or DVstick " --inputbox "Baudrate ? [460800 (Old ver: 230400)]" 8 50 ${ambe_baud} 3>&1 1>&2 2>&3)
         if [ $? != 0 ]; then ${DVS}dvsmu M exit 0; fi
 
 elif [ $ambe_option = "3" ]; then
-        ambe_baud=$(whiptail --title " Baudrate of AMBE Board " --inputbox "Baudrate ? [$T168]" 8 50 ${ambe_baud} 3>&1 1>&2 2>&3)
+        ambe_baud=$(whiptail --title " Baudrate of AMBE Board " --inputbox "Baudrate ? [460800 (Old ver: 230400)]" 8 50 ${ambe_baud} 3>&1 1>&2 2>&3)
         if [ $? != 0 ]; then ${DVS}dvsmu M exit 0; fi
 
 elif [ $ambe_option = "4" ]; then :
@@ -601,31 +601,25 @@ fi
 
 #----------------------------------------------------------------------------------------------------------------------
 
-if [[ $T220 =~ Power ]]; then T220=$T220; else T220="Power : $T220"; fi
-pwr=$(whiptail --title " $T009 " --inputbox "$T220" 10 60 ${pwr} 3>&1 1>&2 2>&3)
+pwr=$(whiptail --title " 입력 " --inputbox "출력 (Power)" 10 60 ${pwr} 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 
-if [[ $T218 =~ Latitude ]]; then T218=$T218; else T218="Latitude : $T218"; fi
-lat=$(whiptail --title " $T009 " --inputbox "$T218" 10 60 -- ${lat} 3>&1 1>&2 2>&3)
+lat=$(whiptail --title " 입력 " --inputbox "위도 Latitude (xxx.xxxx OR -xxx.xxxx)" 10 60 -- ${lat} 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 
-if [[ $T219 =~ Longitude ]]; then T219=$T219; else T219="Longitude : $T219"; fi
-lon=$(whiptail --title " $T009 " --inputbox "$T219" 10 60 -- ${lon} 3>&1 1>&2 2>&3)
+lon=$(whiptail --title " 입력 " --inputbox "경도 Longitude  (xxx.xxxx OR -xxx.xxxx)" 10 60 -- ${lon} 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 
-if [[ $T221 =~ Height ]]; then T221=$T221; else T221="Height : $T221"; fi
-hgt=$(whiptail --title " $T009 " --inputbox "$T221" 10 60 ${hgt} 3>&1 1>&2 2>&3)
+hgt=$(whiptail --title " 입력 " --inputbox "지표고 (Altitude)" 10 60 ${hgt} 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 
-if [[ $T222 =~ Location ]]; then T222=$T222; else T222="Location : $T222"; fi
-lctn=$(whiptail --title " $T009 " --inputbox "$T222" 10 60 "${lctn}" 3>&1 1>&2 2>&3)
+lctn=$(whiptail --title " 입력 " --inputbox "위치 (Location)" 10 60 "${lctn}" 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 
-if [[ $T223 =~ Description ]]; then T223=$T223; else T223="Description : $T223"; fi
-desc=$(whiptail --title " $T009 " --inputbox "$T223" 10 60 "${desc}" 3>&1 1>&2 2>&3)
+desc=$(whiptail --title " 입력 " --inputbox "설명 (Description)" 10 60 "${desc}" 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 
-url=$(whiptail --title " $T009 " --inputbox "URL" 10 60 ${url} 3>&1 1>&2 2>&3)
+url=$(whiptail --title " 입력 " --inputbox "URL" 10 60 ${url} 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 
 
