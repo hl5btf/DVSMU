@@ -1,6 +1,5 @@
 #!/bin/bash
 
-dvsmu_version=3.0
 DVS=/usr/local/dvs/
 AB=/opt/userUSER_NO/
 MB=/opt/userUSER_NO/
