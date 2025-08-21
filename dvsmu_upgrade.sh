@@ -33,7 +33,7 @@ if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
 	echo "> $file copied or updated"
 else
 	sudo rm -f "$tmp"
-	echo "> $file not changed"
+	echo "> $file not changed. already exists."
 fi
 }
 
