@@ -453,10 +453,10 @@ for file in $files; do
         		sudo mv -f "$tmp" "$dst"
         		sudo chmod +x $dst
         		sudo rm -f "$tmp"
-        		echo "> $file for English copied or updated"
+        		echo "> [●] $file for English copied or updated"
 		else
         		sudo rm -f "$tmp"
-        		echo "> $file for English not changed"
+        		echo "> [✗] $file for English not changed"
 		fi
 
 		dst="/var/lib/dvswitch/dvs/adv/user00KR/$file"
@@ -468,10 +468,10 @@ for file in $files; do
         		sudo mv -f "$tmp" "$dst"
         		sudo chmod +x $dst
         		sudo rm -f "$tmp"
-        		echo "> $file for Korean copied or updated"
+        		echo "> [●] $file for Korean copied or updated"
 		else
         		sudo rm -f "$tmp"
-        		echo "> $file for Korean not changed"
+        		echo "> [✗] $file for Korean not changed"
 		fi
 done
 }
@@ -654,10 +654,10 @@ check_qemu_version
 
 # --- qemu 관리방식이 이전방식이면서 qemu 버전이 6.2.0 보다 높으면, qemu를 6.2.0으로 downgrade
 if [ "$qemu_manage_type" = "old" ] && [ "$qemu_arm_ver" = "HigherThan6.2.0" ]; then
-		echo ">>> qemu 관리방식이 이전방식이면서 qemu 버전이 6.2.0 보다 높으므로 downgrade"
+		echo ">>> [✔] qemu 관리방식이 이전방식이면서 qemu 버전이 6.2.0 보다 높으므로 downgrade"
 		downgrade_qemu
 else
-		echo ">>> qemu 관리가 새로운 방식이거나 버전이 6.2.0보다 높지 않으므로 qemu-arm-static 버전 변경하지 않음"
+		echo ">>> [✔] qemu 관리가 새로운 방식이거나 버전이 6.2.0보다 높지 않으므로 qemu-arm-static 버전 변경하지 않음"
 fi
 
 echo
