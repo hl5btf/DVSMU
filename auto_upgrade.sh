@@ -124,17 +124,14 @@ else
 fi
 
 
-#----- execute dvsmu_upgrade.sh (only function download------------------------------------------------------------------------------
-    	file=dvsmu_upgrade.sh
-		dst="/usr/local/dvs/$file"
-		tmp="/tmp/$file"
-		url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
-		sudo wget -O "$dst" "$url/$file"  
-#		sudo wget -O "$tmp" "$url/$file"
-#		sudo mv -f "$tmp" "$dst"
-		sudo chmod +x $dst
-		sudo $dst call_from_auto_upgrade
-		sudo rm -f "$dst"
+#----- execute dvsmu_upgrade.sh (only function download_and_update_apps --------------------------------------
+file=dvsmu_upgrade.sh
+tmp="/tmp/$file"
+url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
+sudo wget -O "$tmp" "$url/$file"  
+sudo chmod +x $tmp
+sudo $tmp call_from_auto_upgrade
+sudo rm -f "$tmp"
 #-----------------------------------------------------------------------------------
 # tmp파일이 있고 && 크기가 0이 아니면서 && tmp와 dst의 내용이 다르면(변경이 되었으면)
 if [ -s "$tmp_auto" ] && ! cmp -s -- "$tmp_auto" "$dst_auto"; then
