@@ -377,7 +377,7 @@ for file in $files; do
 		dst="/var/lib/dvswitch/dvs/$file"
 		tmp="/tmp/$file"
 		url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
-		sudo wget -O "$tmp" "$url/$file"
+		sudo wget -O "$tmp" "$url/$file" > /dev/null 2>&1
 
 		if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
     	    sudo mv -f "$tmp" "$dst"
@@ -400,7 +400,7 @@ if [[ -f "$CHECK_FILE" ]]; then
 		dst="/var/lib/dvswitch/dvs/$file"
 		tmp="/tmp/$file"
 		url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
-		sudo wget -O "$tmp" "$url/$file_download"
+		sudo wget -O "$tmp" "$url/$file_download" > /dev/null 2>&1
 
 		if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
         		sudo mv -f "$tmp" "$dst"
@@ -424,7 +424,7 @@ for file in $files; do
 		dst="/var/lib/dvswitch/dvs/adv/user00/$file"
 		tmp="/tmp/$file"
 		url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
-		sudo wget -O "$tmp" "$url/$file"
+		sudo wget -O "$tmp" "$url/$file" > /dev/null 2>&1
 
 		if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
         		sudo mv -f "$tmp" "$dst"
@@ -447,7 +447,7 @@ for file in $files; do
 		dst="/var/lib/dvswitch/dvs/adv/user00EN/$file"
 		tmp="/tmp/$file"
 		url="https://raw.githubusercontent.com/hl5btf/DVSMU/main/EN"
-		sudo wget -O "$tmp" "$url/$file"
+		sudo wget -O "$tmp" "$url/$file" > /dev/null 2>&1
 
 		if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
         		sudo mv -f "$tmp" "$dst"
@@ -462,7 +462,7 @@ for file in $files; do
 		dst="/var/lib/dvswitch/dvs/adv/user00KR/$file"
 		tmp="/tmp/$file"
 		url="https://raw.githubusercontent.com/hl5btf/DVSMU/main/KR"
-		sudo wget -O "$tmp" "$url/$file"
+		sudo wget -O "$tmp" "$url/$file" > /dev/null 2>&1
 
 		if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
         		sudo mv -f "$tmp" "$dst"
