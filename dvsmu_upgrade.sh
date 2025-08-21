@@ -24,7 +24,7 @@ file=var00.txt
 dst="/var/lib/dvswitch/dvs/$file"
 tmp="/tmp/$file"
 url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
-sudo wget -O "$tmp" "$url/$file"
+sudo wget -O "$tmp" "$url/$file" > /dev/null 2>&1
 
 if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
 	sudo mv -f "$tmp" "$dst"
@@ -218,7 +218,7 @@ for file in $files; do
     dst="/usr/local/dvs/$file"
     tmp="/tmp/$file"
 	url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
-	sudo wget -O "$tmp" "$url/$file"
+	sudo wget -O "$tmp" "$url/$file" > /dev/null 2>&1
 
     if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
 	    sudo mv -f "$tmp" "$dst"
@@ -260,7 +260,7 @@ fi
 dst="/usr/local/dvs/$file"
 tmp="/tmp/$file"
 url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
-sudo wget -O "$tmp" "$url/$file_download"
+sudo wget -O "$tmp" "$url/$file_download" > /dev/null 2>&1
 
 if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
 	sudo mv -f "$tmp" "$dst"
