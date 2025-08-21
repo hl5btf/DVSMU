@@ -376,8 +376,8 @@ files="analog_bridge00.service md380-emu00.service mmdvm_bridge00.service var00.
 for file in $files; do
 		dst="/var/lib/dvswitch/dvs/$file"
 		tmp="/tmp/$file"
-		SHA=$(wget -qO- "https://api.github.com/repos/hl5btf/DVSMU/commits/main" | awk -F\" '/"sha"/{print $4; exit}')
-		sudo wget -qO "$tmp" "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/${file}"
+		url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
+		sudo wget -O "$tmp" "$url/$file"
 
 		if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
     	    sudo mv -f "$tmp" "$dst"
@@ -399,8 +399,8 @@ if [[ -f "$CHECK_FILE" ]]; then
 		file_download="md380-emu00-new.service"
 		dst="/var/lib/dvswitch/dvs/$file"
 		tmp="/tmp/$file"
-		SHA=$(wget -qO- "https://api.github.com/repos/hl5btf/DVSMU/commits/main" | awk -F\" '/"sha"/{print $4; exit}')
-		sudo wget -qO "$tmp" "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/${file_download}"
+		url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
+		sudo wget -O "$tmp" "$url/$file_download"
 
 		if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
         		sudo mv -f "$tmp" "$dst"
@@ -423,8 +423,8 @@ files="dvsm.adv dvsm.basic dvsm.macro dvsm.sh"
 for file in $files; do
 		dst="/var/lib/dvswitch/dvs/adv/user00/$file"
 		tmp="/tmp/$file"
-		SHA=$(wget -qO- "https://api.github.com/repos/hl5btf/DVSMU/commits/main" | awk -F\" '/"sha"/{print $4; exit}')
-		sudo wget -qO "$tmp" "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/${file}"
+		url="https://raw.githubusercontent.com/hl5btf/DVSMU/main"
+		sudo wget -O "$tmp" "$url/$file"
 
 		if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
         		sudo mv -f "$tmp" "$dst"
@@ -446,8 +446,8 @@ files="adv_audio.txt adv_dmr.txt adv_hotspot.txt adv_main.txt adv_managetg.txt a
 for file in $files; do
 		dst="/var/lib/dvswitch/dvs/adv/user00EN/$file"
 		tmp="/tmp/$file"
-		SHA=$(wget -qO- "https://api.github.com/repos/hl5btf/DVSMU/commits/main" | awk -F\" '/"sha"/{print $4; exit}')
-		sudo wget -qO "$tmp" "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/EN/${file}"
+		url="https://raw.githubusercontent.com/hl5btf/DVSMU/main/EN"
+		sudo wget -O "$tmp" "$url/$file"
 
 		if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
         		sudo mv -f "$tmp" "$dst"
@@ -461,8 +461,8 @@ for file in $files; do
 
 		dst="/var/lib/dvswitch/dvs/adv/user00KR/$file"
 		tmp="/tmp/$file"
-		SHA=$(wget -qO- "https://api.github.com/repos/hl5btf/DVSMU/commits/main" | awk -F\" '/"sha"/{print $4; exit}')
-		sudo wget -qO "$tmp" "https://raw.githubusercontent.com/hl5btf/DVSMU/${SHA}/KR/${file}"
+		url="https://raw.githubusercontent.com/hl5btf/DVSMU/main/KR"
+		sudo wget -O "$tmp" "$url/$file"
 
 		if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
         		sudo mv -f "$tmp" "$dst"
