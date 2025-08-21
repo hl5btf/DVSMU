@@ -280,8 +280,9 @@ done
 
 #====== download_and_update_apps =============================================
 function download_and_update_apps() {
+LOG_FILE="/var/log/dvswitch/auto_upgrade.log"
 echo
-echo ">>> download_and_update_apps"
+echo ">>> download_and_update_apps" | sudo tee -a "$LOG_FILE"
 
 if [ "$1" = "call_from_auto_upgrade" ]; then
     files="funcs.sh config_main_user.sh man_log DMRIds_chk.sh bm_watchdog.sh"
@@ -299,17 +300,17 @@ for file in $files; do
 	    sudo mv -f "$tmp" "$dst"
 	    sudo chmod +x $dst
 	    sudo rm -f "$tmp"
-	    echo "> $file copied or updated"
+	    echo "> $file copied or updated" | sudo tee -a "$LOG_FILE"
     else
 	    sudo rm -f "$tmp"
-	    echo "> $file not changed"
+	    echo "> $file not changed" | sudo tee -a "$LOG_FILE"
     fi
 #sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file > /dev/null 2>&1
 #sudo chmod +x /usr/local/dvs/$file
 done
 
 echo
-echo ">>> dvsmu 설치"
+echo ">>> check architecture and download dvsmu" | sudo tee -a "$LOG_FILE"
 
 file=dvsmu
 # 아키텍처 정보
@@ -319,17 +320,17 @@ ARCH_UNAME=$(uname -m)                   # 예: armv7l, aarch64, x86_64
 # 아키텍처 및 배포판 기반 분기
 if [[ "$ARCH_DPKG" == "armhf" || "$ARCH_UNAME" == "armv7l" ]]; then
     echo ">>> 32비트 ARMHF 시스템"
-    file_download=dvsmu_armhf_glibc228
+    file_download=dvsmu_armhf_glibc228 | sudo tee -a "$LOG_FILE"
 
 elif [[ "$ARCH_DPKG" == "arm64" || "$ARCH_UNAME" == "aarch64" ]]; then
     echo ">>> 64비트 ARM64 시스템"
-    file_download=dvsmu_arm64_glibc231
+    file_download=dvsmu_arm64_glibc231 | sudo tee -a "$LOG_FILE"
 
 elif [[ "$ARCH_DPKG" == "amd64" || "$ARCH_UNAME" == "x86_64" ]]; then
     echo ">>> 64비트 AMD64 PC 시스템"
-    file_download=dvsmu_amd64_glibc231
+    file_download=dvsmu_amd64_glibc231 | sudo tee -a "$LOG_FILE"
 else
-    echo "dvsMU 설치 불가"
+    echo "dvsMU 설치 불가" | sudo tee -a "$LOG_FILE"
 fi
 
 dst="/usr/local/dvs/$file"
@@ -341,14 +342,12 @@ if [ -s "$tmp" ] && ! cmp -s -- "$tmp" "$dst"; then
 	sudo mv -f "$tmp" "$dst"
 	sudo chmod +x $dst
 	sudo rm -f "$tmp"
-	echo "> $file copied or updated"
+	echo "> $file copied or updated" | sudo tee -a "$LOG_FILE"
 else
 	sudo rm -f "$tmp"
-	echo "> $file not changed"
+	echo "> $file not changed" | sudo tee -a "$LOG_FILE"
 fi
 
-#sudo wget -O /usr/local/dvs/$file https://raw.githubusercontent.com/hl5btf/DVSMU/main/$file_download > /dev/null 2>&1
-#sudo chmod +x /usr/local/dvs/$file
 }
 
 #=======================
