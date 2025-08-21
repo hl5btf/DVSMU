@@ -660,16 +660,9 @@ else
 		echo ">>> qemu 관리가 새로운 방식이거나 버전이 6.2.0보다 높지 않으므로 qemu-arm-static 버전 변경하지 않음"
 fi
 
-#echo
-#echo "========================="
-#echo ">>> dvsmu_upgrade.sh"
-#echo
-
-#sudo wget https://raw.githubusercontent.com/hl5btf/DVSMU/main/dvsmu_upgrade.sh
-#sudo chmod +x dvsmu_upgrade.sh
-#sudo ./dvsmu_upgrade.sh
-#sleep 1
-#sudo rm dvsmu_upgrade.sh
-#}
+echo
+echo "========================="
+echo ">>> setup part1 finished"
+echo
 
 
