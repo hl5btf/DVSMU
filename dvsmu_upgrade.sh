@@ -319,18 +319,18 @@ ARCH_UNAME=$(uname -m)                   # 예: armv7l, aarch64, x86_64
 
 # 아키텍처 및 배포판 기반 분기
 if [[ "$ARCH_DPKG" == "armhf" || "$ARCH_UNAME" == "armv7l" ]]; then
-    echo "> 32비트 ARMHF 시스템"
-    file_download=dvsmu_armhf_glibc228 | sudo tee -a "$LOG_FILE"
+    echo "> [✔] 32비트 ARMHF 시스템" | sudo tee -a "$LOG_FILE"
+    file_download=dvsmu_armhf_glibc228
 
 elif [[ "$ARCH_DPKG" == "arm64" || "$ARCH_UNAME" == "aarch64" ]]; then
-    echo "> 64비트 ARM64 시스템"
-    file_download=dvsmu_arm64_glibc231 | sudo tee -a "$LOG_FILE"
+    echo "> [✔] 64비트 ARM64 시스템" | sudo tee -a "$LOG_FILE"
+    file_download=dvsmu_arm64_glibc231
 
 elif [[ "$ARCH_DPKG" == "amd64" || "$ARCH_UNAME" == "x86_64" ]]; then
-    echo "> 64비트 AMD64 PC 시스템"
-    file_download=dvsmu_amd64_glibc231 | sudo tee -a "$LOG_FILE"
+    echo "> [✔] 64비트 AMD64 PC 시스템" | sudo tee -a "$LOG_FILE"
+    file_download=dvsmu_amd64_glibc231
 else
-    echo "> 시스템 ARCH 확인 불가" | sudo tee -a "$LOG_FILE"
+    echo "> [✔] 시스템 ARCH 확인 불가" | sudo tee -a "$LOG_FILE"
 fi
 
 dst="/usr/local/dvs/$file"
