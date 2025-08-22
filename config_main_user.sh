@@ -497,7 +497,7 @@ module=$(whiptail --title " 입력 " --inputbox "Dstar module ? (A~Z) ? " 10 60 
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 #
 
-nxdn_id=$(whiptail --title " 입력 " --inputbox "없으면 ENTER  (if none, press ENTER)" 10 60 ${nxdn_id} 3>&1 1>&2 2>&3)
+nxdn_id=$(whiptail --title " 입력 " --inputbox "NXDN ID  (없으면 ENTER)  (if none, press ENTER)" 10 60 ${nxdn_id} 3>&1 1>&2 2>&3)
 if [ $? != 0 ]; then ${DVS}dvsmu M; exit 0; fi
 #
 
