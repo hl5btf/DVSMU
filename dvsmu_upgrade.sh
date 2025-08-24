@@ -210,6 +210,20 @@ echo ">>> set_crontab"
 
 FILE_CRON=/etc/crontab
 
+#----------- PATH 추가 ---------------------------------
+if grep -q "SHELL=/bin/" "$FILE_CRON"; then
+    # SHELL=/bin/ 라인과 다음 라인 교체
+    sudo sed -i '/SHELL=\/bin\//{
+        N
+        c\SHELL=/bin/sh\
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    }' "$FILE_CRON"
+else
+    # 맨 앞에 두 줄 삽입
+    sudo sed -i "1i SHELL=/bin/sh\nPATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" "$FILE_CRON"
+fi
+#-------------------------------------------------------
+
 value_time=$(grep -oP 'time=\K[^#\s]+' "$FILE_CRON")
 if [ -z "$value_time" ]; then value_time=5; fi
 
@@ -217,14 +231,12 @@ if grep -q "reboot" "$FILE_CRON"; then
         value_reboot=$(grep -oP 'reboot=\K[^#\s]+' "$FILE_CRON")
 fi
 
-
 sudo sed -i '/time/d' "$FILE_CRON"
 sudo sed -i '/reboot/d' "$FILE_CRON"
 sudo sed -i '/man_log/d' "$FILE_CRON"
 sudo sed -i '/DMRIds_chk.sh/d' "$FILE_CRON"
 sudo sed -i '/bm_watchdog.sh/d' "$FILE_CRON"
 sudo sed -i '/auto_upgrade.sh/d' "$FILE_CRON"
-
 
 echo "#time=$value_time" | sudo tee -a $FILE_CRON > /dev/null 2>&1
 
