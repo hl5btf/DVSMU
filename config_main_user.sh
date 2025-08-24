@@ -435,6 +435,7 @@ user=$user_array
 
 for user in $user; do
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ]; then
+
         source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
         declare usrp_port_chk=$usrp_port
         if [ "$usrp_port_in" = "$usrp_port_chk" ]; then
