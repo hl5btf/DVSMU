@@ -208,6 +208,10 @@ function set_crontab() {
 echo
 echo ">>> set_crontab"
 
+# /etc/crontab에 대한 중복 실행 방지
+exec 9>/var/lock/set_crontab.lock
+flock -w 10 9 || { echo "다른 프로세스가 set_crontab 실행 중"; return 1; }
+
 FILE_CRON=/etc/crontab
 
 #----------- PATH 추가 ---------------------------------
@@ -250,6 +254,10 @@ echo "0 $value_time * * * root flock -n /var/lock/man_log.lock /usr/local/dvs/ma
 echo "28 6 * * * root flock -n /var/lock/DMRIds_chk.lock /usr/local/dvs/DMRIds_chk.sh" | sudo tee -a $FILE_CRON > /dev/null 2>&1
 echo "*/5 * * * * root flock -n /var/lock/bm_watchdog.lock /usr/local/dvs/bm_watchdog.sh" | sudo tee -a $FILE_CRON > /dev/null 2>&1
 echo "33 3 * * * root flock -n /var/lock/auto_upgrade.lock /usr/local/dvs/auto_upgrade.sh" | sudo tee -a $FILE_CRON > /dev/null 2>&1
+
+# CR/LF 제거 및 숫자만 있는 라인 제거
+sudo sed -i 's/\r$//' /etc/crontab
+sudo sed -i -E '/^[[:space:]]*([0-9]+|[0-9]+[[:space:]]+[0-9]+)[[:space:]]*$/d' /etc/crontab
 }
 
 #====== add_variables =============================================
