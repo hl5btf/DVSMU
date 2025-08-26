@@ -208,10 +208,6 @@ function set_crontab() {
 echo
 echo ">>> set_crontab"
 
-# /etc/crontab에 대한 중복 실행 방지
-exec 9>/var/lock/set_crontab.lock
-flock -w 10 9 || { echo "다른 프로세스가 set_crontab 실행 중"; return 1; }
-
 FILE_CRON=/etc/crontab
 
 #----------- PATH 추가 ---------------------------------
