@@ -252,6 +252,7 @@ echo "*/5 * * * * root flock -n /var/lock/bm_watchdog.lock /usr/local/dvs/bm_wat
 echo "33 3 * * * root flock -n /var/lock/auto_upgrade.lock /usr/local/dvs/auto_upgrade.sh" | sudo tee -a $FILE_CRON > /dev/null 2>&1
 
 # CR/LF 제거 및 숫자만 있는 라인 제거
+sleep 0.2
 sudo sed -i 's/\r$//' /etc/crontab
 sudo sed -i -E '/^[[:space:]]*([0-9]+|[0-9]+[[:space:]]+[0-9]+)[[:space:]]*$/d' /etc/crontab
 }
