@@ -13,7 +13,17 @@ fi
 # language.txt 가 없으면 아래 source에서 에러가 발생함
 source /var/lib/dvswitch/dvs/var.txt > /dev/null 2>&1
 
-user_array=(01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40)
+#------ 추가사용자수 max_user 확인  -------------------------------
+shopt -s nullglob; dirs=(/opt/user[0-9][0-9]); shopt -u nullglob
+max_user=0
+for d in "${dirs[@]}"; do
+        n=${d#/opt/user}          # 예: "07", "15"
+        if [[ $n =~ ^[0-9][0-9]$ ]] && (( 10#$n > max_user )); then
+                max_user=$((10#$n))
+        fi
+done
+#echo "$max_user"
+#---------------------------------------------------------------
 
 #====== replace_var00_txt =============================================
 function replace_var00_txt() {
@@ -62,7 +72,10 @@ if [ "$RXFrequency" = "000000000" ]; then
     $update_ini $file $section $tag $value
 fi
 
-for user in "${user_array[@]}"; do
+# 01 ~ max_user 까지만 while 루프 실행
+idx=1
+while (( idx <= max_user )); do
+        user=$(printf "%02d" "$idx")
 source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
     update_ini="sudo /opt/user${user}/dvswitch.sh updateINIFileValue"
@@ -83,6 +96,7 @@ if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
         $update_ini $file $section $tag $value
     fi
 fi
+((idx++))
 done
 }
 
@@ -102,7 +116,10 @@ if [ ! -f "$file" ] || [[ -z $(sudo grep "45039" "$file") ]]; then
     sudo wget -O $file https://raw.githubusercontent.com/hl5btf/DVSMU/main/tgdb_KR/DMR_fvrt_list.txt > /dev/null 2>&1
 fi
 
-for user in "${user_array[@]}"; do
+# 01 ~ max_user 까지만 while 루프 실행
+idx=1
+while (( idx <= max_user )); do
+        user=$(printf "%02d" "$idx")
 source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
     file=/var/lib/dvswitch/dvs/tgdb/user${user}/DMR_fvrt_list.txt
@@ -110,6 +127,7 @@ if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
         sudo wget -O /var/lib/dvswitch/dvs/tgdb/user${user}/DMR_fvrt_list.txt https://raw.githubusercontent.com/hl5btf/DVSMU/main/tgdb_KR/DMR_fvrt_list.txt > /dev/null 2>&1
     fi
 fi
+((idx++))
 done
 }
 
@@ -161,7 +179,10 @@ fi
 ##    $update_ini $file Info Description "${desc}"
 #=================================================================================================
 
-for user in "${user_array[@]}"; do
+# 01 ~ max_user 까지만 while 루프 실행
+idx=1
+while (( idx <= max_user )); do
+        user=$(printf "%02d" "$idx")
 source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
     if ! sudo grep -q "talkerAlias" /var/lib/dvswitch/dvs/var${user}.txt; then
@@ -200,6 +221,7 @@ file_var=/var/lib/dvswitch/dvs/var${user}.txt
         fi
 #    $update_ini $file Info Description "${desc}"
 fi
+((idx++))
 done
 }
 
@@ -286,12 +308,16 @@ file=/var/lib/dvswitch/dvs/var.txt
 file=/var/lib/dvswitch/dvs/var00.txt
     do_add; n=0
 
-for user in "${user_array[@]}"; do
+# 01 ~ max_user 까지만 while 루프 실행
+idx=1
+while (( idx <= max_user )); do
+        user=$(printf "%02d" "$idx")
     source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
     file=/var/lib/dvswitch/dvs/var${user}.txt
     do_add; n=0
 fi
+((idx++))
 done
 }
 
