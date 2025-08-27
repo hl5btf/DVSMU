@@ -398,6 +398,8 @@ fi
 #=======================
 if [ "$1" = "call_from_auto_upgrade" ]; then
 	download_and_update_apps $1
+elif [ "$1" = "call_from_dvsstart" ]; then
+	download_and_update_apps
 elif [ "$1" = "check" ]; then
 	add_talkeralias
 	set_crontab
