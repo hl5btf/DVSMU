@@ -398,6 +398,10 @@ fi
 #=======================
 if [ "$1" = "call_from_auto_upgrade" ]; then
 	download_and_update_apps $1
+elif [ "$1" = "check" ]; then
+	add_talkeralias
+	set_crontab
+	add_variables  
 else
 	replace_var00_txt
 	replace_freq_of_all_users
