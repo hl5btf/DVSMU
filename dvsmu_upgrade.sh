@@ -411,7 +411,7 @@ else
 	add_talkeralias
 	set_crontab
 	add_variables  
-	download_and_update_apps
+	download_and_upgrade_apps
 
 	echo
 	echo "========================="
