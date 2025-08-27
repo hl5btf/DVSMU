@@ -321,11 +321,11 @@ fi
 done
 }
 
-#====== download_and_update_apps =============================================
-function download_and_update_apps() {
+#====== download_and_upgrade_apps =============================================
+function download_and_upgrade_apps() {
 LOG_FILE="/var/log/dvswitch/auto_upgrade.log"
 echo
-echo ">>> download_and_update_apps" | sudo tee -a "$LOG_FILE"
+echo ">>> download_and_upgrade_apps" | sudo tee -a "$LOG_FILE"
 
 if [ "$1" = "call_from_auto_upgrade" ]; then
     files="funcs.sh config_main_user.sh man_log DMRIds_chk.sh bm_watchdog.sh"
@@ -397,9 +397,9 @@ fi
 # MAIN SCRIPT
 #=======================
 if [ "$1" = "call_from_auto_upgrade" ]; then
-	download_and_update_apps $1
+	download_and_upgrade_apps $1
 elif [ "$1" = "call_from_dvsstart" ]; then
-	download_and_update_apps
+	download_and_upgrade_apps
 elif [ "$1" = "check" ]; then
 	add_talkeralias
 	set_crontab
