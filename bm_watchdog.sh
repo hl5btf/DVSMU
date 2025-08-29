@@ -1,9 +1,9 @@
 #!/bin/bash
 
 #===================================
-SCRIPT_VERSION="Menu Script v.1.0"
+SCRIPT_VERSION="Menu Script v.2.0"
 SCRIPT_AUTHOR="HL5KY"
-SCRIPT_DATE="2025/07/09"
+SCRIPT_DATE="2025/08/29"
 #===================================
 
 # 설정
@@ -36,12 +36,24 @@ if [ "$hour" == "03" ]; then
     # 플래그 파일이 없거나, 날짜가 오늘이 아니면 실행
     if [ ! -f "$flagfile" ] || [ "$(cat "$flagfile")" != "$today" ]; then
         echo "$(date '+%Y-%m-%d %H:%M:%S') [•] 최근 $maxline줄만 보존하고 정리함" >> "$logfile"
-	tail -n "$maxline" "$logfile" > "$tmpfile" && cp "$tmpfile" "$logfile"
+	# 뒤에서 부터 남기고 자르기
+	#tail -n "$maxline" "$logfile" > "$tmpfile" && cp "$tmpfile" "$logfile"
+	sudo sh -c "tail -n '$maxline' '$logfile' > '$tmpfile' && cp --preserve=mode,ownership,timestamps '$tmpfile' '$logfile'"
         echo "$today" > "$flagfile"  # 오늘 실행했다고 기록
     fi
 fi
 
-user_array=("" 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40)
+#------ 추가사용자수 max_user 확인  -------------------------------
+shopt -s nullglob; dirs=(/opt/user[0-9][0-9]); shopt -u nullglob
+max_user=0
+for d in "${dirs[@]}"; do
+        n=${d#/opt/user}          # 예: "07", "15"
+        if [[ $n =~ ^[0-9][0-9]$ ]] && (( 10#$n > max_user )); then
+                max_user=$((10#$n))
+        fi
+done
+#echo "$max_user"
+#---------------------------------------------------------------
 
 # msmtp/mail 환경 자동 결정: MAIL_ENV 배열에 env-assignments 세팅
 function prepare_mail_env() {
@@ -90,7 +102,13 @@ is_in_array() {
 }
 
 # now_bm_address 수집
-for user in "${user_array[@]}"; do
+#for user in "${user_array[@]}"; do
+
+# 01 ~ max_user 까지만 while 루프 실행
+idx=1
+while (( idx <= max_user )); do
+        user=$(printf "%02d" "$idx")
+
     var_file="/var/lib/dvswitch/dvs/var${user}.txt"
     unset bm_address
 
@@ -108,10 +126,15 @@ for user in "${user_array[@]}"; do
             fi
         fi
     fi
+((idx++))
 done
 
 # original_bm_address 수집
-for user in "${user_array[@]}"; do
+# 01 ~ max_user 까지만 while 루프 실행
+idx=1
+while (( idx <= max_user )); do
+        user=$(printf "%02d" "$idx")
+
     var_file="/var/lib/dvswitch/dvs/var${user}.txt"
     unset original_bm_address
 
@@ -123,6 +146,7 @@ for user in "${user_array[@]}"; do
             fi
         fi
     fi
+((idx++))
 done
 
 # 결과를 배열로 저장 (bm_list_tmp_file에 덮어쓰기)
@@ -254,7 +278,11 @@ for test_bm_address in "${now_bm_address[@]}"; do
         			echo "$TIME - 대체 주소 사용 가능" >> "$logfile"
 
 				# 주소 전환 처리...
-				for user in "${user_array[@]}"; do
+				# 01 ~ max_user 까지만 while 루프 실행
+				idx=1
+				while (( idx <= max_user )); do
+					user=$(printf "%02d" "$idx")
+
 					source_file=/var/lib/dvswitch/dvs/var${user}.txt
 					source $source_file > /dev/null 2>&1
 					present_bm_address=$bm_address
@@ -317,6 +345,7 @@ fi
 							# 위의 조건뿐만 아니라 email은 관련 프로그램을 설치해야 작동함
 						fi
 					fi
+				((idx++))
 				done
 				break
 			else
@@ -405,7 +434,11 @@ for test_bm_address in "${original_bm_address[@]}"; do
                 echo "$TIME - 복구 조건 충족, 주소 복원 시작" >> "$logfile"
 
 		# 주소 전환 처리...
-        	for user in "${user_array[@]}"; do
+		# 01 ~ max_user 까지만 while 루프 실행
+		idx=1
+		while (( idx <= max_user )); do
+			user=$(printf "%02d" "$idx")
+
         		source_file=/var/lib/dvswitch/dvs/var${user}.txt
 	            	source $source_file > /dev/null 2>&1
 			present_bm_address=$bm_address
@@ -466,6 +499,7 @@ fi
         	        	# 위의 조건뿐만 아니라 email은 관련 프로그램을 설치해야 작동함
 	            		fi
 			fi
+		((idx++))
         	done
 	fi
 done
@@ -509,7 +543,7 @@ restore_bm_address
 #|	if 특정 서버가 결과값인 bm_watchdog_status.txt에서 3회 이상 실패하면
 #|	|	while DMRIds_host.txt에서 하나씩 대체주소 ping 확인- 모든 줄 확인
 #|	|	|	if 대체주소의 ping이 성공하면 주소전환 시작
-#|	|	|	|	for user_array에서 하나씩 do
+#|	|	|	|	while user to max_user에서 하나씩 do
 #|	|	|	|	|	주소전환
 #|	|	|	|	done
 #|	|	|	|	break
