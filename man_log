@@ -1,17 +1,27 @@
 #!/bin/bash
 
 #===================================
-SCRIPT_VERSION="2.0"
+SCRIPT_VERSION="3.0"
 SCRIPT_AUTHOR="HL5KY"
-SCRIPT_DATE="2025/07/07"
+SCRIPT_DATE="2025/08/29"
 #===================================
 
 time_now=$(date +%Y-%m-%d'  '%H:%M:%S)
 FILE_LOG=/var/log/dvswitch/dvsmu.log
 
-user_array="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40"
 
-#echo $time_now
+#------ 추가사용자수 max_user 확인  -------------------------------
+shopt -s nullglob; dirs=(/opt/user[0-9][0-9]); shopt -u nullglob
+max_user=0
+for d in "${dirs[@]}"; do
+        n=${d#/opt/user}          # 예: "07", "15"
+        if [[ $n =~ ^[0-9][0-9]$ ]] && (( 10#$n > max_user )); then
+                max_user=$((10#$n))
+        fi
+done
+#echo "$max_user"
+#---------------------------------------------------------------
+
 
 #=====================================================
 # Function time_chk
@@ -117,9 +127,10 @@ function sub_user_connection_chk() {
 
 con_cl_one_of_sub_users=NO
 
-user=$user_array
-
-for user in $user; do
+# 01 ~ max_user 까지만 while 루프 실행
+idx=1
+while (( idx <= max_user )); do
+        user=$(printf "%02d" "$idx")
 
 dir=/opt/user${user}
 
@@ -171,7 +182,7 @@ if [ "$1" = and_shrink ] && [ $con_cl_user = "NO" ]; then
 fi
 
 fi
-
+((idx++))
 done
 }
 
@@ -259,9 +270,10 @@ fi
 #=====================================================
 function sub_user_busy_check() {
 
-user=$user_array
-
-for user in $user; do
+# 01 ~ max_user 까지만 while 루프 실행
+idx=1
+while (( idx <= max_user )); do
+        user=$(printf "%02d" "$idx")
 
 dir=/opt/user${user}
 source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
@@ -312,7 +324,7 @@ if [ -d $dir ] && [ "$busy_user" != yes ]; then
 #echo ${user}
 
 fi
-
+((idx++))
 done
 }
 
@@ -340,6 +352,11 @@ function do_reboot() {
         file=/etc/crontab
         time_chk
         sudo sed -i -e "/man_log/ c 0 $time * * * root flock -n /var/lock/man_log.lock /usr/local/dvs/man_log" $file
+
+	# CR/LF 제거 및 숫자만 있는 라인 제거
+	sleep 0.2
+	sudo sed -i 's/\r$//' /etc/crontab
+	sudo sed -i -E '/^[[:space:]]*[0-9]+([[:space:]]+[0-9]+)*[[:space:]]*(#[^!]*)?$/d' /etc/crontab
 
 	if sudo grep -q "reboot=yes" "$file"; then
                 log_line="$time_now  ${busy_callsigns}Busy, REBOOT"
@@ -437,6 +454,12 @@ else
         	sudo sed -i "1 i\\$log_line" $FILE_LOG
 
 	fi
+
+	# CR/LF 제거 및 숫자만 있는 라인 제거
+	sleep 0.2
+	sudo sed -i 's/\r$//' /etc/crontab
+	sudo sed -i -E '/^[[:space:]]*[0-9]+([[:space:]]+[0-9]+)*[[:space:]]*(#[^!]*)?$/d' /etc/crontab
+
 	#log_line="$time_now  ${cnted_callsigns}Connected, ${busy_callsigns}Busy, no REBOOT"
 fi
 #-----------------------------------------------------------------
