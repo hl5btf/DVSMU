@@ -727,14 +727,15 @@ esac
 function sys_admin_z() {
 sel=$(whiptail --title " -dvsmuz- 시스템 관리 " --menu "\
 \n
-" 15 50 8 \
+" 16 70 9 \
 "1" "시스템 모니터링" \
 "2" "시스템 최적화" \
 "3" "1일1회 리부팅 설정" \
 "4" "BM 및 클라이언트 연결상태 확인" \
 "5" "업그레이드 -z" \
 "6" "로그 확인 ---> -z" \
-"7" "Back to Main" \
+"7" "자동기능점검 (1분이내)  (Automation feature check)" \
+"8" "Back to Main" \
 3>&1 1>&2 2>&3)
 
 if [ $? != 0 ]; then ${DVS}dvsmu; exit 0
@@ -770,6 +771,8 @@ _upgrade ;;
 6)
 sys_log ;;
 7)
+auto_feature_check_menu ;;
+8)
 ${DVS}dvsmu; exit 0 ;;
 esac
 }
