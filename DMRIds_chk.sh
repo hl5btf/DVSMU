@@ -3,9 +3,9 @@
 source /var/lib/dvswitch/dvs/var.txt
 
 #===================================
-SCRIPT_VERSION="2.0"
+SCRIPT_VERSION="3.0"
 SCRIPT_AUTHOR="HL5KY"
-SCRIPT_DATE="2025/07/07"
+SCRIPT_DATE="2025/08/29"
 #===================================
 
 FILE_DAT=/var/lib/mmdvm/DMRIds.dat
@@ -25,8 +25,10 @@ ORG_NUMBER_HL=1439
 MIN_FILE_SIZE=4584788
 MIN_NUMBER_HL=1429
 
-# MAX_LOG_LINE을 넘으면 오래된 내용부터 자르기
-head -n "$MAX_LOG_LINE" "$FILE_LOG" > "$FILE_TMP" && cp "$FILE_TMP" "$FILE_LOG"
+# MAX_LOG_LINE을넘기면  앞에서부터 남기고 뒷쪽은 자르기
+#head -n "$MAX_LOG_LINE" "$FILE_LOG" > "$FILE_TMP" && cp "$FILE_TMP" "$FILE_LOG"
+sudo sh -c "head -n '$MAX_LOG_LINE' '$FILE_LOG' > '$FILE_TMP' \
+  && cp --preserve=mode,ownership,timestamps '$FILE_TMP' '$FILE_LOG'"
 
 CHK_CALLSIGNS="HL5KY HL5BTF HL5BHH HL5PPT HL2DRY DS5QDR DS5ANY DS5TUK JA2HWE ZL1SN"
 
@@ -191,6 +193,11 @@ else
 	sudo cp -f $FILE_NEW $FILE_BAK
 	log_line="$time  new DMRIds.dat is OK"; logging
 	log_line=--------------------------------------------------; logging
+
+	# CR/LF 제거 및 숫자만 있는 라인 제거
+	sleep 0.2
+	sudo sed -i 's/\r$//' /etc/crontab
+	sudo sed -i -E '/^[[:space:]]*[0-9]+([[:space:]]+[0-9]+)*[[:space:]]*(#[^!]*)?$/d' /etc/crontab
 
 fi
 
