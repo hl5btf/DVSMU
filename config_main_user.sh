@@ -1,9 +1,9 @@
 #!/bin/bash
 
 #===================================
-SCRIPT_VERSION="1.0"
+SCRIPT_VERSION="2.0"
 SCRIPT_AUTHOR="HL5KY"
-SCRIPT_DATE="2025/07/23"
+SCRIPT_DATE="2025/09/29"
 #===================================
 
 source /var/lib/dvswitch/dvs/var.txt
@@ -357,8 +357,17 @@ function main_user_input() {
 
 source /var/lib/dvswitch/dvs/var.txt
 
-user_array="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40"
-
+#------ 추가사용자수 max_user 확인  -------------------------------
+shopt -s nullglob; dirs=(/opt/user[0-9][0-9]); shopt -u nullglob
+max_user=0
+for d in "${dirs[@]}"; do
+        n=${d#/opt/user}          # 예: "07", "15"
+        if [[ $n =~ ^[0-9][0-9]$ ]] && (( 10#$n > max_user )); then
+                max_user=$((10#$n))
+        fi
+done
+#echo "$max_user"
+#---------------------------------------------------------------
 
 clear
 
@@ -431,9 +440,12 @@ if [ $ar_status = "active" ]; then
         fi
 fi
 
-user=$user_array
 
-for user in $user; do
+# 01 ~ max_user 까지만 while 루프 실행
+idx=1
+while (( idx <= max_user )); do
+        user=$(printf "%02d" "$idx")
+
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ]; then
 
         source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
@@ -443,6 +455,7 @@ if [ -e /var/lib/dvswitch/dvs/var${user}.txt ]; then
         fi
 fi
 declare port_check=ok
+((idx++))
 done
 
 #-------------------------------
@@ -464,9 +477,12 @@ if [ $ar_status = "active" ]; then
         fi
 fi
 
-user=$user_array
 
-for user in $user; do
+# 01 ~ max_user 까지만 while 루프 실행
+idx=1
+while (( idx <= max_user )); do
+        user=$(printf "%02d" "$idx")
+
 if [ -e /var/lib/dvswitch/dvs/var${user}.txt ]; then
         source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
         declare usrp_port_chk=$usrp_port
@@ -475,6 +491,7 @@ if [ -e /var/lib/dvswitch/dvs/var${user}.txt ]; then
         fi
 fi
 declare port_check=ok
+((idx++))
 done
 
 done
