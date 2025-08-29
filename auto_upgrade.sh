@@ -2,9 +2,9 @@
 
 # /usr/local/dvs/auto_upgrade.sh
 #===================================
-SCRIPT_VERSION="1.0"
+SCRIPT_VERSION="2.0"
 SCRIPT_AUTHOR="HL5KY"
-SCRIPT_DATE="2025-07-27"
+SCRIPT_DATE="2025-08-29"
 #===================================
 # 외부 스크립트(dvsstart.sh)에서 auto_upgrade.sh를 실행할때 로그기록을 하지 않으려면 sudo env DISABLE_LOG=1 /usr/local/dvs/auto_upgrade.sh
 
@@ -26,8 +26,10 @@ MAX_LINES=300
 # 로그 없으면 생성
 [ -f "$LOG_FILE" ] || sudo touch "$LOG_FILE"
 
-# 로그 줄 수가 MAX_LINES를 넘으면 최근 라인만 유지
-tail -n "$MAX_LINES" "$LOG_FILE" > "$TMP_FILE" && cp "$TMP_FILE" "$LOG_FILE"
+# 로그 줄 수가 MAX_LINES를 넘으면 뒤에서 부터 남기고 앞쪽 자르기
+#tail -n "$MAX_LINES" "$LOG_FILE" > "$TMP_FILE" && cp "$TMP_FILE" "$LOG_FILE"
+sudo sh -c "tail -n '$MAX_LINES' '$LOG_FILE' > '$TMP_FILE' && cp --preserve=mode,ownership,timestamps '$TMP_FILE' '$LOG_FILE'"
+
 
 [ -n "$DISABLE_LOG" ] || echo ">>> AutoUpgrade check started at $(date)" | sudo tee -a "$LOG_FILE"
 # 외부 스크립트에서 auto_upgrade.sh를 실행할때 로그기록을 하지 않으려면 sudo env DISABLE_LOG=1 /usr/local/dvs/auto_upgrade.sh
@@ -48,10 +50,23 @@ if dpkg -l | grep -q "^ii  dvswitch-server" && apt-get -s upgrade | grep -q "^In
 	main_user_dvswitch_upgrade
 	[ -n "$DISABLE_LOG" ] || echo "> Found upgrade of DVSwitch" | sudo tee -a "$LOG_FILE"
 
-	user_array="01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40"
+#------ 추가사용자수 max_user 확인  -------------------------------
+shopt -s nullglob; dirs=(/opt/user[0-9][0-9]); shopt -u nullglob
+max_user=0
+for d in "${dirs[@]}"; do
+        n=${d#/opt/user}          # 예: "07", "15"
+        if [[ $n =~ ^[0-9][0-9]$ ]] && (( 10#$n > max_user )); then
+                max_user=$((10#$n))
+        fi
+done
+#echo "$max_user"
+#---------------------------------------------------------------
 
-	for user in $user_array; do
- 
+	# 01 ~ max_user 까지만 while 루프 실행
+	idx=1
+	while (( idx <= max_user )); do
+        user=$(printf "%02d" "$idx")
+
 		source /var/lib/dvswitch/dvs/var${user}.txt > /dev/null 2>&1
   		if [ -e /var/lib/dvswitch/dvs/var${user}.txt ] && [ x${call_sign} != x ]; then
     		sudo systemctl stop mmdvm_bridge${user} analog_bridge${user} md380-emu${user} > /dev/null 2>&1
@@ -62,6 +77,7 @@ if dpkg -l | grep -q "^ii  dvswitch-server" && apt-get -s upgrade | grep -q "^In
     		file_copy_and_initialize ${user}
     		var_to_ini ${user} upgrade
 		fi
+	((idx++))
 	done
 	[ -n "$DISABLE_LOG" ] || echo "> DVSwitch upgrade done" | sudo tee -a "$LOG_FILE"
 else
