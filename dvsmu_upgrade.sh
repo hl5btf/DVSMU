@@ -403,7 +403,8 @@ elif [ "$1" = "call_from_dvsstart" ]; then
 elif [ "$1" = "amend" ]; then
 	add_talkeralias
 	set_crontab
-	add_variables  
+	add_variables
+ 	download_and_upgrade_apps
 else
 	replace_var00_txt
 	replace_freq_of_all_users
