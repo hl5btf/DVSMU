@@ -3,7 +3,7 @@
 #===================================
 SCRIPT_VERSION="1.0"
 SCRIPT_AUTHOR="HL5KY"
-SCRIPT_DATE="2025/07/22"
+SCRIPT_DATE="2025/07/23"
 #===================================
 
 source /var/lib/dvswitch/dvs/var.txt
