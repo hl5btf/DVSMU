@@ -400,6 +400,10 @@ if [ "$1" = "call_from_auto_upgrade" ]; then
 	download_and_upgrade_apps $1
 elif [ "$1" = "call_from_dvsstart" ]; then
 	download_and_upgrade_apps
+elif [ "$1" = "call_from_dvsmu" ]; then
+	add_talkeralias
+	set_crontab
+	add_variables
 elif [ "$1" = "amend" ]; then
 	add_talkeralias
 	set_crontab
