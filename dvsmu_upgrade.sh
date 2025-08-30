@@ -325,7 +325,7 @@ done
 function download_and_upgrade_apps() {
 LOG_FILE="/var/log/dvswitch/auto_upgrade.log"
 echo
-echo ">>> download_and_upgrade_apps" | sudo tee -a "$LOG_FILE"
+echo ">>> $(date) download_and_upgrade_apps" | sudo tee -a "$LOG_FILE"
 
 if [ "$1" = "call_from_auto_upgrade" ]; then
     files="funcs.sh config_main_user.sh man_log DMRIds_chk.sh bm_watchdog.sh"
