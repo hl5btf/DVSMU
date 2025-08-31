@@ -102,15 +102,18 @@ is_in_array() {
 }
 
 # now_bm_address 수집
-#for user in "${user_array[@]}"; do
-
 # 01 ~ max_user 까지만 while 루프 실행
-idx=1
+unset bm_address
+idx=""
 while (( idx <= max_user )); do
-        user=$(printf "%02d" "$idx")
+	if [ "$idx" = "" ]; then
+		user=""
+	else
+		user=$(printf "%02d" "$idx")
+	fi
+
 
     var_file="/var/lib/dvswitch/dvs/var${user}.txt"
-    unset bm_address
 
     if [ -f "$var_file" ]; then
         source "$var_file"
@@ -131,12 +134,16 @@ done
 
 # original_bm_address 수집
 # 01 ~ max_user 까지만 while 루프 실행
-idx=1
+unset original_bm_address
+idx=""
 while (( idx <= max_user )); do
-        user=$(printf "%02d" "$idx")
+	if [ "$idx" = "" ]; then
+		user=""
+	else
+		user=$(printf "%02d" "$idx")
+	fi
 
     var_file="/var/lib/dvswitch/dvs/var${user}.txt"
-    unset original_bm_address
 
     if [ -f "$var_file" ]; then
         source "$var_file"
@@ -278,10 +285,14 @@ for test_bm_address in "${now_bm_address[@]}"; do
         			echo "$TIME - 대체 주소 사용 가능" >> "$logfile"
 
 				# 주소 전환 처리...
-				# 01 ~ max_user 까지만 while 루프 실행
-				idx=1
+				# "" ~ max_user 까지만 while 루프 실행
+				idx=""
 				while (( idx <= max_user )); do
-					user=$(printf "%02d" "$idx")
+					if [ "$idx" = "" ]; then
+						user=""
+					else
+						user=$(printf "%02d" "$idx")
+					fi
 
 					source_file=/var/lib/dvswitch/dvs/var${user}.txt
 					source $source_file > /dev/null 2>&1
@@ -434,10 +445,14 @@ for test_bm_address in "${original_bm_address[@]}"; do
                 echo "$TIME - 복구 조건 충족, 주소 복원 시작" >> "$logfile"
 
 		# 주소 전환 처리...
-		# 01 ~ max_user 까지만 while 루프 실행
-		idx=1
+		# "" ~ max_user 까지만 while 루프 실행
+		idx=""
 		while (( idx <= max_user )); do
-			user=$(printf "%02d" "$idx")
+			if [ "$idx" = "" ]; then
+				user=""
+			else
+				user=$(printf "%02d" "$idx")
+			fi
 
         		source_file=/var/lib/dvswitch/dvs/var${user}.txt
 	            	source $source_file > /dev/null 2>&1
