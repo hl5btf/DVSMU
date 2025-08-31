@@ -11,7 +11,7 @@ sel=$(whiptail --title " bm_watchdog_test " --menu "\
 "1" "DMR_Hosts.txt" \
 "2" "bm_present_list.txt" \
 "3" "bm_watchdog_status.txt" \
-"4" "reserved" \
+"4" "수정" \
 "5" "실행" \
 "6" "var.txt" \
 "7" "var01.txt" \
@@ -30,7 +30,7 @@ sudo nano /var/tmp/bm_present_list.txt; ${DVS}dvsman bm_test; exit 0 ;;
 3)
 sudo nano /var/tmp/bm_watchdog_status.txt; ${DVS}dvsman bm_test; exit 0 ;;
 4)
-sudo nano /var/lib/mmdvm/DMR_Hosts.txt; ${DVS}dvsman bm_test; exit 0 ;;
+sudo nano /usr/local/dvs/bm_watchdog.sh; ${DVS}dvsman bm_test; exit 0 ;;
 5)
 sudo ${DVS}bm_watchdog.sh; ${DVS}dvsman bm_test; exit 0 ;;
 6)
