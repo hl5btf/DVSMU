@@ -1,9 +1,9 @@
 #!/bin/bash
 
 #===================================
-SCRIPT_VERSION="Menu Script v.2.0"
+SCRIPT_VERSION="Menu Script v.2.1"
 SCRIPT_AUTHOR="HL5KY"
-SCRIPT_DATE="2025/08/29"
+SCRIPT_DATE="2025/11/13"
 #===================================
 
 # 설정
