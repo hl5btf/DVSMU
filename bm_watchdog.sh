@@ -12,7 +12,7 @@ bm_list_tmp_file="/var/tmp/bm_present_list.txt"
 bm_status_tmp_file="/var/tmp/bm_watchdog_status.txt"
 logfile="/var/log/dvswitch/bm_watchdog.log"
 tmpfile="/var/log/dvswitch/bm.trim"
-maxline=500
+maxline=3000
 email="onetree9@gmail.com"
 
 # file이 없으면 새로 만들기
