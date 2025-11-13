@@ -2,9 +2,9 @@
 
 # /usr/local/dvs/auto_upgrade.sh
 #===================================
-SCRIPT_VERSION="2.0"
+SCRIPT_VERSION="2.1"
 SCRIPT_AUTHOR="HL5KY"
-SCRIPT_DATE="2025-08-29"
+SCRIPT_DATE="2025-11-13"
 #===================================
 # 외부 스크립트(dvsstart.sh)에서 auto_upgrade.sh를 실행할때 로그기록을 하지 않으려면 sudo env DISABLE_LOG=1 /usr/local/dvs/auto_upgrade.sh
 
@@ -21,7 +21,7 @@ source /usr/local/dvs/funcs.sh
 
 LOG_FILE="/var/log/dvswitch/auto_upgrade.log"
 TMP_FILE="/var/log/dvswitch/auto_upgrade.trim"
-MAX_LINES=300
+MAX_LINES=1000
 
 # 로그 없으면 생성
 [ -f "$LOG_FILE" ] || sudo touch "$LOG_FILE"
