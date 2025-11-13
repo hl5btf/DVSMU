@@ -488,7 +488,7 @@ sel=$(whiptail --title " 로그 확인 " --menu "\
 " 15 50 6 \
 "1" "dvsmu.log 열기" \
 "2" "auto_upgrade.log 열기" \
-"3" "bm_watchdog.txt 열기" \
+"3" "bm_watchdog.log 열기" \
 "4" "dvsstart-runner.sh 열기" \
 "5" "crontab 열기" \
 "6" "Back to Main" \
