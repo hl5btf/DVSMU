@@ -312,7 +312,7 @@ for test_bm_address in "${now_bm_address[@]}"; do
 					        $update_ini "$ini_file" "DMR Network" Address "$new_address"
 					        sudo systemctl restart mmdvm_bridge${user}
 
-				        	echo "$TIME - USER${user} 전환 완료: $present_bm_address -> $new_address" >> "$logfile"
+				        	echo "$TIME - USER${user} $call_sign 전환 완료: $present_bm_address -> $new_address" >> "$logfile"
 
 						# 임시 변수 지우기
                                                 sed -i "/^${bm_prefix_ping_ok}=.*/d" "$bm_status_tmp_file"
@@ -336,7 +336,7 @@ if [ -n "$MSMTP_CFG" ] && [ -d "$REAL_HOME" ]; then
   "$MAIL_BIN" -a 'Content-Type: text/plain; charset=UTF-8' \
               -s "$SUBJECT" "$TO" <<EOF
 ${TIME:-$(date '+%F %T')}
-USER${user:-}
+USER${user:-} $call_sign
 초기 설정 주소: ${present_bm_address:-unknown}}
 대체 변경 주소: ${new_address:-unknown}
 EOF
@@ -344,7 +344,7 @@ else
   "$MAIL_BIN" -a 'Content-Type: text/plain; charset=UTF-8' \
               -s "$SUBJECT" "$TO" <<EOF
 ${TIME:-$(date '+%F %T')}
-USER${user:-}
+USER${user:-} $call_sign
 초기 설정 주소: ${present_bm_address:-${bm_address:-unknown}}
 대체 변경 주소: ${new_address:-unknown}
 EOF
@@ -469,7 +469,7 @@ for test_bm_address in "${original_bm_address[@]}"; do
 		                $update_ini "$ini_file" "DMR Network" Address "$test_bm_address"
         		        sudo systemctl restart mmdvm_bridge${user}
 
-                                echo "$TIME - USER${user} 복원 성공: $present_bm_address -> $test_bm_address" >> "$logfile"
+                                echo "$TIME - USER${user} $call_sign 복원 성공: $present_bm_address -> $test_bm_address" >> "$logfile"
 
 		                # 임시 변수 지우기
         		        sed -i "/^${bm_prefix_ping_ok}=.*/d" "$bm_status_tmp_file"
@@ -495,17 +495,17 @@ if [ -n "$MSMTP_CFG" ] && [ -d "$REAL_HOME" ]; then
   "$MAIL_BIN" -a 'Content-Type: text/plain; charset=UTF-8' \
               -s "$SUBJECT" "$TO" <<EOF
 ${TIME:-$(date '+%F %T')}
-USER${user:-}
+USER${user:-} $call_sign
 임시 사용 주소: ${present_bm_address:-unknown}}
-복원된 원래 주소: ${new_address:-unknown}
+복원된 원래 주소: ${test_bm_address:-unknown}
 EOF
 else
   "$MAIL_BIN" -a 'Content-Type: text/plain; charset=UTF-8' \
               -s "$SUBJECT" "$TO" <<EOF
 ${TIME:-$(date '+%F %T')}
-USER${user:-}
+USER${user:-} $call_sign
 임시 사용 주소: ${present_bm_address:-unknown}}
-복원된 원래 주소: ${new_address:-unknown}
+복원된 원래 주소: ${test_bm_address:-unknown}
 EOF
 fi
 	        	        # 다음의 두 가지 조건에 맞으면 email 전송
